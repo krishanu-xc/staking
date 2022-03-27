@@ -1288,7 +1288,7 @@ const Staking = () => {
 
     const ethers = require("ethers");
 
-    const provider1 = new ethers.providers.Web3Provider(window.ethereum);
+    const provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
     const _signer = provider1.getSigner();
 
     const nftStakingContract = new ethers.Contract(nftContractAddress, nftContractABI, _signer);
@@ -1339,7 +1339,7 @@ const Staking = () => {
 
     const setupMultiCallContract = async (nftAddress, nftABI) => {
       const provider = new ethers.providers.Web3Provider(
-        window.ethereum,
+        web3.currentProvider,
         "any"
       );
       const ethcallProvider = new MulticallProvider(provider);
@@ -1961,7 +1961,7 @@ const Staking = () => {
 
     // init nft contract(not staking)
     const ethers = require("ethers");
-    const provider1 = new ethers.providers.Web3Provider(window.ethereum);
+    const provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
     const _signer = provider1.getSigner();
 
     const contract = new ethers.Contract(nftAddress, nftABI, _signer);

@@ -1629,7 +1629,7 @@ export const nftABI = [
     }
 ]
 
-export const nftContractAddress = '0xfE5194fF2D8fb9728e60d9b59991fE1dfE300ca6'
+export const nftContractAddress = '0xfe5194ff2d8fb9728e60d9b59991fe1dfe300ca6'
 
 export const nftContractABI = [
     {
