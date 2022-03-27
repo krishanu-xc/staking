@@ -1433,7 +1433,7 @@ const Staking = () => {
       for (let i = 0; i < result.length; i++) {
         const element = result[i];
         // getRewardsByID
-        const res = await nftContract.methods.getRewardsByID(nftAddress, element.id).call({ from: address });
+        const res = await nftContract.getReward(element.id);
 
         rewarding.push({
           id: element.id,
@@ -1961,9 +1961,10 @@ const Staking = () => {
 
     // init nft contract(not staking)
     const ethers = require("ethers");
-    let provider = new ethers.providers.JsonRpcProvider("https://api.s0.b.hmny.io");
+    const provider1 = new ethers.providers.Web3Provider(window.ethereum);
+    const _signer = provider1.getSigner();
 
-    const contract = new ethers.Contract(nftAddress, nftABI, provider);
+    const contract = new ethers.Contract(nftAddress, nftABI, _signer);
 
     try {
       const checkApproval = await contract.isApprovedForAll(address, nftContractAddress);
@@ -1973,7 +1974,7 @@ const Staking = () => {
       }
       const transaction = await nftContract.stakeNFT(filtered);
       const finishTxn = await transaction.wait();
-      toast.success(`${filtered.length} token staked successfully.`)
+      toast.success(`${filtered.length} Nfts successfully staked.`)
       console.log(finishTxn)
       // getNFTBalance();
       // deselectAllNFT1();
@@ -1996,11 +1997,19 @@ const Staking = () => {
       rewardItems.forEach(elem => {
         if (checkedItems2[elem.name])
           ids.push(elem.id)
-      })
-      const res = await nftContract.methods.batchUnstake(nftAddress, ids).send({ from: address });
+      });
 
-      getNFTBalance();
-      deselectAllNFT2();
+      console.log(ids, '+++')
+
+      const webRequest = await axios.get("http://104.197.187.131/");
+      const { signature, address, types, voucher, finalPrice } = webRequest.data;
+      const transaction = await nftContract.claimRewards(ids, [voucher.price, voucher.time, signature]);
+      const finishTxn = await transaction.wait();
+      toast.success(`${ids.length} NFts were successfully claimed.`)
+      console.log(finishTxn);
+
+      // getNFTBalance();
+      // deselectAllNFT2();
     } catch (error) {
       toast.error(error.message)
       console.log(error)
@@ -2035,7 +2044,7 @@ const Staking = () => {
       const transaction = await nftContract.unstakeTokens(filtered, [voucher.price.toString(), voucher.time.toString(), signature]);
       const finishTxn = await transaction.wait();
       console.log(finishTxn);
-      toast.success(`${filtered.length} token staked successfully.`)
+      toast.success(`${filtered.length} NFts were successfully unstaked.`)
       // getNFTBalance();
       // deselectAllNFT1();
     } catch (error) {
