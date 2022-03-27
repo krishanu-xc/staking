@@ -26,6 +26,7 @@ import AddIcon from '@material-ui/icons/Add';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import UnlocksModal from '../components/Staking/UnlocksModal'
 import { Provider as MulticallProvider, Contract as MulticallContract } from "ethers-multicall";
+import axios from 'axios'
 
 const useStyles = makeStyles((theme) => ({
   leftSide: {
@@ -1286,9 +1287,11 @@ const Staking = () => {
     });
 
     const ethers = require("ethers");
-    let provider1 = new ethers.providers.JsonRpcProvider("https://api.s0.b.hmny.io");
 
-    const nftStakingContract = new ethers.Contract(nftContractAddress, nftContractABI, provider1);
+    const provider1 = new ethers.providers.Web3Provider(window.ethereum);
+    const _signer = provider1.getSigner();
+
+    const nftStakingContract = new ethers.Contract(nftContractAddress, nftContractABI, _signer);
 
     dispatch({
       type: 'SET_NFT_CONTRACT',
@@ -1366,7 +1369,6 @@ const Staking = () => {
           throw new Error(response.statusText);
 
         const json = await response;
-        console.log(element, json, '_________________')
         // return {
         //   id: element,
         //   name: json.name,
@@ -1384,6 +1386,7 @@ const Staking = () => {
       }
     })
     const itemsArr = await Promise.all(promises)
+    console.log(promises, '*************')
 
     dispatch({
       type: 'SET_CURRENT_ITEMS',
@@ -1392,22 +1395,29 @@ const Staking = () => {
 
     // getting staked nfts
 
-    // const stakedIds = await nftContract.methods.getStakedIDs(nftAddress).call({ from: address });
-    const stakedIds = []
+    const stakedOnes = await nftContract.getUserStaked(address);
+    const stakedIds = stakedOnes.map((e) => Number(e))
+    console.log(stakedIds, '+++')
 
     const stakedPromises = stakedIds.map(async (element) => {
-      const uri = await contract.methods.tokenURI(element).call({ from: address });
+      const uri = await contract.tokenURI(element);
       const response = await fetch(uri);
 
       if (!response.ok)
         throw new Error(response.statusText);
 
-      const json = await response.json();
+      const json = await response;
+      // return {
+      //   id: element,
+      //   name: json.name,
+      //   key: json.dna,
+      //   url: json.image
+      // }
       return {
         id: element,
-        name: json.name,
-        key: json.dna,
-        url: json.image
+        name: element,
+        key: element,
+        url: '/buy-button.png'
       }
     })
     const result = await Promise.all(stakedPromises)
@@ -1943,26 +1953,6 @@ const Staking = () => {
       return;
     }
 
-    // try {
-    //   const contract = new web3.eth.Contract(nftABI, nftAddress);
-
-    //   for (let i = 0; i < currentItems.length; i++) {
-    //     const elem = currentItems[i];
-    //     if (!checkedItems[elem.name]) continue;
-    //     const isApproved = await contract.methods.getApproved(elem.id);
-    //     if (isApproved !== nftContractAddress)
-    //       await contract.methods.approve(nftContractAddress, elem.id).send({ from: address });
-    //     const res = await nftContract.methods.stake(nftAddress, elem.id).send({ from: address });
-
-    //     toast.success(`Claimed ${elem.id} token`)
-    //   }
-    //   getNFTBalance();
-    //   deselectAllNFT();
-    // } catch (error) {
-    //   toast.error(error.message)
-    //   console.log(error)
-    // }
-
     function isSelected(elem) {
       return checkedItems[elem.name];
     }
@@ -1973,13 +1963,7 @@ const Staking = () => {
     const ethers = require("ethers");
     let provider = new ethers.providers.JsonRpcProvider("https://api.s0.b.hmny.io");
 
-    let signer;
-    provider.listAccounts().then((accounts) => {
-      signer = provider.getSigner(accounts[1]);
-      console.log(signer, accounts);
-    });
-
-    const contract = new ethers.Contract(nftAddress, nftABI, signer);
+    const contract = new ethers.Contract(nftAddress, nftABI, provider);
 
     try {
       const checkApproval = await contract.isApprovedForAll(address, nftContractAddress);
@@ -1989,7 +1973,10 @@ const Staking = () => {
       }
       const transaction = await nftContract.stakeNFT(filtered);
       const finishTxn = await transaction.wait();
+      toast.success(`${filtered.length} token staked successfully.`)
       console.log(finishTxn)
+      // getNFTBalance();
+      // deselectAllNFT1();
     }
     catch (e) {
       console.log(e);
@@ -2032,16 +2019,25 @@ const Staking = () => {
       return;
     }
 
-    try {
-      for (let i = 0; i < stakedItems.length; i++) {
-        const elem = stakedItems[i];
-        if (!checkedItems1[elem.name]) continue;
-        const res = await nftContract.methods.unstake(nftAddress, elem.id).send({ from: address });
+    function isSelected(elem) {
+      return checkedItems1[elem.name];
+    }
 
-        toast.success(`Unstaked ${elem.id} token`)
-      }
-      getNFTBalance();
-      deselectAllNFT1();
+    let filtered = stakedItems.filter(isSelected).map((a) => a.id)
+
+    console.log(filtered, '_+_+_+_+_+_+_+')
+
+    try {
+      const webRequest = await axios.get("http://104.197.187.131/");
+      const { signature, address, types, voucher, finalPrice } = webRequest.data;
+      console.log(voucher)
+      console.log(filtered, [voucher.price.toString(), voucher.time.toString(), signature], '*******')
+      const transaction = await nftContract.unstakeTokens(filtered, [voucher.price.toString(), voucher.time.toString(), signature]);
+      const finishTxn = await transaction.wait();
+      console.log(finishTxn);
+      toast.success(`${filtered.length} token staked successfully.`)
+      // getNFTBalance();
+      // deselectAllNFT1();
     } catch (error) {
       toast.error(error.message)
       console.log(error)
