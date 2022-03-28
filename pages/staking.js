@@ -1232,7 +1232,6 @@ const Staking = () => {
       providerOptions // required
     });
     web3Modal.clearCachedProvider();
-    //var provider
 
     const provider = await web3Modal.connect();
     const web3 = new Web3(provider);
@@ -1323,18 +1322,14 @@ const Staking = () => {
   }, [nftContract])
 
   const getNFTBalance = async () => {
-    // const contract = new web3.eth.Contract(nftABI, nftAddress);
     const ethers = require("ethers");
 
     let provider = new ethers.providers.JsonRpcProvider("https://api.s0.b.hmny.io");
 
     //Contract
-    // const stakingContract = new ethers.Contract(STAKING_CONTRACT_ADDRESS, stakingAbi, provider);
     const contract = new ethers.Contract(nftAddress, nftABI, provider);
 
     const balance = await contract.balanceOf(address);
-
-    let nftIds = [];
 
     const setupMultiCallContract = async (nftAddress, nftABI) => {
       const provider = new ethers.providers.Web3Provider(
@@ -1358,7 +1353,6 @@ const Staking = () => {
     }
     const userTokens = (await multicallProvider?.all(tokenCalls)).map(e => e.toString());
 
-    // getting unstaked nfts
     const promises = userTokens.map(async (element) => {
       try {
         const uri = await contract.tokenURI(element);
@@ -1390,8 +1384,6 @@ const Staking = () => {
       type: 'SET_CURRENT_ITEMS',
       currentItems: itemsArr
     });
-
-    // getting staked nfts
 
     const stakedOnes = await nftContract.getUserStaked(address);
     const stakedIds = stakedOnes.map((e) => Number(e))
@@ -1450,7 +1442,6 @@ const Staking = () => {
       rewardItems: rewarding
     });
 
-    // const total = await nftContract.methods.getTotalRewards(nftAddress).call({ from: address });
     dispatch({
       type: 'SET_TOTAL_REWARDS',
       totalRewards: sumUpRewards
@@ -1799,8 +1790,6 @@ const Staking = () => {
 
     toast.info('Please Wait Till The Transaction Succeeds')
 
-    // await stakingContract.methods.updateStakedTime().call({ from: address });
-
     stakingContract.methods.redeem(amount).send({ from: address })
       .on('receipt', receipt => {
         toast.success('Wormhole Withdrawal Success')
@@ -1956,7 +1945,6 @@ const Staking = () => {
 
     let filtered = currentItems.filter(isSelected).map((a) => a.id)
 
-    // init nft contract(not staking)
     const ethers = require("ethers");
     const provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
     const _signer = provider1.getSigner();
