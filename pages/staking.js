@@ -1999,15 +1999,23 @@ const Staking = () => {
           ids.push(elem.id)
       });
 
-      console.log(ids, '+++')
-
       const webRequest = await axios.get("http://104.197.187.131/");
       const { signature, address, types, voucher, finalPrice } = webRequest.data;
-      const transaction = await nftContract.claimRewards(ids, [voucher.price, voucher.time, signature]);
-      const finishTxn = await transaction.wait();
-      toast.success(`${ids.length} NFts were successfully claimed.`)
-      console.log(finishTxn);
 
+      const ethers = require("ethers");
+
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: `0x${(1666700000).toString(16)}` }],
+      });
+      const _provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
+      const _signer = await _provider1.getSigner();
+      let add = await _signer.getAddress()
+      let _nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress)
+      console.log(_nftContract.address)
+      const transaction = await _nftContract.methods?.claimRewards(ids.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add, gas: 1000000 });
+
+      toast.success(`${ids.length} NFts were successfully claimed.`)
       getNFTBalance();
       deselectAllNFT2();
     } catch (error) {
@@ -2051,7 +2059,7 @@ const Staking = () => {
       let add = await _signer.getAddress()
       let _nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress)
       console.log(_nftContract.address)
-      const transaction = await _nftContract.methods?.unstakeTokens(filtered.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add });
+      const transaction = await _nftContract.methods?.unstakeTokens(filtered.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add, gas: 1000000 });
 
 
       toast.success(`${filtered.length} NFts were successfully unstaked.`)
