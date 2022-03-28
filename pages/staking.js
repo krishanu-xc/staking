@@ -1976,8 +1976,8 @@ const Staking = () => {
       const finishTxn = await transaction.wait();
       toast.success(`${filtered.length} Nfts successfully staked.`)
       console.log(finishTxn)
-      // getNFTBalance();
-      // deselectAllNFT1();
+      getNFTBalance();
+      deselectAllNFT1();
     }
     catch (e) {
       console.log(e);
@@ -2008,8 +2008,8 @@ const Staking = () => {
       toast.success(`${ids.length} NFts were successfully claimed.`)
       console.log(finishTxn);
 
-      // getNFTBalance();
-      // deselectAllNFT2();
+      getNFTBalance();
+      deselectAllNFT2();
     } catch (error) {
       toast.error(error.message)
       console.log(error)
@@ -2039,14 +2039,24 @@ const Staking = () => {
     try {
       const webRequest = await axios.get("http://104.197.187.131/");
       const { signature, address, types, voucher, finalPrice } = webRequest.data;
-      console.log(voucher)
-      console.log(filtered, [voucher.price.toString(), voucher.time.toString(), signature], '*******')
-      const transaction = await nftContract.unstakeTokens(filtered, [voucher.price.toString(), voucher.time.toString(), signature]);
-      const finishTxn = await transaction.wait();
-      console.log(finishTxn);
+
+      const ethers = require("ethers");
+
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: `0x${(1666700000).toString(16)}` }],
+      });
+      const _provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
+      const _signer = await _provider1.getSigner();
+      let add = await _signer.getAddress()
+      let _nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress)
+      console.log(_nftContract.address)
+      const transaction = await _nftContract.methods?.unstakeTokens(filtered.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add });
+
+
       toast.success(`${filtered.length} NFts were successfully unstaked.`)
-      // getNFTBalance();
-      // deselectAllNFT1();
+      getNFTBalance();
+      deselectAllNFT1();
     } catch (error) {
       toast.error(error.message)
       console.log(error)
