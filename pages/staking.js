@@ -1333,7 +1333,6 @@ const Staking = () => {
     const contract = new ethers.Contract(nftAddress, nftABI, provider);
 
     const balance = await contract.balanceOf(address);
-    console.log(Number(balance), address, '+++')
 
     let nftIds = [];
 
@@ -1386,7 +1385,6 @@ const Staking = () => {
       }
     })
     const itemsArr = await Promise.all(promises)
-    console.log(promises, '*************')
 
     dispatch({
       type: 'SET_CURRENT_ITEMS',
@@ -1397,7 +1395,6 @@ const Staking = () => {
 
     const stakedOnes = await nftContract.getUserStaked(address);
     const stakedIds = stakedOnes.map((e) => Number(e))
-    console.log(stakedIds, '+++')
 
     const stakedPromises = stakedIds.map(async (element) => {
       const uri = await contract.tokenURI(element);
@@ -1975,7 +1972,6 @@ const Staking = () => {
       const transaction = await nftContract.stakeNFT(filtered);
       const finishTxn = await transaction.wait();
       toast.success(`${filtered.length} Nfts successfully staked.`)
-      console.log(finishTxn)
       getNFTBalance();
       deselectAllNFT1();
     }
@@ -2012,7 +2008,6 @@ const Staking = () => {
       const _signer = await _provider1.getSigner();
       let add = await _signer.getAddress()
       let _nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress)
-      console.log(_nftContract.address)
       const transaction = await _nftContract.methods?.claimRewards(ids.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add, gas: 1000000 });
 
       toast.success(`${ids.length} NFts were successfully claimed.`)
@@ -2042,8 +2037,6 @@ const Staking = () => {
 
     let filtered = stakedItems.filter(isSelected).map((a) => a.id)
 
-    console.log(filtered, '_+_+_+_+_+_+_+')
-
     try {
       const webRequest = await axios.get("http://104.197.187.131/");
       const { signature, address, types, voucher, finalPrice } = webRequest.data;
@@ -2058,7 +2051,6 @@ const Staking = () => {
       const _signer = await _provider1.getSigner();
       let add = await _signer.getAddress()
       let _nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress)
-      console.log(_nftContract.address)
       const transaction = await _nftContract.methods?.unstakeTokens(filtered.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add, gas: 1000000 });
 
 
