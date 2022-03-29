@@ -1271,19 +1271,19 @@ const Staking = () => {
       web3: web3
     });
 
-    const singleStakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
+    // const singleStakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
 
-    dispatch({
-      type: 'SET_SINGLE_CONTRACT',
-      singleContract: singleStakingContract
-    });
+    // dispatch({
+    //   type: 'SET_SINGLE_CONTRACT',
+    //   singleContract: singleStakingContract
+    // });
 
-    const lockStakingContract = new web3.eth.Contract(lockAbi, lockContractAddress)
+    // const lockStakingContract = new web3.eth.Contract(lockAbi, lockContractAddress)
 
-    dispatch({
-      type: 'SET_LOCK_CONTRACT',
-      lockContract: lockStakingContract
-    });
+    // dispatch({
+    //   type: 'SET_LOCK_CONTRACT',
+    //   lockContract: lockStakingContract
+    // });
 
     const ethers = require("ethers");
 
@@ -1297,26 +1297,26 @@ const Staking = () => {
       nftContract: nftStakingContract
     });
 
-    const lockXgravContracts = new web3.eth.Contract(lockXGRAVAbi, lockXGRAVContractAddress);
+    // const lockXgravContracts = new web3.eth.Contract(lockXGRAVAbi, lockXGRAVContractAddress);
 
-    dispatch({
-      type: 'SET_XGRAV_LOCK_CONTRACT',
-      lockXgravContract: lockXgravContracts
-    });
+    // dispatch({
+    //   type: 'SET_XGRAV_LOCK_CONTRACT',
+    //   lockXgravContract: lockXgravContracts
+    // });
   }
-
-  useEffect(() => {
-    singleContract && getBalance();
-  }, [singleContract])
-
-  useEffect(() => {
-    lockContract && getLockStakingBalance();
-  }, [lockContract])
-
-  useEffect(() => {
-    lockXgravContract && getXgravLockStakingBalance();
-  }, [lockXgravContract])
-
+  /*
+    useEffect(() => {
+      singleContract && getBalance();
+    }, [singleContract])
+  
+    useEffect(() => {
+      lockContract && getLockStakingBalance();
+    }, [lockContract])
+  
+    useEffect(() => {
+      lockXgravContract && getXgravLockStakingBalance();
+    }, [lockXgravContract])
+  */
   useEffect(() => {
     nftContract && getNFTBalance();
   }, [nftContract])
@@ -1340,7 +1340,7 @@ const Staking = () => {
 
       await ethcallProvider.init();
       ethcallProvider._multicallAddress =
-        '0xd078799c53396616844e2fa97f0dd2b4c145a685';
+        '0x34b415f4d3b332515e66f70595ace1dcf36254c5';
 
       const multicallContract = new MulticallContract(nftAddress, nftABI);
       return ([ethcallProvider, multicallContract]);
@@ -1983,7 +1983,7 @@ const Staking = () => {
           ids.push(elem.id)
       });
 
-      const webRequest = await axios.get("http://104.197.187.131/");
+      const webRequest = await axios.get("https://oneverse-backend.vercel.app/api/price");
       const { signature, address, types, voucher, finalPrice } = webRequest.data;
 
       const ethers = require("ethers");
@@ -2026,7 +2026,7 @@ const Staking = () => {
     let filtered = stakedItems.filter(isSelected).map((a) => a.id)
 
     try {
-      const webRequest = await axios.get("http://104.197.187.131/");
+      const webRequest = await axios.get("https://oneverse-backend.vercel.app/api/price");
       const { signature, address, types, voucher, finalPrice } = webRequest.data;
 
       const ethers = require("ethers");
