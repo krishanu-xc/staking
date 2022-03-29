@@ -1211,7 +1211,7 @@ export const tokenAbi = [
     }
 ]
 
-export const nftAddress = '0xfA764110CFCd7175B5b9A081b9426cfe5dEbEd58'
+export const nftAddress = '0x870c0238e8779fe9f568dd1cc907fa449dbe8552'
 
 export const nftABI = [
     {
@@ -1629,7 +1629,7 @@ export const nftABI = [
     }
 ]
 
-export const nftContractAddress = '0xfe5194ff2d8fb9728e60d9b59991fe1dfe300ca6'
+export const nftContractAddress = '0xbb81d68544490A76338ea233922B55c9576f6af1'
 
 export const nftContractABI = [
     {

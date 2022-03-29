@@ -1219,9 +1219,9 @@ const Staking = () => {
         package: WalletConnectProvider, // required
         options: {
           rpc: {
-            1666700000: 'https://api.s0.b.hmny.io'
+            1666600000: 'https://api.harmony.one'
           },
-          network: 'harmony testnet'
+          network: 'harmony mainnet'
         }
       }
     };
@@ -1324,7 +1324,7 @@ const Staking = () => {
   const getNFTBalance = async () => {
     const ethers = require("ethers");
 
-    let provider = new ethers.providers.JsonRpcProvider("https://api.s0.b.hmny.io");
+    let provider = new ethers.providers.JsonRpcProvider("https://api.harmony.one");
 
     //Contract
     const contract = new ethers.Contract(nftAddress, nftABI, provider);
@@ -1361,19 +1361,19 @@ const Staking = () => {
         if (!response.ok)
           throw new Error(response.statusText);
 
-        const json = await response;
-        // return {
-        //   id: element,
-        //   name: json.name,
-        //   key: json.dna,
-        //   url: json.image
-        // }
+        const json = await response.json();
         return {
           id: element,
-          name: element,
-          key: element,
-          url: '/buy-button.png'
+          name: json.name,
+          key: json.dna,
+          url: json.image
         }
+        // return {
+        //   id: element,
+        //   name: element,
+        //   key: element,
+        //   url: '/buy-button.png'
+        // }
       } catch (err) {
         console.log(err)
       }
@@ -1395,19 +1395,19 @@ const Staking = () => {
       if (!response.ok)
         throw new Error(response.statusText);
 
-      const json = await response;
-      // return {
-      //   id: element,
-      //   name: json.name,
-      //   key: json.dna,
-      //   url: json.image
-      // }
+      const json = await response.json();
       return {
         id: element,
-        name: element,
-        key: element,
-        url: '/buy-button.png'
+        name: json.name,
+        key: json.dna,
+        url: json.image
       }
+      // return {
+      //   id: element,
+      //   name: element,
+      //   key: element,
+      //   url: '/buy-button.png'
+      // }
     })
     const result = await Promise.all(stakedPromises)
 
