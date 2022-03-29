@@ -1990,7 +1990,7 @@ const Staking = () => {
 
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: `0x${(1666700000).toString(16)}` }],
+        params: [{ chainId: `0x${(1666600000).toString(16)}` }],
       });
       const _provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
       const _signer = await _provider1.getSigner();
@@ -2033,7 +2033,7 @@ const Staking = () => {
 
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: `0x${(1666700000).toString(16)}` }],
+        params: [{ chainId: `0x${(1666600000).toString(16)}` }],
       });
       const _provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
       const _signer = await _provider1.getSigner();
