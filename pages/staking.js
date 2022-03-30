@@ -29,6 +29,14 @@ import { Provider as MulticallProvider, Contract as MulticallContract } from "et
 import axios from 'axios'
 
 const useStyles = makeStyles((theme) => ({
+  connectBtn: {
+    minWidth: "100%",
+    padding: "10px 0px",
+    textAlign: "center",
+    color: "#E9D758",
+    border: "1px solid #E9D758",
+    borderRadius: "0"
+  },
   leftSide: {
     position: "sticky",
     top: 20,
@@ -1746,7 +1754,6 @@ const Staking = () => {
     }
   }
 
-
   const getRewards = async () => {
     if (!address) {
       toast.error('Please Connect Your Wallet', 'error')
@@ -1765,7 +1772,6 @@ const Staking = () => {
       console.log(err)
     }
   }
-
 
   const handleSingleAmountChange = (event) => {
     dispatch({
@@ -2133,6 +2139,10 @@ const Staking = () => {
     setSelectedStakedItems(event.target.value);
   };
 
+  const formatAddress = (str) => {
+    return str ? str.slice(0, 5) + '...' + str.slice(str.length - 5) : '';
+  }
+
   return (
     <Layout
       // type your page title and page description.
@@ -2187,6 +2197,19 @@ const Staking = () => {
             </Grid>
           )}
           <Grid item md={10} xs={12}>
+            {matches && (
+              <Box padding="50px 16px 40px 16px">
+                {address ? (
+                  <Button variant="outlined" size="medium" className={classes.connectBtn}>
+                    <Typography variant="h2">{formatAddress(address)}</Typography>
+                  </Button>
+                ) : (
+                  <Button onClick={connectWallet} variant="outlined" size="medium" className={classes.connectBtn}>
+                    <Typography variant="h2">CONNECT</Typography>
+                  </Button>
+                )}
+              </Box>
+            )}
             <Box id="swap" className={classes.swapBlock} style={{ position: "relative", overflowX: "hidden" }}>
               <Typography variant="h2" className={clsx(classes.blockTitle, classes.mobileLocked)}>
                 LOCKED xGRAV STAKING
