@@ -316,19 +316,19 @@ const About = () => {
                   </Typography>
                 </Link>
                 <Box display="flex" flexWrap="wrap" justifyContent="center">
-                  <Links href="/">
+                  <Links href="https://twitter.com/ONEverseONE">
                     <img width="20px" height="18px" src="/twitter.png" ></img>
                   </Links>
-                  <Links href="/">
+                  <Links href="https://discord.com/invite/oneverse">
                     <img width="20px" height="20px" src="/discord.png"></img>
                   </Links>
-                  <Links href="/">
+                  <Links href="https://ovexclusive.com/">
                     <img width="20px" height="20px" style={{ marginRight: 0 }} src="/medium.png"></img>
                   </Links>
-                  <Links href="/">
+                  <Links href="https://t.me/ONEverseONEofficial">
                     <img width="20px" height="20px" src="/telegram.png"></img>
                   </Links>
-                  <Links href="/">
+                  <Links href="https://www.reddit.com/r/ONEverse/">
                     <img width="20px" height="20px" src="/reddit.png"></img>
                   </Links>
                 </Box>
