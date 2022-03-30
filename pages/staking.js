@@ -2168,7 +2168,7 @@ const Staking = () => {
                 </Link>
                 <Link href="#" smooth={true} className={classes.leftMenu} style={{ textDecoration: "none" }} to="nft" duration={2000} spy={true}>
                   <Typography variant="h2">
-                    NFT STAKING
+                    PUFF STAKING
                   </Typography>
                 </Link>
                 <Link href="#" smooth={true} className={classes.leftMenu} style={{ textDecoration: "none" }} to="time" duration={2000} spy={true}>
@@ -2212,7 +2212,7 @@ const Staking = () => {
             )}
             <Box id="swap" className={classes.swapBlock} style={{ pointerEvents: "none", position: "relative", overflowX: "hidden" }}>
               <Typography variant="h2" className={clsx(classes.blockTitle, classes.mobileLocked)}>
-                COMING SOON - LOCKED xGRAV STAKING
+                INCOMING - LOCKED xGRAV
               </Typography>
               {
                 !matches ? (
@@ -2422,7 +2422,7 @@ const Staking = () => {
             </Box>
             <Box id="flexible" className={classes.flexibleBlock} style={{ pointerEvents: "none" }}>
               <Typography variant="h2" className={classes.blockTitle}>
-                INCOMING - FLEXIBLE STAKING
+                INCOMING - FLEX STAKING
               </Typography>
               <Grid container className={classes.flexibleContent}>
                 <Grid item md={6} xs={12}>
@@ -2469,7 +2469,7 @@ const Staking = () => {
             </Box>
             <Box id="nft" className={classes.nftStakingBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
-                NFT STAKING
+                PUFF STAKING
               </Typography>
               <Grid container className={classes.nftStakingContent}>
                 <Grid item md={4} xs={12}>
@@ -2479,7 +2479,7 @@ const Staking = () => {
                 <Grid item md={8} xs={12}>
                   <Box className={classes.stakingNFT} >
                     <Box className={classes.nftTitle}>
-                      <Typography variant="h1" className={classes.flyInto1}>INCUBATE YOUR NFT</Typography>
+                      <Typography variant="h1" className={classes.flyInto1}>INCUBATE YOUR PUFF</Typography>
                       <Typography variant="h1" className={classes.darkMatter} style={{ marginBottom: "0" }}>Earn Variable xGrav</Typography>
                     </Box>
                     <Box className={classes.nftNFTs}>
@@ -2652,7 +2652,7 @@ const Staking = () => {
                 </Box>
               )}
               <Typography variant="h2" className={classes.blockTitle}>
-                INCOMING - TIME LOCKED STAKING
+                INCOMING - TIME LOCKED
               </Typography>
               <Typography variant="h2" className={classes.blockTitleDesc}>
                 <img style={{ marginRight: "10px" }} src="up-arrow.png"></img> Lock GRAV Token and Earn xGRAV <img style={{ marginLeft: "10px" }} src="up-arrow.png"></img>
