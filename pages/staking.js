@@ -2212,7 +2212,7 @@ const Staking = () => {
             )}
             <Box id="swap" className={classes.swapBlock} style={{ pointerEvents: "none", position: "relative", overflowX: "hidden" }}>
               <Typography variant="h2" className={clsx(classes.blockTitle, classes.mobileLocked)}>
-                LOCKED xGRAV STAKING
+                COMING SOON - LOCKED xGRAV STAKING
               </Typography>
               {
                 !matches ? (
@@ -2422,7 +2422,7 @@ const Staking = () => {
             </Box>
             <Box id="flexible" className={classes.flexibleBlock} style={{ pointerEvents: "none" }}>
               <Typography variant="h2" className={classes.blockTitle}>
-                FLEXIBLE STAKING
+                COMING SOON - FLEXIBLE STAKING
               </Typography>
               <Grid container className={classes.flexibleContent}>
                 <Grid item md={6} xs={12}>
@@ -2627,7 +2627,7 @@ const Staking = () => {
                           <Box display="flex" justifyContent="space-between">
                             <Box className={classes.totalBlock}>
                               <Typography className={classes.totalTitle}>TOTAL REWARDS</Typography>
-                              <Typography className={classes.gravAmount}>{totalRewards && totalRewards.toFixed(3)} xGRAV</Typography>
+                              <Typography className={classes.gravAmount}>{totalRewards && totalRewards.toFixed(3)} $ </Typography>
                             </Box>
                             <Button onClick={nftClaim} className={classes.nftStakeBtn}>CLAIM</Button>
                           </Box>
@@ -2652,7 +2652,7 @@ const Staking = () => {
                 </Box>
               )}
               <Typography variant="h2" className={classes.blockTitle}>
-                TIME LOCKED STAKING
+                COMING SOON - TIME LOCKED STAKING
               </Typography>
               <Typography variant="h2" className={classes.blockTitleDesc}>
                 <img style={{ marginRight: "10px" }} src="up-arrow.png"></img> Lock GRAV Token and Earn xGRAV <img style={{ marginLeft: "10px" }} src="up-arrow.png"></img>
