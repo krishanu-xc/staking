@@ -2256,8 +2256,8 @@ const Staking = () => {
                         <Box display="flex" alignItems="start">
                           <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
                           <Box>
-                            <Typography className={classes.antiGravDesc}>Upgrade land (Level 1-3)</Typography>
-                            <Typography className={classes.antiGravDescBottom}>Quantity of materials scales with land</Typography>
+                            <Typography className={classes.antiGravDesc}>Upgrade Your Space Pod</Typography>
+                            <Typography className={classes.antiGravDescBottom}></Typography>
                           </Box>
                         </Box>
                       </Grid>
@@ -2265,7 +2265,7 @@ const Staking = () => {
                         <Box display="flex" alignItems="start">
                           <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
                           <Box className={classes.itemMargin}>
-                            <Typography className={classes.antiGravDesc}>Not transferable or tradeable</Typography>
+                            <Typography className={classes.antiGravDesc}>Power the Harmonex</Typography>
                           </Box>
                         </Box>
                       </Grid>
@@ -2273,7 +2273,7 @@ const Staking = () => {
                         <Box display="flex" alignItems="start">
                           <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
                           <Box className={classes.itemMargin}>
-                            <Typography className={classes.antiGravDesc}>P2E main earnings</Typography>
+                            <Typography className={classes.antiGravDesc}>PvP Games</Typography>
                           </Box>
                         </Box>
                       </Grid>
@@ -2281,7 +2281,7 @@ const Staking = () => {
                         <Box display="flex" alignItems="start">
                           <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
                           <Box className={classes.itemMargin}>
-                            <Typography className={classes.antiGravDesc}>Total supply/price mirrors GRAV</Typography>
+                            <Typography className={classes.antiGravDesc}>Buy Collectibles</Typography>
                           </Box>
                         </Box>
                       </Grid>
