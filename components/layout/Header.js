@@ -146,7 +146,7 @@ const Header = ({ onConnect, address }) => {
           <Button size="medium" className={classes.gameBtn}>
             <Typography variant="h2">TESTNET</Typography>
           </Button> 
-          {address "https://testnet.onverse.one" (
+          {address ?(
             <Button variant="outlined" size="medium" className={classes.connectBtn}>
               <Typography variant="h2">{formatAddress(address)}</Typography>
             </Button>
