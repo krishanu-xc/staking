@@ -2422,7 +2422,7 @@ const Staking = () => {
             </Box>
             <Box id="flexible" className={classes.flexibleBlock} style={{ pointerEvents: "none" }}>
               <Typography variant="h2" className={classes.blockTitle}>
-                COMING SOON - FLEXIBLE STAKING
+                INCOMING - FLEXIBLE STAKING
               </Typography>
               <Grid container className={classes.flexibleContent}>
                 <Grid item md={6} xs={12}>
@@ -2626,8 +2626,8 @@ const Staking = () => {
                           </Box>
                           <Box display="flex" justifyContent="space-between">
                             <Box className={classes.totalBlock}>
-                              <Typography className={classes.totalTitle}>TOTAL REWARDS</Typography>
-                              <Typography className={classes.gravAmount}>{totalRewards && totalRewards.toFixed(3)} $ </Typography>
+                              <Typography className={classes.totalTitle}>TOTAL REWARDS $ </Typography>
+                              <Typography className={classes.gravAmount}>{totalRewards && totalRewards.toFixed(3)}  </Typography>
                             </Box>
                             <Button onClick={nftClaim} className={classes.nftStakeBtn}>CLAIM</Button>
                           </Box>
@@ -2652,7 +2652,7 @@ const Staking = () => {
                 </Box>
               )}
               <Typography variant="h2" className={classes.blockTitle}>
-                COMING SOON - TIME LOCKED STAKING
+                INCOMING - TIME LOCKED STAKING
               </Typography>
               <Typography variant="h2" className={classes.blockTitleDesc}>
                 <img style={{ marginRight: "10px" }} src="up-arrow.png"></img> Lock GRAV Token and Earn xGRAV <img style={{ marginLeft: "10px" }} src="up-arrow.png"></img>
