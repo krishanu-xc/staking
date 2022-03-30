@@ -2210,7 +2210,7 @@ const Staking = () => {
                 )}
               </Box>
             )}
-            <Box id="swap" className={classes.swapBlock} style={{ position: "relative", overflowX: "hidden" }}>
+            <Box id="swap" className={classes.swapBlock} style={{ pointerEvents: "none", position: "relative", overflowX: "hidden" }}>
               <Typography variant="h2" className={clsx(classes.blockTitle, classes.mobileLocked)}>
                 LOCKED xGRAV STAKING
               </Typography>
@@ -2420,7 +2420,7 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            <Box id="flexible" className={classes.flexibleBlock}>
+            <Box id="flexible" className={classes.flexibleBlock} style={{ pointerEvents: "none" }}>
               <Typography variant="h2" className={classes.blockTitle}>
                 FLEXIBLE STAKING
               </Typography>
@@ -2638,7 +2638,7 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            <Box id="time" className={classes.lockStakingBlock} style={{ position: "relative", overflowX: "hidden" }}>
+            <Box id="time" className={classes.lockStakingBlock} style={{ position: "relative", overflowX: "hidden", pointerEvents: "none" }}>
               {!matches && (
                 <Box display="flex" position="absolute" style={{ right: "0px", top: "14px" }}>
                   <Box width="217px" display="flex" justifyContent="space-around">
