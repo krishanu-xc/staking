@@ -435,10 +435,10 @@ const CustomizedAccordions = () => {
                 <img style={{ width: "205px", marginTop: "28px", marginBottom: "40px" }} src="token-icon1.png"></img>
               </Box>
             </Grid>
-            <Grid item md={8} style={{ borderRight: '1px solid #E9D758' }}>
+            <Grid item md={8}>
               <Grid container>
                 <Grid item md={12}>
-                  <Box display="flex" alignItems="center" style={{ padding: "14px 0 14px 18px", borderBottom: "1px solid #E9D758", borderRight: "1px solid #E9D758" }}>
+                  <Box display="flex" alignItems="center" style={{ padding: "14px 0 14px 18px", borderBottom: "1px solid #E9D758" }}>
                     <Typography className={classes.tokenTitle}>TOKEN NAME</Typography>
                     <Typography style={{ paddingLeft: "15px" }} className={classes.tokenDesc}>ANTI-GRAVITY</Typography>
                   </Box>
@@ -449,7 +449,7 @@ const CustomizedAccordions = () => {
                 <Typography style={{ marginRight: "50px" }} className={classes.tokenDesc}>25,000,000</Typography>
                 <Typography className={classes.tokenDesc}>(Total supply/price mirrors $GRAV)</Typography>
               </Box>
-              <Box style={{ borderBottom: "1px solid #E9D758", padding: "14px 60px 0px 20px" }}>
+              <Box style={{ borderBottom: "1px solid #E9D758", padding: "14px 20px 0px 20px" }}>
                 <Typography style={{ marginBottom: '18px' }} className={classes.tokenTitle}>TOKEN UTILITY</Typography>
                 <Grid container>
                   <Grid item md={6}>
@@ -467,9 +467,7 @@ const CustomizedAccordions = () => {
                   <Grid item md={6}>
                     <Box display="flex" alignItems="start">
                       <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
-                      <Typography style={{ marginBottom: '18px' }} className={classes.tokenDesc}>Upgrade Lands (Level 1-3)
-                        <span style={{ fontStyle: "italic" }}>Quantity of materials scale
-                          with land</span>
+                      <Typography style={{ marginBottom: '18px' }} className={classes.tokenDesc}>Upgrade Lands (Level 1-3) <span style={{ fontStyle: "italic" }}>Quantity of materials scale with land</span>
                       </Typography>
                     </Box>
                     <Box display="flex" alignItems="start">
