@@ -2480,7 +2480,7 @@ const Staking = () => {
                   <Box className={classes.stakingNFT} >
                     <Box className={classes.nftTitle}>
                       <Typography variant="h1" className={classes.flyInto1}>INCUBATE YOUR PUFF</Typography>
-                      <Typography variant="h1" className={classes.darkMatter} style={{ marginBottom: "0" }}>Earn Variable xGrav</Typography>
+                      <Typography variant="h1" className={classes.darkMatter} style={{ marginBottom: "0" }}>Earn Variable xGRAV</Typography>
                     </Box>
                     <Box className={classes.nftNFTs}>
                       <Box display={matches ? "block" : "flex"} alignItems="center" mb="33px">
