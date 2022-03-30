@@ -2517,7 +2517,7 @@ const Staking = () => {
                                     <Box>
                                       <Box display="flex" alignItems="center" mb="12px">
                                         <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingInfo, classes.stakingInfoSelected) : classes.stakingInfo}>NAME</Typography>
-                                        <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>PUFFS {item.name}</Typography>
+                                        <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>{item.name}</Typography>
                                       </Box>
                                       <Box display="flex" alignItems="center">
                                         <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingInfo1, classes.stakingInfoSelected) : classes.stakingInfo1}>RARITY RANK</Typography>
@@ -2561,7 +2561,7 @@ const Staking = () => {
                                     <Box>
                                       <Box display="flex" alignItems="center" mb="12px">
                                         <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingInfo, classes.stakingInfoSelected) : classes.stakingInfo}>NAME</Typography>
-                                        <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>PUFFS {item.name}</Typography>
+                                        <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>{item.name}</Typography>
                                       </Box>
                                       <Box display="flex" alignItems="center">
                                         <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingInfo1, classes.stakingInfoSelected) : classes.stakingInfo1}>RARITY RANK</Typography>
@@ -2605,7 +2605,7 @@ const Staking = () => {
                                     <Box>
                                       <Box display="flex" alignItems="center" mb="12px">
                                         <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingInfo, classes.stakingInfoSelected) : classes.stakingInfo}>NAME</Typography>
-                                        <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>PUFFS {item.name}</Typography>
+                                        <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>{item.name}</Typography>
                                       </Box>
                                       <Box display="flex" alignItems="center">
                                         <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingInfo1, classes.stakingInfoSelected) : classes.stakingInfo1}>REWARDS</Typography>
