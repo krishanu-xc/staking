@@ -1458,9 +1458,9 @@ const Staking = () => {
   }
 
   const getBalance = async () => {
-    const stakedAmount = await singleContract.methods.supplyAmount(address).call({ from: address });
+    const stakedAmount = await singleContract.methods.balances(address).call({ from: address });
     const temp = stakedAmount / Math.pow(10, 18);
-    const rewarded = await singleContract.methods.accruedReward(address, 0).call({ from: address });
+    const rewarded = await singleContract.methods.rewards(address).call({ from: address });
     const tempPending = rewarded / Math.pow(10, 18);
 
     dispatch({
@@ -1495,7 +1495,7 @@ const Staking = () => {
 
     toast.info('Please Wait Till The Transaction Succeeds')
 
-    stakingContract.methods.claimRewards().send({ from: address })
+    stakingContract.methods.getReward().send({ from: address })
       .on('receipt', receipt => {
         toast.success('Claiming rewards successful')
         getBalance();
@@ -1799,9 +1799,7 @@ const Staking = () => {
 
     toast.info('Please Wait Till The Transaction Succeeds')
 
-    // await stakingContract.methods.updateStakedTime().call({ from: address });
-
-    stakingContract.methods.redeem(amount).send({ from: address })
+    stakingContract.methods.withdraw(amount).send({ from: address })
       .on('receipt', receipt => {
         toast.success('Wormhole Withdrawal Success')
         getBalance();
@@ -1832,7 +1830,7 @@ const Staking = () => {
     tokenContract.methods.approve(singleContractAddress, amount).send({ from: address })
       .on('receipt', receipt => {
         toast.info('Please wait...')
-        stakingContract.methods.deposit(amount).send({ from: address })
+        stakingContract.methods.stake(amount).send({ from: address })
           .on('receipt', receipt => {
             toast.success('Your tokens have been sent into the Wormhole! - Amount: ' + singleInputAmount);
             getBalance();
