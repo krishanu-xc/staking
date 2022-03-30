@@ -2439,7 +2439,7 @@ const Staking = () => {
                         onChange={handleSingleAmountChange}
                       />
                     </FormControl>
-                    <Typography variant="h1" className={classes.darkMatter}>15% APR</Typography>
+                    <Typography variant="h1" className={classes.darkMatter}>~% APR</Typography>
                     <ButtonGroup color="secondary" aria-label="outlined secondary button group">
                       <Button onClick={singleStake} className={classes.stakeBtn}>STAKE</Button>
                       <Button onClick={singleUnstake} className={classes.unstakeBtn}>UNSTAKE</Button>
@@ -2643,11 +2643,11 @@ const Staking = () => {
                 <Box display="flex" position="absolute" style={{ right: "0px", top: "14px" }}>
                   <Box width="217px" display="flex" justifyContent="space-around">
                     <Typography className={classes.topLabel}>6 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~35% APR</Typography>
+                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
                   </Box>
                   <Box width="217px" display="flex" justifyContent="space-around">
                     <Typography className={classes.topLabel}>12 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~35% APR</Typography>
+                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
                   </Box>
                 </Box>
               )}
@@ -2661,11 +2661,11 @@ const Staking = () => {
                 <Box display="flex" flexDirection="column" alignItems="center">
                   <Box width="217px" display="flex" flexDirection="column" style={{ border: "1px solid #E9D758", padding: "20px", textAlign: "center", marginBottom: "15px" }}>
                     <Typography className={classes.topLabel}>6 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~35% APR</Typography>
+                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
                   </Box>
                   <Box width="217px" display="flex" flexDirection="column" style={{ border: "1px solid #E9D758", padding: "20px", textAlign: "center", marginBottom: "50px" }}>
                     <Typography className={classes.topLabel}>6 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~35% APR</Typography>
+                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
                   </Box>
                 </Box>
               )}
