@@ -1459,13 +1459,13 @@ const Staking = () => {
   const getBalance = async () => {
     const stakedAmount = await singleContract.methods.balances(address).call({ from: address });
     const temp = stakedAmount / Math.pow(10, 18);
-    const rewarded = await singleContract.methods.rewards(address).call({ from: address });
+    const rewarded = await singleContract.methods.earned(address).call({ from: address });
     const tempPending = rewarded / Math.pow(10, 18);
 
     dispatch({
       type: 'SET_STAKED_PENDING',
-      stakedAmount: temp.toFixed(3),
-      pendingReward: tempPending.toFixed(3)
+      stakedAmount: temp.toFixed(10),
+      pendingReward: tempPending.toFixed(10)
     });
   }
 
