@@ -2420,9 +2420,9 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            <Box id="flexible" className={classes.flexibleBlock} style={{ pointerEvents: "none" }}>
+            <Box id="flexible" className={classes.flexibleBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
-                INCOMING - FLEX STAKING
+                FLEX STAKING
               </Typography>
               <Grid container className={classes.flexibleContent}>
                 <Grid item md={6} xs={12}>
