@@ -1279,12 +1279,12 @@ const Staking = () => {
       web3: web3
     });
 
-    // const singleStakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
+    const singleStakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
 
-    // dispatch({
-    //   type: 'SET_SINGLE_CONTRACT',
-    //   singleContract: singleStakingContract
-    // });
+    dispatch({
+      type: 'SET_SINGLE_CONTRACT',
+      singleContract: singleStakingContract
+    });
 
     // const lockStakingContract = new web3.eth.Contract(lockAbi, lockContractAddress)
 
@@ -1312,19 +1312,19 @@ const Staking = () => {
     //   lockXgravContract: lockXgravContracts
     // });
   }
-  /*
-    useEffect(() => {
-      singleContract && getBalance();
-    }, [singleContract])
-  
-    useEffect(() => {
-      lockContract && getLockStakingBalance();
-    }, [lockContract])
-  
-    useEffect(() => {
-      lockXgravContract && getXgravLockStakingBalance();
-    }, [lockXgravContract])
-  */
+
+  useEffect(() => {
+    singleContract && getBalance();
+  }, [singleContract])
+
+  // useEffect(() => {
+  //   lockContract && getLockStakingBalance();
+  // }, [lockContract])
+
+  // useEffect(() => {
+  //   lockXgravContract && getXgravLockStakingBalance();
+  // }, [lockXgravContract])
+
   useEffect(() => {
     nftContract && getNFTBalance();
   }, [nftContract])
