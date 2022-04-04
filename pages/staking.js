@@ -1490,11 +1490,9 @@ const Staking = () => {
       return;
     }
 
-    const stakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
-
     toast.info('Please Wait Till The Transaction Succeeds')
 
-    stakingContract.methods.getReward().send({ from: address })
+    singleContract.methods.getReward().send({ from: address })
       .on('receipt', receipt => {
         toast.success('Claiming rewards successful')
         getBalance();
@@ -1791,12 +1789,11 @@ const Staking = () => {
       return;
     }
 
-    const stakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
     const amount = Web3.utils.toBN(String(Math.floor(singleInputAmount)) + "0".repeat(18))
 
     toast.info('Please Wait Till The Transaction Succeeds')
 
-    stakingContract.methods.withdraw(amount).send({ from: address })
+    singleContract.methods.withdraw(amount).send({ from: address })
       .on('receipt', receipt => {
         toast.success('Wormhole Withdrawal Success')
         getBalance();
@@ -1820,14 +1817,13 @@ const Staking = () => {
 
     const amount = Web3.utils.toBN(String(Math.floor(singleInputAmount)) + "0".repeat(18))
     const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress)
-    const stakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
 
     toast.info('Approve Transaction To Allow ONEverse token spending')
 
     tokenContract.methods.approve(singleContractAddress, amount).send({ from: address })
       .on('receipt', receipt => {
         toast.info('Please wait...')
-        stakingContract.methods.stake(amount).send({ from: address })
+        singleContract.methods.stake(amount).send({ from: address })
           .on('receipt', receipt => {
             toast.success('Your tokens have been sent into the Wormhole! - Amount: ' + singleInputAmount);
             getBalance();
