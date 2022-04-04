@@ -221,250 +221,276 @@ export const lockXGRAVAbi = [
     }
 ]
 
-export const singleContractAddress = '0xf129b8983686830f06Eb2E3f220f058a1f963749'
+export const singleContractAddress = '0x7230548C352f1310Af126e092bB0Fe2E8429B7D3'
 
 export const singleAbi = [
     {
+        "type": "constructor",
+        "stateMutability": "nonpayable",
         "inputs": [
             {
-                "type": "address",
+                "name": "_grav",
                 "internalType": "address",
-                "name": "_grav"
+                "type": "address"
             }
-        ],
-        "type": "constructor",
-        "stateMutability": "nonpayable"
+        ]
     },
     {
-        "name": "OwnershipTransferred",
+        "anonymous": false,
         "inputs": [
             {
-                "name": "previousOwner",
                 "type": "address",
                 "internalType": "address",
-                "indexed": true
+                "indexed": true,
+                "name": "previousOwner"
             },
             {
+                "name": "newOwner",
                 "type": "address",
                 "internalType": "address",
-                "name": "newOwner",
                 "indexed": true
             }
         ],
-        "type": "event",
-        "anonymous": false
+        "name": "OwnershipTransferred",
+        "type": "event"
     },
     {
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256",
-                "internalType": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "name": "balances",
         "type": "function",
         "inputs": [
             {
-                "name": "",
                 "type": "address",
+                "name": "",
                 "internalType": "address"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "internalType": "uint256",
+                "type": "uint256"
+            }
+        ],
+        "name": "balances",
+        "stateMutability": "view"
+    },
+    {
+        "inputs": [],
+        "name": "lastUpdateTime",
+        "stateMutability": "view",
+        "type": "function",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
         ]
     },
     {
         "type": "function",
         "stateMutability": "view",
-        "inputs": [],
-        "name": "lastUpdateTime",
         "outputs": [
             {
-                "type": "uint256",
-                "internalType": "uint256",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "stateMutability": "view",
-        "outputs": [
-            {
-                "type": "address",
                 "internalType": "address",
+                "type": "address",
                 "name": ""
             }
         ],
         "name": "owner",
-        "inputs": [],
-        "type": "function"
-    },
-    {
-        "outputs": [],
-        "name": "renounceOwnership",
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "type": "function",
-        "outputs": [
-            {
-                "type": "uint256",
-                "internalType": "uint256",
-                "name": ""
-            }
-        ],
-        "stateMutability": "view",
-        "name": "rewardPerTokenStored",
         "inputs": []
     },
     {
-        "name": "rewardRate",
         "type": "function",
-        "stateMutability": "view",
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint256",
-                "name": "",
-                "internalType": "uint256"
+                "internalType": "bool",
+                "type": "bool",
+                "name": ""
             }
-        ]
+        ],
+        "name": "paused",
+        "inputs": [],
+        "stateMutability": "view"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable"
     },
     {
         "outputs": [
             {
-                "type": "uint256",
+                "internalType": "uint256",
                 "name": "",
-                "internalType": "uint256"
+                "type": "uint256"
             }
         ],
+        "name": "rewardPerTokenStored",
         "stateMutability": "view",
-        "inputs": [
-            {
-                "name": "",
-                "internalType": "address",
-                "type": "address"
-            }
-        ],
-        "name": "rewards",
+        "inputs": [],
         "type": "function"
     },
     {
+        "name": "rewardRate",
+        "stateMutability": "view",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "inputs": [],
+        "type": "function"
+    },
+    {
+        "stateMutability": "view",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "type": "address",
+                "name": ""
+            }
+        ],
+        "name": "rewards"
+    },
+    {
+        "stateMutability": "nonpayable",
         "name": "transferOwnership",
-        "outputs": [],
         "type": "function",
         "inputs": [
             {
                 "name": "newOwner",
                 "type": "address",
                 "internalType": "address"
-            }
-        ],
-        "stateMutability": "nonpayable"
-    },
-    {
-        "name": "userRewardPerTokenPaid",
-        "inputs": [
-            {
-                "name": "",
-                "internalType": "address",
-                "type": "address"
-            }
-        ],
-        "outputs": [
-            {
-                "name": "",
-                "internalType": "uint256",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "name": "rewardPerToken",
-        "stateMutability": "view",
-        "type": "function",
-        "inputs": [],
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ]
-    },
-    {
-        "name": "earned",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "type": "uint256",
-                "name": ""
-            }
-        ],
-        "type": "function",
-        "inputs": [
-            {
-                "internalType": "address",
-                "type": "address",
-                "name": "account"
-            }
-        ],
-        "stateMutability": "view"
-    },
-    {
-        "outputs": [],
-        "type": "function",
-        "stateMutability": "nonpayable",
-        "name": "stake",
-        "inputs": [
-            {
-                "type": "uint256",
-                "internalType": "uint256",
-                "name": "_amount"
-            }
-        ]
-    },
-    {
-        "stateMutability": "nonpayable",
-        "name": "withdraw",
-        "type": "function",
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "type": "uint256",
-                "name": "_amount"
             }
         ],
         "outputs": []
     },
     {
-        "name": "getReward",
-        "inputs": [],
+        "name": "userRewardPerTokenPaid",
         "type": "function",
-        "outputs": [],
-        "stateMutability": "nonpayable"
+        "outputs": [
+            {
+                "type": "uint256",
+                "internalType": "uint256",
+                "name": ""
+            }
+        ],
+        "stateMutability": "view",
+        "inputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "address"
+            }
+        ]
     },
     {
+        "type": "function",
+        "inputs": [
+            {
+                "type": "bool",
+                "name": "status",
+                "internalType": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "pauseContract"
+    },
+    {
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "rewardPerToken",
+        "inputs": [],
+        "type": "function",
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "name": "earned",
+        "inputs": [
+            {
+                "name": "account",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "uint256",
+                "internalType": "uint256",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "name": "stake",
         "type": "function",
         "stateMutability": "nonpayable",
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "_rate",
-                "type": "uint256"
+                "type": "uint256",
+                "name": "_amount",
+                "internalType": "uint256"
             }
         ],
+        "outputs": []
+    },
+    {
         "outputs": [],
-        "name": "setRewardRate"
+        "name": "withdraw",
+        "stateMutability": "nonpayable",
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_amount",
+                "internalType": "uint256"
+            }
+        ],
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "outputs": [],
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "name": "getReward"
     },
     {
         "type": "function",
-        "outputs": [],
+        "inputs": [
+            {
+                "type": "uint256",
+                "internalType": "uint256",
+                "name": "_rate"
+            }
+        ],
+        "name": "setRewardRate",
         "stateMutability": "nonpayable",
+        "outputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
         "name": "setGrav",
         "inputs": [
             {
@@ -475,11 +501,11 @@ export const singleAbi = [
         ]
     },
     {
-        "type": "function",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "name": "retrieveGrav",
-        "inputs": []
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "type": "function"
     }
 ]
 
@@ -806,169 +832,158 @@ export const lockAbi = [
     }
 ]
 
-export const tokenAddress = '0xe2807e430043d8531b8ce9385dC77871E61Fb7a0'
+export const tokenAddress = '0x1A89d6212d735931b7aA235C4a3a791FF67517B1'
 
 export const tokenAbi = [
     {
         "stateMutability": "nonpayable",
-        "inputs": [],
-        "type": "constructor"
+        "type": "constructor",
+        "inputs": []
     },
     {
-        "anonymous": false,
         "inputs": [
             {
+                "name": "owner",
                 "type": "address",
-                "internalType": "address",
                 "indexed": true,
-                "name": "owner"
+                "internalType": "address"
             },
             {
                 "indexed": true,
-                "internalType": "address",
                 "name": "spender",
-                "type": "address"
+                "type": "address",
+                "internalType": "address"
             },
             {
-                "name": "value",
+                "type": "uint256",
                 "internalType": "uint256",
                 "indexed": false,
-                "type": "uint256"
+                "name": "value"
             }
         ],
         "name": "Approval",
-        "type": "event"
+        "type": "event",
+        "anonymous": false
     },
     {
-        "name": "Transfer",
         "type": "event",
-        "anonymous": false,
         "inputs": [
             {
-                "type": "address",
+                "internalType": "address",
                 "indexed": true,
                 "name": "from",
-                "internalType": "address"
-            },
-            {
-                "indexed": true,
-                "name": "to",
-                "internalType": "address",
                 "type": "address"
             },
             {
-                "indexed": false,
-                "type": "uint256",
-                "name": "value",
-                "internalType": "uint256"
-            }
-        ]
-    },
-    {
-        "outputs": [
-            {
-                "type": "uint256",
-                "name": "",
-                "internalType": "uint256"
-            }
-        ],
-        "type": "function",
-        "inputs": [
-            {
-                "type": "address",
+                "indexed": true,
                 "internalType": "address",
-                "name": "owner"
+                "type": "address",
+                "name": "to"
             },
             {
-                "type": "address",
-                "name": "spender",
-                "internalType": "address"
+                "indexed": false,
+                "name": "value",
+                "type": "uint256",
+                "internalType": "uint256"
             }
         ],
-        "stateMutability": "view",
-        "name": "allowance"
+        "anonymous": false,
+        "name": "Transfer"
     },
     {
-        "type": "function",
         "inputs": [
+            {
+                "name": "owner",
+                "type": "address",
+                "internalType": "address"
+            },
             {
                 "internalType": "address",
                 "type": "address",
                 "name": "spender"
-            },
+            }
+        ],
+        "outputs": [
             {
-                "name": "amount",
                 "type": "uint256",
-                "internalType": "uint256"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "bool",
-                "name": "",
-                "internalType": "bool"
-            }
-        ],
-        "name": "approve",
-        "stateMutability": "nonpayable"
-    },
-    {
-        "name": "balanceOf",
-        "stateMutability": "view",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "account",
-                "internalType": "address"
-            }
-        ],
-        "outputs": [
-            {
                 "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "type": "function"
-    },
-    {
-        "name": "decimals",
-        "inputs": [],
-        "outputs": [
-            {
-                "internalType": "uint8",
-                "name": "",
-                "type": "uint8"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "name": "spender",
-                "internalType": "address",
-                "type": "address"
-            },
-            {
-                "type": "uint256",
-                "name": "subtractedValue",
-                "internalType": "uint256"
-            }
-        ],
-        "name": "decreaseAllowance",
-        "type": "function",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "type": "bool",
                 "name": ""
             }
         ],
-        "stateMutability": "nonpayable"
+        "type": "function",
+        "stateMutability": "view",
+        "name": "allowance"
     },
     {
+        "outputs": [
+            {
+                "type": "bool",
+                "name": "",
+                "internalType": "bool"
+            }
+        ],
+        "inputs": [
+            {
+                "name": "spender",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "type": "uint256",
+                "internalType": "uint256",
+                "name": "amount"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "approve"
+    },
+    {
+        "inputs": [
+            {
+                "type": "address",
+                "internalType": "address",
+                "name": "account"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256",
+                "internalType": "uint256"
+            }
+        ],
+        "name": "balanceOf",
+        "type": "function",
+        "stateMutability": "view"
+    },
+    {
+        "name": "decimals",
+        "stateMutability": "view",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "uint8",
+                "internalType": "uint8",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "stateMutability": "nonpayable",
+        "inputs": [
+            {
+                "type": "address",
+                "internalType": "address",
+                "name": "spender"
+            },
+            {
+                "type": "uint256",
+                "internalType": "uint256",
+                "name": "subtractedValue"
+            }
+        ],
         "outputs": [
             {
                 "name": "",
@@ -976,27 +991,51 @@ export const tokenAbi = [
                 "internalType": "bool"
             }
         ],
+        "name": "decreaseAllowance",
+        "type": "function"
+    },
+    {
         "type": "function",
-        "name": "increaseAllowance",
         "inputs": [
             {
                 "type": "address",
-                "name": "spender",
-                "internalType": "address"
+                "internalType": "address",
+                "name": "spender"
             },
             {
-                "internalType": "uint256",
+                "type": "uint256",
                 "name": "addedValue",
-                "type": "uint256"
+                "internalType": "uint256"
             }
         ],
-        "stateMutability": "nonpayable"
+        "stateMutability": "nonpayable",
+        "outputs": [
+            {
+                "type": "bool",
+                "internalType": "bool",
+                "name": ""
+            }
+        ],
+        "name": "increaseAllowance"
     },
     {
-        "inputs": [],
-        "stateMutability": "view",
-        "type": "function",
         "name": "name",
+        "outputs": [
+            {
+                "type": "string",
+                "internalType": "string",
+                "name": ""
+            }
+        ],
+        "stateMutability": "view",
+        "inputs": [],
+        "type": "function"
+    },
+    {
+        "stateMutability": "view",
+        "inputs": [],
+        "name": "symbol",
+        "type": "function",
         "outputs": [
             {
                 "name": "",
@@ -1006,39 +1045,26 @@ export const tokenAbi = [
         ]
     },
     {
-        "stateMutability": "view",
-        "type": "function",
-        "name": "symbol",
         "inputs": [],
-        "outputs": [
-            {
-                "type": "string",
-                "name": "",
-                "internalType": "string"
-            }
-        ]
-    },
-    {
         "name": "totalSupply",
+        "stateMutability": "view",
         "outputs": [
             {
+                "name": "",
                 "type": "uint256",
-                "internalType": "uint256",
-                "name": ""
+                "internalType": "uint256"
             }
         ],
-        "stateMutability": "view",
-        "inputs": [],
         "type": "function"
     },
     {
-        "name": "transfer",
+        "type": "function",
         "stateMutability": "nonpayable",
         "inputs": [
             {
                 "type": "address",
-                "name": "to",
-                "internalType": "address"
+                "internalType": "address",
+                "name": "to"
             },
             {
                 "internalType": "uint256",
@@ -1046,56 +1072,56 @@ export const tokenAbi = [
                 "type": "uint256"
             }
         ],
-        "type": "function",
-        "outputs": [
-            {
-                "type": "bool",
-                "internalType": "bool",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "name": "transferFrom",
-        "type": "function",
         "outputs": [
             {
                 "name": "",
-                "internalType": "bool",
-                "type": "bool"
+                "type": "bool",
+                "internalType": "bool"
             }
         ],
+        "name": "transfer"
+    },
+    {
+        "name": "transferFrom",
+        "stateMutability": "nonpayable",
+        "type": "function",
         "inputs": [
             {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
                 "type": "address",
-                "name": "to",
+                "name": "from",
                 "internalType": "address"
             },
             {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
                 "name": "amount",
-                "type": "uint256",
-                "internalType": "uint256"
+                "type": "uint256"
             }
         ],
-        "stateMutability": "nonpayable"
-    },
-    {
-        "outputs": [],
-        "type": "function",
-        "stateMutability": "nonpayable",
-        "name": "mint",
-        "inputs": [
+        "outputs": [
             {
-                "type": "uint256",
-                "name": "amount",
-                "internalType": "uint256"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
             }
         ]
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "type": "uint256",
+                "name": "amount"
+            }
+        ],
+        "outputs": [],
+        "name": "_mintToken",
+        "stateMutability": "nonpayable",
+        "type": "function"
     }
 ]
 
