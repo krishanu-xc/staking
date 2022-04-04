@@ -221,7 +221,7 @@ export const lockXGRAVAbi = [
     }
 ]
 
-export const singleContractAddress = '0x7230548C352f1310Af126e092bB0Fe2E8429B7D3'
+export const singleContractAddress = '0x81C9ADeb1d0AC06331D8467E5FA527B8b44b907e'
 
 export const singleAbi = [
     {
@@ -832,7 +832,7 @@ export const lockAbi = [
     }
 ]
 
-export const tokenAddress = '0x1A89d6212d735931b7aA235C4a3a791FF67517B1'
+export const tokenAddress = '0x5DCE7A3E8B53387A9Ee1cE0d855b7A8d948100A3'
 
 export const tokenAbi = [
     {
