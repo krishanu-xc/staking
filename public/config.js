@@ -221,120 +221,107 @@ export const lockXGRAVAbi = [
     }
 ]
 
-export const singleContractAddress = '0x81C9ADeb1d0AC06331D8467E5FA527B8b44b907e'
+export const singleContractAddress = '0x84653568e292677f2be042e8e109dcbacb44aa5d'
 
 export const singleAbi = [
     {
-        "type": "constructor",
-        "stateMutability": "nonpayable",
         "inputs": [
             {
-                "name": "_grav",
                 "internalType": "address",
+                "name": "_grav",
                 "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
         "anonymous": false,
         "inputs": [
             {
-                "type": "address",
-                "internalType": "address",
                 "indexed": true,
-                "name": "previousOwner"
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
             },
             {
-                "name": "newOwner",
-                "type": "address",
+                "indexed": true,
                 "internalType": "address",
-                "indexed": true
+                "name": "newOwner",
+                "type": "address"
             }
         ],
         "name": "OwnershipTransferred",
         "type": "event"
     },
     {
-        "type": "function",
         "inputs": [
             {
-                "type": "address",
+                "internalType": "address",
                 "name": "",
-                "internalType": "address"
-            }
-        ],
-        "outputs": [
-            {
-                "name": "",
-                "internalType": "uint256",
-                "type": "uint256"
+                "type": "address"
             }
         ],
         "name": "balances",
-        "stateMutability": "view"
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
         "inputs": [],
         "name": "lastUpdateTime",
-        "stateMutability": "view",
-        "type": "function",
         "outputs": [
             {
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "stateMutability": "view",
+        "inputs": [],
+        "name": "owner",
         "outputs": [
             {
                 "internalType": "address",
-                "type": "address",
-                "name": ""
+                "name": "",
+                "type": "address"
             }
         ],
-        "name": "owner",
-        "inputs": []
-    },
-    {
-        "type": "function",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "type": "bool",
-                "name": ""
-            }
-        ],
-        "name": "paused",
-        "inputs": [],
-        "stateMutability": "view"
+        "stateMutability": "view",
+        "type": "function"
     },
     {
         "inputs": [],
         "name": "renounceOwnership",
-        "type": "function",
         "outputs": [],
-        "stateMutability": "nonpayable"
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
+        "inputs": [],
         "name": "rewardPerTokenStored",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
         "stateMutability": "view",
-        "inputs": [],
         "type": "function"
     },
     {
+        "inputs": [],
         "name": "rewardRate",
-        "stateMutability": "view",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -342,74 +329,18 @@ export const singleAbi = [
                 "type": "uint256"
             }
         ],
-        "inputs": [],
+        "stateMutability": "view",
         "type": "function"
     },
     {
-        "stateMutability": "view",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "type": "function",
         "inputs": [
             {
                 "internalType": "address",
-                "type": "address",
-                "name": ""
-            }
-        ],
-        "name": "rewards"
-    },
-    {
-        "stateMutability": "nonpayable",
-        "name": "transferOwnership",
-        "type": "function",
-        "inputs": [
-            {
-                "name": "newOwner",
-                "type": "address",
-                "internalType": "address"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "name": "userRewardPerTokenPaid",
-        "type": "function",
-        "outputs": [
-            {
-                "type": "uint256",
-                "internalType": "uint256",
-                "name": ""
-            }
-        ],
-        "stateMutability": "view",
-        "inputs": [
-            {
                 "name": "",
-                "type": "address",
-                "internalType": "address"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "inputs": [
-            {
-                "type": "bool",
-                "name": "status",
-                "internalType": "bool"
+                "type": "address"
             }
         ],
-        "stateMutability": "nonpayable",
-        "outputs": [],
-        "name": "pauseContract"
-    },
-    {
+        "name": "rewards",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -417,94 +348,137 @@ export const singleAbi = [
                 "type": "uint256"
             }
         ],
-        "name": "rewardPerToken",
-        "inputs": [],
-        "type": "function",
-        "stateMutability": "view"
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "stateMutability": "view",
-        "name": "earned",
         "inputs": [
             {
-                "name": "account",
-                "type": "address",
-                "internalType": "address"
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
             }
         ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "userRewardPerTokenPaid",
         "outputs": [
             {
-                "type": "uint256",
                 "internalType": "uint256",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "name": "stake",
-        "type": "function",
-        "stateMutability": "nonpayable",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_amount",
-                "internalType": "uint256"
+                "name": "",
+                "type": "uint256"
             }
         ],
-        "outputs": []
-    },
-    {
-        "outputs": [],
-        "name": "withdraw",
-        "stateMutability": "nonpayable",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_amount",
-                "internalType": "uint256"
-            }
-        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
         "inputs": [],
-        "outputs": [],
-        "type": "function",
-        "stateMutability": "nonpayable",
-        "name": "getReward"
+        "name": "rewardPerToken",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
         "inputs": [
             {
-                "type": "uint256",
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "earned",
+        "outputs": [
+            {
                 "internalType": "uint256",
-                "name": "_rate"
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "stake",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getReward",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_rate",
+                "type": "uint256"
             }
         ],
         "name": "setRewardRate",
+        "outputs": [],
         "stateMutability": "nonpayable",
-        "outputs": []
+        "type": "function"
     },
     {
-        "type": "function",
-        "stateMutability": "nonpayable",
-        "outputs": [],
-        "name": "setGrav",
         "inputs": [
             {
+                "internalType": "address",
                 "name": "_grav",
-                "type": "address",
-                "internalType": "address"
+                "type": "address"
             }
-        ]
+        ],
+        "name": "setGrav",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "name": "retrieveGrav",
         "inputs": [],
-        "stateMutability": "nonpayable",
+        "name": "retrieveGrav",
         "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     }
 ]
