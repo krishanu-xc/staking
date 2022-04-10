@@ -369,7 +369,9 @@ const CustomizedAccordions = () => {
                 </Box>
               </Grid>
               <Grid item md={4} style={{ borderTop: '1px solid #E9D758' }}>
-                <Button className={classes.purchaseBtn}>PURCHASE AT THE DFK DEX</Button>
+                <Link target="_blank" href="https://foxswap.one/">
+                  <Button className={classes.purchaseBtn}>SWAP</Button>
+                </Link>
               </Grid>
               <Grid item md={8} style={{ borderTop: '1px solid #E9D758' }}>
                 <Box display="flex" alignItems="center" justifyContent="center" height="100%">
