@@ -316,19 +316,19 @@ const About = () => {
                   </Typography>
                 </Link>
                 <Box display="flex" flexWrap="wrap" justifyContent="center">
-                  <Links href="https://twitter.com/ONEverseONE">
+                  <Links target="_blank" href="https://twitter.com/ONEverseONE">
                     <img width="20px" height="18px" src="/twitter.png" ></img>
                   </Links>
-                  <Links href="https://discord.com/invite/oneverse">
+                  <Links target="_blank" href="https://discord.gg/ONEverse">
                     <img width="20px" height="20px" src="/discord.png"></img>
                   </Links>
-                  <Links href="https://ovexclusive.com/">
+                  <Links target="_blank" href="https://ovexclusive.com/">
                     <img width="20px" height="20px" style={{ marginRight: 0 }} src="/medium.png"></img>
                   </Links>
-                  <Links href="https://t.me/ONEverseONEofficial">
+                  <Links target="_blank" href="https://t.me/ONEverseONEofficial">
                     <img width="20px" height="20px" src="/telegram.png"></img>
                   </Links>
-                  <Links href="https://www.reddit.com/r/ONEverse/">
+                  <Links target="_blank" href="https://www.reddit.com/r/ONEverse/">
                     <img width="20px" height="20px" src="/reddit.png"></img>
                   </Links>
                 </Box>
@@ -338,7 +338,9 @@ const About = () => {
             <Box id="oneverse">
               <Box className={classes.gamingBlock}>
                 <Box className={classes.centerBlock}>
-                  <Button className={classes.buttonCta}></Button>
+                  <Links href="https://testnet.oneverse.one/">
+                    <Button className={classes.buttonCta}></Button>
+                  </Links>
                 </Box>
               </Box>
               <Box>
@@ -416,16 +418,20 @@ const About = () => {
                     </Box>
                   </Box>
                   <Box display="flex">
-                    <Button className={classes.learnMoreBtn}>
-                      <Typography variant="h2" className={classes.ctaBtn}>
-                        LEARN MORE
-                      </Typography>
-                    </Button>
-                    <Button className={classes.buyBtn}>
-                      <Typography variant="h2" className={classes.ctaBtn}>
-                        BUY
-                      </Typography>
-                    </Button>
+                    <Links target="_blank" href="https://puffs.one/">
+                      <Button className={classes.learnMoreBtn}>
+                        <Typography variant="h2" className={classes.ctaBtn}>
+                          LEARN MORE
+                        </Typography>
+                      </Button>
+                    </Links>
+                    <Links target="_blank" href="https://nftkey.app/collections/puffs/">
+                      <Button className={classes.buyBtn}>
+                        <Typography variant="h2" className={classes.ctaBtn}>
+                          BUY
+                        </Typography>
+                      </Button>
+                    </Links>
                   </Box>
                 </Box>
               </Grid>

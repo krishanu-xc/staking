@@ -5,7 +5,7 @@ import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
 import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { Box, Grid, Button } from '@material-ui/core';
+import { Box, Grid, Button, Link } from '@material-ui/core';
 import clsx from 'clsx';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
@@ -424,7 +424,9 @@ const CustomizedAccordions = () => {
                 </Box>
               </Grid>
               <Grid item xs={12}>
-                <Button className={classes.purchaseBtn}>PURCHASE AT THE DFK DEX</Button>
+                <Link target="_blank" href="https://foxswap.one/">
+                  <Button className={classes.purchaseBtn}>SWAP</Button>
+                </Link>
               </Grid>
             </Grid>
           )}
