@@ -305,12 +305,18 @@ const useStyles = makeStyles((theme) => ({
   stakedAmount: {
     color: "#000",
     fontWeight: "normal",
-    marginRight: "10px"
+    marginRight: "10px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "16px"
+    }
   },
   rewardedAmount: {
     color: "#000",
     fontWeight: "normal",
-    marginRight: "10px"
+    marginRight: "10px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "16px"
+    }
   },
   stakingNFT: {
     width: "100%",
@@ -1464,8 +1470,8 @@ const Staking = () => {
 
     dispatch({
       type: 'SET_STAKED_PENDING',
-      stakedAmount: temp.toFixed(10),
-      pendingReward: tempPending.toFixed(10)
+      stakedAmount: temp.toFixed(5),
+      pendingReward: tempPending.toFixed(5)
     });
   }
 
