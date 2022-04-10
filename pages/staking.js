@@ -1,32 +1,63 @@
 import Layout from "components/layout/Layout";
 
-import { Container, Grid, Typography, Box, Button, ButtonGroup, Tabs, Tab, Switch, Select, Input, MenuItem, Checkbox } from "@material-ui/core";
+import {
+  Container,
+  Grid,
+  Typography,
+  Box,
+  Button,
+  ButtonGroup,
+  Tabs,
+  Tab,
+  Switch,
+  Select,
+  Input,
+  MenuItem,
+  Checkbox,
+} from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import { Link } from 'react-scroll';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
+import { Link } from "react-scroll";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 import clsx from "clsx";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
-import React, { useEffect, useReducer, useState } from 'react';
-import Web3 from 'web3';
-import { singleContractAddress, singleAbi, lockContractAddress, lockAbi, tokenAddress, tokenAbi, nftContractAddress, nftContractABI, nftAddress, nftABI, lockXGRAVContractAddress, lockXGRAVAbi } from '../public/config';
+import React, { useEffect, useReducer, useState } from "react";
+import Web3 from "web3";
+import {
+  singleContractAddress,
+  singleAbi,
+  lockContractAddress,
+  lockAbi,
+  tokenAddress,
+  tokenAbi,
+  nftContractAddress,
+  nftContractABI,
+  nftAddress,
+  nftABI,
+  lockXGRAVContractAddress,
+  lockXGRAVAbi,
+} from "../public/config";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Link as Links } from "@material-ui/core";
 
-import PropTypes from 'prop-types';
-import CloseIcon from '@material-ui/icons/Close';
-import AddIcon from '@material-ui/icons/Add';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import UnlocksModal from '../components/Staking/UnlocksModal'
-import { Provider as MulticallProvider, Contract as MulticallContract } from "ethers-multicall";
-import axios from 'axios'
+import PropTypes from "prop-types";
+import CloseIcon from "@material-ui/icons/Close";
+import AddIcon from "@material-ui/icons/Add";
+import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
+import UnlocksModal from "../components/Staking/UnlocksModal";
+import { ethers } from "ethers";
+import {
+  Provider as MulticallProvider,
+  Contract as MulticallContract,
+} from "ethers-multicall";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   connectBtn: {
@@ -35,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     color: "#E9D758",
     border: "1px solid #E9D758",
-    borderRadius: "0"
+    borderRadius: "0",
   },
   leftSide: {
     position: "sticky",
@@ -47,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
       height: "40px",
       marginRight: "10px",
       marginBottom: "10px",
-    }
+    },
   },
   leftMenu: {
     "& h2": {
@@ -64,8 +95,8 @@ const useStyles = makeStyles((theme) => ({
     },
     "&.active h2": {
       backgroundImage: "url('menu-active.png')",
-      color: "#fff"
-    }
+      color: "#fff",
+    },
   },
   flexibleBlock: {
     backgroundImage: "url('flexible-frame.png')",
@@ -79,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
       padding: "16px",
       paddingTop: "0",
       backgroundSize: "180% 100%",
-    }
+    },
   },
   swapBlock: {
     backgroundImage: "url('swap-frame.png')",
@@ -93,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
       padding: "16px",
       paddingTop: "0",
       backgroundSize: "180% 100%",
-    }
+    },
   },
   nftStakingBlock: {
     backgroundImage: "url('nft-staking-frame.png')",
@@ -105,7 +136,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       padding: "0px 16px",
       backgroundSize: "130% 100%",
-    }
+    },
   },
   lockStakingBlock: {
     backgroundImage: "url('lock-staking-frame.png')",
@@ -118,12 +149,12 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       padding: "0px 16px",
       backgroundSize: "216% 100%",
-      paddingBottom: "10px"
-    }
+      paddingBottom: "10px",
+    },
   },
   blockTitle: {
     paddingTop: "16px",
-    color: '#E9D758',
+    color: "#E9D758",
     fontSize: "24px",
     lineHeight: "26px",
   },
@@ -135,20 +166,20 @@ const useStyles = makeStyles((theme) => ({
     color: "#E9D758",
     display: "flex",
     alignItems: "center",
-    marginBottom: "48px"
+    marginBottom: "48px",
   },
   flexibleContent: {
     paddingTop: "60px",
     [theme.breakpoints.down("xs")]: {
       paddingBottom: "20px",
-    }
+    },
   },
   nftStakingContent: {
     paddingTop: "40px",
     paddingBottom: "55px",
     [theme.breakpoints.down("xs")]: {
-      paddingTop: "80px"
-    }
+      paddingTop: "80px",
+    },
   },
   leftFlexBlock: {
     backgroundImage: "url('flex-left.png')",
@@ -158,8 +189,8 @@ const useStyles = makeStyles((theme) => ({
     height: "263px",
     textAlign: "center",
     "& .MuiButtonGroup-grouped": {
-      minWidth: "100px"
-    }
+      minWidth: "100px",
+    },
   },
   leftStakingBlock: {
     backgroundImage: "url('incubator-illo.png')",
@@ -171,14 +202,14 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     [theme.breakpoints.down("xs")]: {
       width: "100%",
-    }
+    },
   },
   flyInto: {
     fontWeight: "600",
     fontSize: "20px",
     lineHeight: "22px",
     color: "#E9D758",
-    paddingTop: "12px"
+    paddingTop: "12px",
   },
   flyInto1: {
     fontWeight: "600",
@@ -191,7 +222,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     lineHeight: "18px",
     color: "#E9D758",
-    paddingTop: "28px"
+    paddingTop: "28px",
   },
   flexStakeInput: {
     width: "218px",
@@ -212,20 +243,20 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: "6px",
     "& span": {
       cursor: "pointer",
-      height: "14px"
+      height: "14px",
     },
     "& .rc-input-number-handler-up": {
-      border: "0"
+      border: "0",
     },
     "& .rc-input-number-handler-wrap": {
-      border: "0"
-    }
+      border: "0",
+    },
   },
   darkMatter: {
     fontWeight: 400,
     fontSize: "12px",
     lineHeight: "13px",
-    marginBottom: "24px"
+    marginBottom: "24px",
   },
   stakeBtn: {
     color: "#000",
@@ -233,15 +264,15 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #E9D758",
     "&:hover": {
       border: "1px solid #E9D758",
-      background: "#E9D758"
-    }
+      background: "#E9D758",
+    },
   },
   unstakeBtn: {
     color: "#fff",
     border: "1px solid #E9D758",
     "&:hover": {
       border: "1px solid #E9D758",
-    }
+    },
   },
   rewardBlock: {
     backgroundImage: "url('reward-frame.png')",
@@ -255,8 +286,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     [theme.breakpoints.down("xs")]: {
       marginTop: "50px",
-      height: "230px"
-    }
+      height: "230px",
+    },
   },
   stakedBlock: {
     width: "270px",
@@ -266,8 +297,8 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: "12px",
     [theme.breakpoints.down("xs")]: {
       width: "200px",
-      marginTop: "50px"
-    }
+      marginTop: "50px",
+    },
   },
   rewardedBlock: {
     width: "270px",
@@ -291,7 +322,7 @@ const useStyles = makeStyles((theme) => ({
     fontStyle: "normal",
     fontSize: "14px",
     lineHeight: "16px",
-    fontWeight: 600
+    fontWeight: 600,
   },
   rewardLabel: {
     textAlign: "left",
@@ -300,25 +331,25 @@ const useStyles = makeStyles((theme) => ({
     fontStyle: "normal",
     fontSize: "12px",
     lineHeight: "13px",
-    fontWeight: 600
+    fontWeight: 600,
   },
   stakedAmount: {
     color: "#000",
     fontWeight: "normal",
-    marginRight: "10px"
+    marginRight: "10px",
   },
   rewardedAmount: {
     color: "#000",
     fontWeight: "normal",
-    marginRight: "10px"
+    marginRight: "10px",
   },
   stakingNFT: {
     width: "100%",
     background: "#06070E",
     [theme.breakpoints.down("xs")]: {
       marginTop: "30px",
-      marginBottom: "50px"
-    }
+      marginBottom: "50px",
+    },
   },
   nftTitle: {
     width: "fit-content",
@@ -327,7 +358,7 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "none",
     [theme.breakpoints.down("xs")]: {
       padding: "10px 40px 10px 15px",
-    }
+    },
   },
   totalBlock: {
     display: "flex",
@@ -335,7 +366,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     border: "1px solid #E9D758",
     marginRight: "20px",
-    padding: "5px 20px"
+    padding: "5px 20px",
   },
   totalTitle: {
     fontStyle: "normal",
@@ -343,7 +374,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "14px",
     lineHeight: "17px",
     color: "#FFFFFF",
-    marginRight: "50px"
+    marginRight: "50px",
   },
   gravAmount: {
     fontStyle: "normal",
@@ -371,7 +402,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: "15px",
       lineHeight: "16px",
       width: "160px",
-    }
+    },
   },
   nftUnStakeBtn: {
     borderRadius: "0",
@@ -387,19 +418,19 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     "&:hover": {
       background: "transparent",
-    }
+    },
   },
   singleStakeInput: {
     marginTop: "20px",
     marginBottom: "20px",
     width: "60%",
-    transition: 'none',
+    transition: "none",
     "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "#E9D758"
+      borderColor: "#E9D758",
     },
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
       borderColor: "#E9D758",
-      borderWidth: "1px"
+      borderWidth: "1px",
     },
     "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
       borderColor: "#E9D758",
@@ -418,18 +449,18 @@ const useStyles = makeStyles((theme) => ({
     },
     "& .MuiTypography-colorTextSecondary": {
       color: "#fff",
-    }
+    },
   },
   stakedInput: {
     marginRight: "20px",
     width: "100%",
-    transition: 'none',
+    transition: "none",
     "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "#E9D758"
+      borderColor: "#E9D758",
     },
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
       borderColor: "#E9D758",
-      borderWidth: "1px"
+      borderWidth: "1px",
     },
     "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
       borderColor: "#E9D758",
@@ -442,7 +473,7 @@ const useStyles = makeStyles((theme) => ({
     },
     "& .MuiTypography-colorTextSecondary": {
       color: "#fff",
-    }
+    },
   },
   unitLabel: {
     "& p": {
@@ -451,21 +482,21 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "500",
       fontSize: "18px",
       lineHeight: "26px",
-      color: '#fff',
+      color: "#fff",
       [theme.breakpoints.down("xs")]: {
         fontSize: "14px",
-      }
-    }
+      },
+    },
   },
   unitLabel1: {
     fontFamily: "Archivo",
     fontStyle: "normal",
     fontWeight: "500",
     fontSize: "18px",
-    color: '#fff',
+    color: "#fff",
     [theme.breakpoints.down("xs")]: {
       fontSize: "14px",
-    }
+    },
   },
   stakeAmountInput: {
     width: "100vh",
@@ -475,7 +506,7 @@ const useStyles = makeStyles((theme) => ({
     "& input": {
       color: "#fff",
       border: "0",
-      padding: "14px"
+      padding: "14px",
     },
     "& input::placeholder": {
       fontFamily: "Archivo",
@@ -483,11 +514,11 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "normal",
       fontSize: "14px",
       lineHeight: "17px",
-      color: '#333745'
+      color: "#333745",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      border: "0"
-    }
+      border: "0",
+    },
   },
   claimBtn: {
     marginTop: "7px",
@@ -503,8 +534,8 @@ const useStyles = makeStyles((theme) => ({
     height: "42px",
     [theme.breakpoints.down("xs")]: {
       width: "100%",
-      fontWeight: "800"
-    }
+      fontWeight: "800",
+    },
   },
   topLabel: {
     fontFamily: "Archivo",
@@ -514,8 +545,8 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "15px",
     color: "#E9D758",
     [theme.breakpoints.down("xs")]: {
-      marginBottom: "5px"
-    }
+      marginBottom: "5px",
+    },
   },
   topLabelInfo: {
     fontFamily: "Archivo",
@@ -529,8 +560,8 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: "40px",
     border: "1px solid #E9D758",
     [theme.breakpoints.down("xs")]: {
-      border: "0"
-    }
+      border: "0",
+    },
   },
   stakeAndLockLeft: {
     borderLeft: "6px solid #E9D758",
@@ -542,31 +573,31 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: "30px",
       borderBottom: "1px solid #E9D758",
       borderTop: "1px solid #E9D758",
-    }
+    },
   },
   stakeAndLockRight: {
     borderLeft: "1px solid #E9D758",
     [theme.breakpoints.down("xs")]: {
       borderLeft: "6px solid #E9D758",
-    }
+    },
   },
   stakeAndLockRightTop: {
     borderBottom: "1px solid #E9D758",
     [theme.breakpoints.down("xs")]: {
       borderRight: "1px solid #E9D758",
-    }
+    },
   },
   stakeAndLockRightBottomLeft: {
     borderRight: "1px solid #E9D758",
     [theme.breakpoints.down("xs")]: {
       borderBottom: "1px solid #E9D758",
-    }
+    },
   },
   stakeAndLockRightBottomRight: {
     borderRight: "1px solid #E9D758",
     [theme.breakpoints.down("xs")]: {
       borderBottom: "1px solid #E9D758",
-    }
+    },
   },
   stake6btn: {
     padding: "13px",
@@ -587,7 +618,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     lineHeight: "17.5px",
     color: "#E9D758",
-    marginBottom: "17px"
+    marginBottom: "17px",
   },
   stakeAndLockSubTitle: {
     fontWeight: "normal",
@@ -617,13 +648,13 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       width: "100px",
       height: "100px",
-    }
+    },
   },
   stakeInputBlock: {
     marginBottom: "70px",
     [theme.breakpoints.down("xs")]: {
-      justifyContent: "center"
-    }
+      justifyContent: "center",
+    },
   },
   activeCta: {
     background: "#E9D758",
@@ -634,8 +665,8 @@ const useStyles = makeStyles((theme) => ({
     },
     "&.Mui-disabled": {
       background: "#333745",
-      color: "#06070E"
-    }
+      color: "#06070E",
+    },
   },
   mobileCTA: {
     [theme.breakpoints.down("xs")]: {
@@ -644,29 +675,29 @@ const useStyles = makeStyles((theme) => ({
       "&:hover": {
         background: "#E9D758",
         color: "#000",
-      }
-    }
+      },
+    },
   },
   customLeftArrow: {
     display: "block",
     top: "40%",
     "&::before": {
-      display: "none"
+      display: "none",
     },
     right: "-20px",
     [theme.breakpoints.down("xs")]: {
       top: "45%",
       "& img": {
         width: "20px",
-        height: "30px"
-      }
-    }
+        height: "30px",
+      },
+    },
   },
   customRightArrow: {
     display: "block",
     top: "40%",
     "&::before": {
-      display: "none"
+      display: "none",
     },
     left: "-30px",
     [theme.breakpoints.down("xs")]: {
@@ -674,27 +705,27 @@ const useStyles = makeStyles((theme) => ({
       left: "-20px",
       "& img": {
         width: "20px",
-        height: "30px"
-      }
-    }
+        height: "30px",
+      },
+    },
   },
   nftItem: {
     display: "flex !important",
     justifyContent: "center",
     flexDirection: "column",
     alignItems: "center",
-    border: "none"
+    border: "none",
   },
   nftImgContainer: {
     padding: "10px 55px",
     border: "2px solid #333745",
     [theme.breakpoints.down("xs")]: {
       padding: "10px 35px",
-    }
+    },
   },
   selectBtn: {
     fontFamily: "Archivo",
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: "16px",
     lineHeight: "17.41px",
     padding: "15px",
@@ -706,11 +737,11 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       width: "174px",
       padding: "10px",
-    }
+    },
   },
   selectBtn1: {
     fontFamily: "Archivo",
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: "16px",
     lineHeight: "17.41px",
     padding: "15px",
@@ -727,14 +758,14 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       width: "174px",
       padding: "10px",
-    }
+    },
   },
   nftNFTs: {
     border: "1px solid #E9D758",
     padding: "13px 20px 29px 20px",
     [theme.breakpoints.down("xs")]: {
       padding: "10px 15px 20px 15px",
-    }
+    },
   },
   selectAllBtn: {
     width: "110px",
@@ -750,7 +781,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "0",
     "&:hover": {
       background: "#E9D758",
-    }
+    },
   },
   myNft: {
     fontStyle: "normal",
@@ -760,8 +791,8 @@ const useStyles = makeStyles((theme) => ({
     color: "#FFFFFF",
     marginRight: "57px",
     [theme.breakpoints.down("xs")]: {
-      marginBottom: "10px"
-    }
+      marginBottom: "10px",
+    },
   },
   muiTab: {
     fontFamily: "Archivo",
@@ -781,15 +812,15 @@ const useStyles = makeStyles((theme) => ({
       borderRight: "none",
     },
     "&.Mui-selected": {
-      background: "#E9D758 !important"
+      background: "#E9D758 !important",
     },
     [theme.breakpoints.down("xs")]: {
       padding: "5px 0",
       minWidth: "100px !important",
-    }
+    },
   },
   muiTabs: {
-    minHeight: "unset !important"
+    minHeight: "unset !important",
   },
   stakingImg: {
     width: "88px",
@@ -799,14 +830,14 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       width: "65px",
       height: "65px",
-    }
+    },
   },
   stakingWrap: {
     padding: "21px",
     flexGrow: "1",
     [theme.breakpoints.down("xs")]: {
       padding: "10px",
-    }
+    },
   },
   stakingInfo: {
     fontWeight: "600",
@@ -817,7 +848,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "70px",
     [theme.breakpoints.down("xs")]: {
       marginRight: "15px",
-    }
+    },
   },
   stakingInfo1: {
     fontWeight: "600",
@@ -825,10 +856,10 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "13px",
     letterSpacing: "0.05em",
     color: "#FFFFFF",
-    marginRight: "18px"
+    marginRight: "18px",
   },
   stakingInfoSelected: {
-    color: "#333745"
+    color: "#333745",
   },
   stakingName: {
     fontStyle: "normal",
@@ -839,14 +870,14 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       fontSize: "14px",
       lineHeight: "15px",
-    }
+    },
   },
   stakingNameSelect: {
-    color: "#06070E"
+    color: "#06070E",
   },
   stakingCTA: {
     color: "#333745",
-    fontSize: "40px"
+    fontSize: "40px",
   },
   stakingNFTBlock: {
     background: "#06070E",
@@ -856,15 +887,15 @@ const useStyles = makeStyles((theme) => ({
   },
   selectedNFT: {
     borderColor: "#E9D758",
-    background: "#E9D758"
+    background: "#E9D758",
   },
   nftCheckbox: {
     color: "#333745",
     padding: "1px",
     borderRadius: "0",
-    '&.Mui-checked': {
+    "&.Mui-checked": {
       color: "#E9D758",
-    }
+    },
   },
   nftScroll: {
     height: "260px",
@@ -874,24 +905,24 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       paddingRight: "10px",
       marginBottom: "35px",
-    }
+    },
   },
   unitMobile: {
     [theme.breakpoints.down("xs")]: {
-      fontSize: "12px"
-    }
+      fontSize: "12px",
+    },
   },
   itemMargin: {
     [theme.breakpoints.down("xs")]: {
-      marginBottom: "12px"
-    }
+      marginBottom: "12px",
+    },
   },
   lockXgrav: {
     fontSize: "15px !important",
     [theme.breakpoints.down("xs")]: {
       marginBottom: "12px",
-      width: "230px"
-    }
+      width: "230px",
+    },
   },
   iconBlock: {
     padding: "36px",
@@ -904,14 +935,14 @@ const useStyles = makeStyles((theme) => ({
       padding: "55px",
       "& img": {
         width: "226px",
-        height: "226px"
-      }
-    }
+        height: "226px",
+      },
+    },
   },
   whiteBg: {
     background: "#fff",
     minHeight: "16px",
-    flexGrow: "1"
+    flexGrow: "1",
   },
   antiGrav: {
     fontStyle: "normal",
@@ -920,7 +951,7 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "17px",
     color: "#FFFFFF",
     flexShrink: "0",
-    marginRight: "16px"
+    marginRight: "16px",
   },
   antiGravDesc: {
     fontStyle: "normal",
@@ -941,7 +972,7 @@ const useStyles = makeStyles((theme) => ({
   forwardIcon: {
     color: "#fff",
     fontSize: "18px",
-    marginRight: "10px"
+    marginRight: "10px",
   },
   antiGravDescBottom: {
     fontStyle: "normal",
@@ -950,18 +981,18 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "15px",
     color: "#FFFFFF",
     marginTop: "10px",
-    marginBottom: "16px"
+    marginBottom: "16px",
   },
   whiteWrap: {
     border: "1px solid #fff",
-    padding: "16px"
+    padding: "16px",
   },
   swapInputBlock: {
     marginBottom: "40px",
     [theme.breakpoints.down("xs")]: {
       display: "flex",
-      justifyContent: "center"
-    }
+      justifyContent: "center",
+    },
   },
   penalty: {
     fontStyle: "normal",
@@ -969,10 +1000,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "14px",
     lineHeight: "15px",
     color: "#FFFFFF",
-    marginBottom: "10px"
+    marginBottom: "10px",
   },
   mb0: {
-    marginBottom: "0"
+    marginBottom: "0",
   },
   toggleBtn: {
     width: "48px",
@@ -980,27 +1011,27 @@ const useStyles = makeStyles((theme) => ({
     padding: "0",
     "& .MuiSwitch-switchBase": {
       top: "-5px",
-      left: "-5px"
+      left: "-5px",
     },
-    '& .MuiSwitch-track': {
-      background: '#333745',
+    "& .MuiSwitch-track": {
+      background: "#333745",
       opacity: "1",
-      borderRadius: "0"
+      borderRadius: "0",
     },
     "& .MuiSwitch-thumb": {
-      borderRadius: '0',
+      borderRadius: "0",
       width: "20px",
-      height: "16px"
+      height: "16px",
     },
     "& .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track": {
       background: "#E9D758",
-      opacity: "1"
+      opacity: "1",
     },
   },
   mobileLocked: {
     [theme.breakpoints.down("xs")]: {
-      width: "200px"
-    }
+      width: "200px",
+    },
   },
   lockedRightTop: {
     right: "0px",
@@ -1008,8 +1039,8 @@ const useStyles = makeStyles((theme) => ({
     padding: "15px 33px",
     border: "1px solid #E9D758",
     [theme.breakpoints.down("xs")]: {
-      width: "200px"
-    }
+      width: "200px",
+    },
   },
   formControl: {
     minWidth: "100%",
@@ -1024,162 +1055,162 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiSelect-select.MuiSelect-select": {
       paddingTop: "14px",
       paddingBottom: "14px",
-      paddingLeft: "70px"
+      paddingLeft: "70px",
     },
     "& svg": {
       fontSize: "40px",
       top: "3px",
-      fill: "#E9D758"
-    }
+      fill: "#E9D758",
+    },
   },
   itemText: {
     color: "#FFFFFF",
     fontSize: "16px",
     fontFamily: "Archivo",
-  }
+  },
 }));
 
 const initialState = {
   address: null,
   web3: null,
   singleContract: null,
-  stakedAmount: '',
-  pendingReward: '',
-  singleInputAmount: '',
+  stakedAmount: "",
+  pendingReward: "",
+  singleInputAmount: "",
   lockContract: null,
-  lockStakedAmount: '',
-  lockPendingReward: '',
-  monthStakingInputAmount: '',
-  lockUnstakeAmount: '',
-  lockDepositAmount: '',
+  lockStakedAmount: "",
+  lockPendingReward: "",
+  monthStakingInputAmount: "",
+  lockUnstakeAmount: "",
+  lockDepositAmount: "",
   nftContract: null,
   currentItems: null,
   stakedItems: null,
   rewardItems: null,
-  totalRewards: '',
+  totalRewards: "",
   lockXgravContract: null,
-  lockXgravStakedAmount: '',
-  lockXgravPendingReward: '',
-  lockXgravStakingInput: '',
-  lockXgravWithdrawal: '',
+  lockXgravStakedAmount: "",
+  lockXgravPendingReward: "",
+  lockXgravStakingInput: "",
+  lockXgravWithdrawal: "",
   lockStakedIds: [],
-  lockStakedRewards: {}
+  lockStakedRewards: {},
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'SET_ADDRESS':
+    case "SET_ADDRESS":
       return {
         ...state,
         address: action.address,
       };
-    case 'SET_WEB3':
+    case "SET_WEB3":
       return {
         ...state,
         web3: action.web3,
       };
-    case 'SET_SINGLE_CONTRACT':
+    case "SET_SINGLE_CONTRACT":
       return {
         ...state,
         singleContract: action.singleContract,
       };
-    case 'SET_SINGLE_AMOUNT':
+    case "SET_SINGLE_AMOUNT":
       return {
         ...state,
         singleInputAmount: action.singleInputAmount,
       };
-    case 'SET_LOCK_CONTRACT':
+    case "SET_LOCK_CONTRACT":
       return {
         ...state,
         lockContract: action.lockContract,
       };
-    case 'SET_XGRAV_LOCK_CONTRACT':
+    case "SET_XGRAV_LOCK_CONTRACT":
       return {
         ...state,
         lockXgravContract: action.lockXgravContract,
       };
-    case 'SET_NFT_CONTRACT':
+    case "SET_NFT_CONTRACT":
       return {
         ...state,
         nftContract: action.nftContract,
       };
-    case 'SET_CURRENT_ITEMS':
+    case "SET_CURRENT_ITEMS":
       return {
         ...state,
         currentItems: action.currentItems,
       };
-    case 'SET_STAKED_ITEMS':
+    case "SET_STAKED_ITEMS":
       return {
         ...state,
         stakedItems: action.stakedItems,
       };
-    case 'SET_REWARD_ITEMS':
+    case "SET_REWARD_ITEMS":
       return {
         ...state,
         rewardItems: action.rewardItems,
       };
-    case 'SET_TOTAL_REWARDS':
+    case "SET_TOTAL_REWARDS":
       return {
         ...state,
         totalRewards: action.totalRewards,
       };
-    case 'SET_MONTH_STAKE_AMOUNT':
+    case "SET_MONTH_STAKE_AMOUNT":
       return {
         ...state,
         monthStakingInputAmount: action.monthStakingInputAmount,
       };
-    case 'SET_XGRAV_LOCK_STAKE_AMOUNT':
+    case "SET_XGRAV_LOCK_STAKE_AMOUNT":
       return {
         ...state,
         lockXgravStakingInput: action.lockXgravStakingInput,
       };
-    case 'SET_XGRAV_LOCK_WITHDRAWAL_AMOUNT':
+    case "SET_XGRAV_LOCK_WITHDRAWAL_AMOUNT":
       return {
         ...state,
         lockXgravWithdrawal: action.lockXgravWithdrawal,
       };
-    case 'SET_UNSTAKE_AMOUNT':
+    case "SET_UNSTAKE_AMOUNT":
       return {
         ...state,
         lockUnstakeAmount: action.lockUnstakeAmount,
       };
-    case 'SET_LOCK_DEPOSIT_AMOUNT':
+    case "SET_LOCK_DEPOSIT_AMOUNT":
       return {
         ...state,
         lockDepositAmount: action.lockDepositAmount,
       };
-    case 'SET_STAKED_PENDING':
+    case "SET_STAKED_PENDING":
       return {
         ...state,
         stakedAmount: action.stakedAmount,
-        pendingReward: action.pendingReward
+        pendingReward: action.pendingReward,
       };
-    case 'SET_LOCK_STAKED_PENDING':
+    case "SET_LOCK_STAKED_PENDING":
       return {
         ...state,
         lockStakedAmount: action.lockStakedAmount,
-        lockPendingReward: action.lockPendingReward
+        lockPendingReward: action.lockPendingReward,
       };
-    case 'SET_LOCK_STAKED_IDS':
+    case "SET_LOCK_STAKED_IDS":
       return {
         ...state,
         lockStakedIds: action.lockStakedIds,
       };
-    case 'SET_LOCK_STAKED_REWARDS':
+    case "SET_LOCK_STAKED_REWARDS":
       return {
         ...state,
         lockStakedRewards: action.lockStakedRewards,
       };
-    case 'SET_XGRAV_LOCK_STAKED_PENDING':
+    case "SET_XGRAV_LOCK_STAKED_PENDING":
       return {
         ...state,
         lockXgravStakedAmount: action.lockXgravStakedAmount,
-        lockXgravPendingReward: action.lockXgravPendingReward
+        lockXgravPendingReward: action.lockXgravPendingReward,
       };
     default:
       throw new Error();
   }
-}
+};
 
 const Staking = () => {
   const classes = useStyles();
@@ -1211,79 +1242,84 @@ const Staking = () => {
     lockXgravStakingInput,
     lockXgravWithdrawal,
     lockStakedIds,
-    lockStakedRewards
+    lockStakedRewards,
   } = state;
+
+  const [APR, setAPR] = useState("~");
 
   const connectWallet = async () => {
     const providerOptions = {
       metamask: {
         display: {
           name: "Injected",
-          description: "Connect with the provider in your Browser"
+          description: "Connect with the provider in your Browser",
         },
-        package: null
+        package: null,
       },
       walletconnect: {
         package: WalletConnectProvider, // required
         options: {
           rpc: {
-            1666600000: 'https://api.harmony.one'
+            1666600000: "https://api.harmony.one",
           },
-          network: 'harmony mainnet'
-        }
-      }
+          network: "harmony mainnet",
+        },
+      },
     };
 
     const web3Modal = new Web3Modal({
       cacheProvider: true, // optional
       disableInjectedProvider: false,
-      providerOptions // required
+      providerOptions, // required
     });
     web3Modal.clearCachedProvider();
 
     const provider = await web3Modal.connect();
     const web3 = new Web3(provider);
 
-    provider.on('connect', (info) => {
+    provider.on("connect", (info) => {
       toast.success(`Connected wallet`);
     });
 
-    provider.on('error', e => {
+    provider.on("error", (e) => {
       toast.success(e);
     });
 
-    provider.on('disconnect', (error) => {
+    provider.on("disconnect", (error) => {
       web3Modal.clearCachedProvider();
       dispatch({
-        type: 'SET_ADDRESS',
-        address: ''
+        type: "SET_ADDRESS",
+        address: "",
       });
     });
 
     provider.on("accountsChanged", (accounts) => {
       dispatch({
-        type: 'SET_ADDRESS',
-        address: accounts[0]
-      })
+        type: "SET_ADDRESS",
+        address: accounts[0],
+      });
     });
 
     const address = await web3.eth.getAccounts();
 
     dispatch({
-      type: 'SET_ADDRESS',
-      address: address[0]
+      type: "SET_ADDRESS",
+      address: address[0],
     });
 
     dispatch({
-      type: 'SET_WEB3',
-      web3: web3
+      type: "SET_WEB3",
+      web3: web3,
     });
 
-    const singleStakingContract = new web3.eth.Contract(singleAbi, singleContractAddress)
+    const singleStakingContract = new web3.eth.Contract(
+      singleAbi,
+      singleContractAddress
+    );
 
     dispatch({
-      type: 'SET_SINGLE_CONTRACT',
-      singleContract: singleStakingContract
+      type: "SET_SINGLE_CONTRACT",
+      singleContract: singleStakingContract,
     });
 
     // const lockStakingContract = new web3.eth.Contract(lockAbi, lockContractAddress)
@@ -1298,11 +1334,15 @@ const Staking = () => {
     const provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
     const _signer = provider1.getSigner();
 
-    const nftStakingContract = new ethers.Contract(nftContractAddress, nftContractABI, _signer);
+    const nftStakingContract = new ethers.Contract(
+      nftContractAddress,
+      nftContractABI,
+      _signer
+    );
 
     dispatch({
-      type: 'SET_NFT_CONTRACT',
-      nftContract: nftStakingContract
+      type: "SET_NFT_CONTRACT",
+      nftContract: nftStakingContract,
     });
 
     // const lockXgravContracts = new web3.eth.Contract(lockXGRAVAbi, lockXGRAVContractAddress);
@@ -1311,11 +1351,11 @@ const Staking = () => {
     //   type: 'SET_XGRAV_LOCK_CONTRACT',
     //   lockXgravContract: lockXgravContracts
     // });
-  }
+  };
 
   useEffect(() => {
     singleContract && getBalance();
-  }, [singleContract])
+  }, [singleContract]);
 
   // useEffect(() => {
   //   lockContract && getLockStakingBalance();
@@ -1327,12 +1367,14 @@ const Staking = () => {
 
   useEffect(() => {
     nftContract && getNFTBalance();
-  }, [nftContract])
+  }, [nftContract]);
 
   const getNFTBalance = async () => {
     const ethers = require("ethers");
 
-    let provider = new ethers.providers.JsonRpcProvider("https://api.harmony.one");
+    let provider = new ethers.providers.JsonRpcProvider(
+      "https://api.harmony.one"
+    );
 
     //Contract
     const contract = new ethers.Contract(nftAddress, nftABI, provider);
@@ -1348,34 +1390,37 @@ const Staking = () => {
 
       await ethcallProvider.init();
       ethcallProvider._multicallAddress =
-        '0x34b415f4d3b332515e66f70595ace1dcf36254c5';
+        "0x34b415f4d3b332515e66f70595ace1dcf36254c5";
 
       const multicallContract = new MulticallContract(nftAddress, nftABI);
-      return ([ethcallProvider, multicallContract]);
-
-    }
-    const [multicallProvider, multicallContract] = await setupMultiCallContract(nftAddress, nftABI);
-    let tokenCalls = []
+      return [ethcallProvider, multicallContract];
+    };
+    const [multicallProvider, multicallContract] = await setupMultiCallContract(
+      nftAddress,
+      nftABI
+    );
+    let tokenCalls = [];
     for (let i = 0; i < balance; i++) {
       tokenCalls.push(multicallContract.tokenOfOwnerByIndex(address, i));
     }
-    const userTokens = (await multicallProvider?.all(tokenCalls)).map(e => e.toString());
+    const userTokens = (await multicallProvider?.all(tokenCalls)).map((e) =>
+      e.toString()
+    );
 
     const promises = userTokens.map(async (element) => {
       try {
         const uri = await contract.tokenURI(element);
         const response = await fetch(uri);
 
-        if (!response.ok)
-          throw new Error(response.statusText);
+        if (!response.ok) throw new Error(response.statusText);
 
         const json = await response.json();
         return {
           id: element,
           name: json.name,
           key: json.dna,
-          url: json.image
-        }
+          url: json.image,
+        };
         // return {
         //   id: element,
         //   name: element,
@@ -1383,49 +1428,48 @@ const Staking = () => {
         //   url: '/buy-button.png'
         // }
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
-    })
-    const itemsArr = await Promise.all(promises)
+    });
+    const itemsArr = await Promise.all(promises);
 
     dispatch({
-      type: 'SET_CURRENT_ITEMS',
-      currentItems: itemsArr
+      type: "SET_CURRENT_ITEMS",
+      currentItems: itemsArr,
     });
 
     const stakedOnes = await nftContract.getUserStaked(address);
-    const stakedIds = stakedOnes.map((e) => Number(e))
+    const stakedIds = stakedOnes.map((e) => Number(e));
 
     const stakedPromises = stakedIds.map(async (element) => {
       const uri = await contract.tokenURI(element);
       const response = await fetch(uri);
 
-      if (!response.ok)
-        throw new Error(response.statusText);
+      if (!response.ok) throw new Error(response.statusText);
 
       const json = await response.json();
       return {
         id: element,
         name: json.name,
         key: json.dna,
-        url: json.image
-      }
+        url: json.image,
+      };
       // return {
       //   id: element,
       //   name: element,
       //   key: element,
       //   url: '/buy-button.png'
       // }
-    })
-    const result = await Promise.all(stakedPromises)
+    });
+    const result = await Promise.all(stakedPromises);
 
     dispatch({
-      type: 'SET_STAKED_ITEMS',
-      stakedItems: result
+      type: "SET_STAKED_ITEMS",
+      stakedItems: result,
     });
 
-    let rewarding = []
-    let sumUpRewards = 0
+    let rewarding = [];
+    let sumUpRewards = 0;
     try {
       for (let i = 0; i < result.length; i++) {
         const element = result[i];
@@ -1437,407 +1481,515 @@ const Staking = () => {
           name: element.name,
           key: element.id,
           url: element.url,
-          reward: res / Math.pow(10, 18)
-        })
-        sumUpRewards += res / Math.pow(10, 18)
+          reward: res / Math.pow(10, 18),
+        });
+        sumUpRewards += res / Math.pow(10, 18);
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
 
     dispatch({
-      type: 'SET_REWARD_ITEMS',
-      rewardItems: rewarding
+      type: "SET_REWARD_ITEMS",
+      rewardItems: rewarding,
     });
 
     dispatch({
-      type: 'SET_TOTAL_REWARDS',
-      totalRewards: sumUpRewards
+      type: "SET_TOTAL_REWARDS",
+      totalRewards: sumUpRewards,
     });
-  }
+  };
 
   const getBalance = async () => {
-    const stakedAmount = await singleContract.methods.balances(address).call({ from: address });
+    const stakedAmount = await singleContract.methods
+      .balances(address)
+      .call({ from: address });
     const temp = stakedAmount / Math.pow(10, 18);
-    const rewarded = await singleContract.methods.earned(address).call({ from: address });
+    const rewarded = await singleContract.methods
+      .earned(address)
+      .call({ from: address });
     const tempPending = rewarded / Math.pow(10, 18);
 
     dispatch({
-      type: 'SET_STAKED_PENDING',
+      type: "SET_STAKED_PENDING",
       stakedAmount: temp.toFixed(10),
-      pendingReward: tempPending.toFixed(10)
+      pendingReward: tempPending.toFixed(10),
     });
-  }
+  };
+
+  const getAPR = async () => {
+    const rewardRate = await singleContract.methods
+      .rewardRate()
+      .call({ from: address });
+    const parsedRewardRate = parseInt(rewardRate);
+
+    const totalReward = parsedRewardRate * 60 * 60 * 24 * 365; // Reward in an year
+    console.log("Reward rate");
+    console.log(parsedRewardRate);
+
+    let url = "https://api.harmony.one";
+    const customHttpProvider = new ethers.providers.JsonRpcProvider(url);
+    const totalTokensStaked = await customHttpProvider.getStorageAt(
+      "0x84653568E292677F2bE042E8E109DCbacb44aa5d",
+      "0x0000000000000000000000000000000000000000000000000000000000000007"
+    );
+    const parsedTokens = parseInt(totalTokensStaked);
+    console.log(parsedTokens);
+    const apr = (totalReward / parsedTokens) * 100;
+
+    setAPR(apr.toFixed(2));
+    console.log(apr);
+  };
+
+  useEffect(() => {
+    address && getAPR();
+  }, [address]);
 
   const getLockStakingBalance = async () => {
-    const total = await lockContract.methods.getUserStakedAmount(address).call({ from: address });
-    const temp = total / Math.pow(10, 18)
+    const total = await lockContract.methods
+      .getUserStakedAmount(address)
+      .call({ from: address });
+    const temp = total / Math.pow(10, 18);
 
-    await lockContract.methods.updatecurrentStakingTime().call({ from: address });
-    const reward = await lockContract.methods.getCurrentRewards().call({ from: address });
-    const tempPending = reward / Math.pow(10, 18)
+    await lockContract.methods
+      .updatecurrentStakingTime()
+      .call({ from: address });
+    const reward = await lockContract.methods
+      .getCurrentRewards()
+      .call({ from: address });
+    const tempPending = reward / Math.pow(10, 18);
 
     dispatch({
-      type: 'SET_LOCK_STAKED_PENDING',
+      type: "SET_LOCK_STAKED_PENDING",
       lockStakedAmount: temp.toFixed(3),
-      lockPendingReward: tempPending.toFixed(3)
+      lockPendingReward: tempPending.toFixed(3),
     });
-  }
+  };
 
   const collectRewards = () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
-    toast.info('Please Wait Till The Transaction Succeeds')
+    toast.info("Please Wait Till The Transaction Succeeds");
 
-    singleContract.methods.getReward().send({ from: address })
-      .on('receipt', receipt => {
-        toast.success('Claiming rewards successful')
+    singleContract.methods
+      .getReward()
+      .send({ from: address })
+      .on("receipt", (receipt) => {
+        toast.success("Claiming rewards successful");
         getBalance();
       })
       .on("error", (error, reciept) => {
-        toast.error(error.message)
-        console.log(error)
-      })
-  }
+        toast.error(error.message);
+        console.log(error);
+      });
+  };
 
   const getXgravLockStakingBalance = async () => {
     // TODO
     try {
-      const getStakedIDs = await lockXgravContract.methods.getStakedIDs(address).call({ from: address });
+      const getStakedIDs = await lockXgravContract.methods
+        .getStakedIDs(address)
+        .call({ from: address });
 
       let totalStakedAmt = 0;
       let rewardsAmount = 0;
-      let stakedRewards = {}
+      let stakedRewards = {};
       for (let index = 0; index < getStakedIDs.length; index++) {
         const element = getStakedIDs[index];
-        let temp = await lockXgravContract.methods.getStakeInfo(element).call({ from: address })
-        totalStakedAmt += temp.amount / Math.pow(10, 18)
-        let tempReward = await lockXgravContract.methods.getCurrentRewards(element).call({ from: address })
+        let temp = await lockXgravContract.methods
+          .getStakeInfo(element)
+          .call({ from: address });
+        totalStakedAmt += temp.amount / Math.pow(10, 18);
+        let tempReward = await lockXgravContract.methods
+          .getCurrentRewards(element)
+          .call({ from: address });
         stakedRewards[element] = {
           amount: temp.amount / Math.pow(10, 18),
-          rewards: tempReward / Math.pow(10, 18)
-        }
-        rewardsAmount += tempReward / Math.pow(10, 18)
+          rewards: tempReward / Math.pow(10, 18),
+        };
+        rewardsAmount += tempReward / Math.pow(10, 18);
       }
 
       dispatch({
-        type: 'SET_LOCK_STAKED_IDS',
+        type: "SET_LOCK_STAKED_IDS",
         lockStakedIds: getStakedIDs,
       });
 
       dispatch({
-        type: 'SET_LOCK_STAKED_REWARDS',
+        type: "SET_LOCK_STAKED_REWARDS",
         lockStakedRewards: stakedRewards,
       });
 
       dispatch({
-        type: 'SET_XGRAV_LOCK_STAKED_PENDING',
+        type: "SET_XGRAV_LOCK_STAKED_PENDING",
         lockXgravStakedAmount: totalStakedAmt.toFixed(3),
-        lockXgravPendingReward: rewardsAmount.toFixed(3)
+        lockXgravPendingReward: rewardsAmount.toFixed(3),
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const lockXgravStake = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (lockXgravStakingInput < 1 || !lockXgravStakingInput) {
-      toast.error('Enter An Amount Greater Than 1 ONEverse token')
+      toast.error("Enter An Amount Greater Than 1 ONEverse token");
       return;
     }
 
-    const amount = Web3.utils.toBN(String(Math.floor(lockXgravStakingInput)) + "0".repeat(18))
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress)
+    const amount = Web3.utils.toBN(
+      String(Math.floor(lockXgravStakingInput)) + "0".repeat(18)
+    );
+    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
 
-    toast.info('Approve Transaction To Allow ONEverse token spending')
+    toast.info("Approve Transaction To Allow ONEverse token spending");
 
-    tokenContract.methods.approve(lockXGRAVContractAddress, amount).send({ from: address })
-      .on('receipt', receipt => {
-        toast.info('Confirm staking transaction')
-        lockXgravContract.methods.lockTokens(amount).send({ from: address })
-          .on('receipt', receipt => {
-            toast.success('Your tokens have been staked! - Amount:' + lockXgravStakingInput)
-            getXgravLockStakingBalance()
+    tokenContract.methods
+      .approve(lockXGRAVContractAddress, amount)
+      .send({ from: address })
+      .on("receipt", (receipt) => {
+        toast.info("Confirm staking transaction");
+        lockXgravContract.methods
+          .lockTokens(amount)
+          .send({ from: address })
+          .on("receipt", (receipt) => {
+            toast.success(
+              "Your tokens have been staked! - Amount:" + lockXgravStakingInput
+            );
+            getXgravLockStakingBalance();
           })
-          .on('error', (error, receipt) => {
-            toast.error(error.message)
-            console.log(error)
-          })
+          .on("error", (error, receipt) => {
+            toast.error(error.message);
+            console.log(error);
+          });
       })
-      .on('error', (error, receipt) => {
-        toast.error(error.message)
-        console.log(error)
-      })
-  }
+      .on("error", (error, receipt) => {
+        toast.error(error.message);
+        console.log(error);
+      });
+  };
 
   const lockXgravUnstake = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (selectedStakedItems.length < 1 || !selectedStakedItems.length) {
-      toast.error('Enter An Amount Greater Than 1')
+      toast.error("Enter An Amount Greater Than 1");
       return;
     }
 
-    toast.info('Please Wait Till The Transaction Succeeds')
+    toast.info("Please Wait Till The Transaction Succeeds");
 
-    lockXgravContract.methods.batchWithdraw(selectedStakedItems).send({ from: address })
-      .on('receipt', receipt => {
-        toast.success('Withdrawal Success')
-        getXgravLockStakingBalance()
+    lockXgravContract.methods
+      .batchWithdraw(selectedStakedItems)
+      .send({ from: address })
+      .on("receipt", (receipt) => {
+        toast.success("Withdrawal Success");
+        getXgravLockStakingBalance();
       })
       .on("error", (error, reciept) => {
-        toast.error(error.message)
-        console.log(error)
-      })
-  }
+        toast.error(error.message);
+        console.log(error);
+      });
+  };
 
   const staking6Months = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (monthStakingInputAmount < 1 || !monthStakingInputAmount) {
-      toast.error('Enter An Amount Greater Than 1 ONEverse token')
+      toast.error("Enter An Amount Greater Than 1 ONEverse token");
       return;
     }
 
-    const amount = Web3.utils.toBN(String(Math.floor(monthStakingInputAmount)) + "0".repeat(18))
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress)
+    const amount = Web3.utils.toBN(
+      String(Math.floor(monthStakingInputAmount)) + "0".repeat(18)
+    );
+    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
 
-    toast.info('Approve Transaction To Allow ONEverse token spending')
+    toast.info("Approve Transaction To Allow ONEverse token spending");
 
-    tokenContract.methods.approve(lockContractAddress, amount).send({ from: address })
-      .on('receipt', receipt => {
-        toast.info('Confirm staking transaction')
+    tokenContract.methods
+      .approve(lockContractAddress, amount)
+      .send({ from: address })
+      .on("receipt", (receipt) => {
+        toast.info("Confirm staking transaction");
         try {
-          lockContract.methods.stake(amount, 182).send({ from: address })
-            .on('receipt', receipt => {
-              toast.success('Your tokens have been secured in the Wormhole for six months! - Amount:' + monthStakingInputAmount)
-              getLockStakingBalance()
+          lockContract.methods
+            .stake(amount, 182)
+            .send({ from: address })
+            .on("receipt", (receipt) => {
+              toast.success(
+                "Your tokens have been secured in the Wormhole for six months! - Amount:" +
+                  monthStakingInputAmount
+              );
+              getLockStakingBalance();
             })
-            .on('error', (error, receipt) => {
-              toast.error(error.message)
-              console.log(error)
-            })
+            .on("error", (error, receipt) => {
+              toast.error(error.message);
+              console.log(error);
+            });
         } catch (err) {
-          console.log(err)
+          console.log(err);
         }
       })
-      .on('error', (error, receipt) => {
-        toast.error(error.message)
-        console.log(error)
-      })
-  }
+      .on("error", (error, receipt) => {
+        toast.error(error.message);
+        console.log(error);
+      });
+  };
 
   const staking12Month = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (monthStakingInputAmount < 1 || !monthStakingInputAmount) {
-      toast.error('Enter An Amount Greater Than 1 ONEverse token')
+      toast.error("Enter An Amount Greater Than 1 ONEverse token");
       return;
     }
 
-    const amount = Web3.utils.toBN(String(Math.floor(monthStakingInputAmount)) + "0".repeat(18))
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress)
+    const amount = Web3.utils.toBN(
+      String(Math.floor(monthStakingInputAmount)) + "0".repeat(18)
+    );
+    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
 
-    toast.info('Approve Transaction To Allow ONEverse token spending')
+    toast.info("Approve Transaction To Allow ONEverse token spending");
 
-    tokenContract.methods.approve(lockContractAddress, amount).send({ from: address })
-      .on('receipt', receipt => {
-        toast.info('Please wait...')
-        toast.info('Confirm staking transaction')
+    tokenContract.methods
+      .approve(lockContractAddress, amount)
+      .send({ from: address })
+      .on("receipt", (receipt) => {
+        toast.info("Please wait...");
+        toast.info("Confirm staking transaction");
         try {
-          lockContract.methods.stake(amount, 365).send({ from: address })
-            .on('receipt', receipt => {
-              toast.success('Your tokens have been secured in the Wormhole for one year! - Amount:' + monthStakingInputAmount)
-              getLockStakingBalance()
+          lockContract.methods
+            .stake(amount, 365)
+            .send({ from: address })
+            .on("receipt", (receipt) => {
+              toast.success(
+                "Your tokens have been secured in the Wormhole for one year! - Amount:" +
+                  monthStakingInputAmount
+              );
+              getLockStakingBalance();
             })
-            .on('error', (error, receipt) => {
-              toast.error(error.message)
-              console.log(error)
-            })
+            .on("error", (error, receipt) => {
+              toast.error(error.message);
+              console.log(error);
+            });
         } catch (err) {
-          console.log(err)
+          console.log(err);
         }
       })
-      .on('error', (error, receipt) => {
-        toast.error(error.message)
-        console.log(error)
-      })
-  }
+      .on("error", (error, receipt) => {
+        toast.error(error.message);
+        console.log(error);
+      });
+  };
 
   const lockUnStake = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (lockUnstakeAmount < 1 || !lockUnstakeAmount) {
-      toast.error('Enter An Amount Greater Than 1')
+      toast.error("Enter An Amount Greater Than 1");
       return;
     }
 
-    const amount = Web3.utils.toBN(String(Math.floor(lockUnstakeAmount)) + "0".repeat(18))
+    const amount = Web3.utils.toBN(
+      String(Math.floor(lockUnstakeAmount)) + "0".repeat(18)
+    );
 
-    toast.info('Please Wait Till The Transaction Succeeds')
+    toast.info("Please Wait Till The Transaction Succeeds");
     try {
-      await lockContract.methods.updatecurrentStakingTime().call({ from: address });
+      await lockContract.methods
+        .updatecurrentStakingTime()
+        .call({ from: address });
 
-      lockContract.methods.unstake(amount).send({ from: address })
-        .on('receipt', receipt => {
-          toast.success('Wormhole Withdrawal Success')
-          toast.info('Please Note Withdrawal Includes Current Reward Obtained!')
-          getLockStakingBalance()
+      lockContract.methods
+        .unstake(amount)
+        .send({ from: address })
+        .on("receipt", (receipt) => {
+          toast.success("Wormhole Withdrawal Success");
+          toast.info(
+            "Please Note Withdrawal Includes Current Reward Obtained!"
+          );
+          getLockStakingBalance();
         })
         .on("error", (error, reciept) => {
-          toast.error(error.message)
-          console.log(error)
-        })
+          toast.error(error.message);
+          console.log(error);
+        });
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   const lockDeposit = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (lockDepositAmount < 1 || !lockDepositAmount) {
-      toast.error('Enter An Amount Greater Than 1')
+      toast.error("Enter An Amount Greater Than 1");
       return;
     }
 
-    const amount = Web3.utils.toBN(String(Math.floor(lockDepositAmount)) + "0".repeat(18))
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress)
+    const amount = Web3.utils.toBN(
+      String(Math.floor(lockDepositAmount)) + "0".repeat(18)
+    );
+    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
 
-    toast.info('Approve Transaction To Allow ONEverse token spending')
+    toast.info("Approve Transaction To Allow ONEverse token spending");
     try {
-      await lockContract.methods.updatecurrentStakingTime().call({ from: address });
+      await lockContract.methods
+        .updatecurrentStakingTime()
+        .call({ from: address });
 
-      tokenContract.methods.approve(lockContractAddress, amount).send({ from: address })
-        .on('receipt', receipt => {
-          lockContract.methods.deposit(amount).send({ from: address })
-            .on('receipt', receipt => {
-              toast.success('Your tokens have been added to the Wormhole! - Amount:' + lockDepositAmount)
-              getLockStakingBalance()
+      tokenContract.methods
+        .approve(lockContractAddress, amount)
+        .send({ from: address })
+        .on("receipt", (receipt) => {
+          lockContract.methods
+            .deposit(amount)
+            .send({ from: address })
+            .on("receipt", (receipt) => {
+              toast.success(
+                "Your tokens have been added to the Wormhole! - Amount:" +
+                  lockDepositAmount
+              );
+              getLockStakingBalance();
             })
-            .on('error', (error, receipt) => {
-              toast.error(error.message)
-              console.log(error)
-            })
+            .on("error", (error, receipt) => {
+              toast.error(error.message);
+              console.log(error);
+            });
         })
-        .on('error', (error, receipt) => {
-          toast.error(error.message)
-          console.log(error)
-        })
+        .on("error", (error, receipt) => {
+          toast.error(error.message);
+          console.log(error);
+        });
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   const getRewards = async () => {
     if (!address) {
-      toast.error('Please Connect Your Wallet', 'error')
+      toast.error("Please Connect Your Wallet", "error");
       return;
     }
     try {
-      lockContract.methods._transferRewards().send({ from: address })
-        .on('receipt', receipt => {
-          toast.success('You have successfully transferred your rewards!')
-          getLockStakingBalance()
+      lockContract.methods
+        ._transferRewards()
+        .send({ from: address })
+        .on("receipt", (receipt) => {
+          toast.success("You have successfully transferred your rewards!");
+          getLockStakingBalance();
         })
-        .on('error', (error, receipt) => {
-          console.error(receipt)
-        })
+        .on("error", (error, receipt) => {
+          console.error(receipt);
+        });
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   const handleSingleAmountChange = (event) => {
     dispatch({
-      type: 'SET_SINGLE_AMOUNT',
-      singleInputAmount: event.target.value
+      type: "SET_SINGLE_AMOUNT",
+      singleInputAmount: event.target.value,
     });
-  }
+  };
 
   const singleUnstake = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (singleInputAmount < 1 || !singleInputAmount) {
-      toast.error('Enter An Amount Greater Than 1 ONEverse token')
+      toast.error("Enter An Amount Greater Than 1 ONEverse token");
       return;
     }
 
-    const amount = Web3.utils.toBN(String(Math.floor(singleInputAmount)) + "0".repeat(18))
+    const amount = Web3.utils.toBN(
+      String(Math.floor(singleInputAmount)) + "0".repeat(18)
+    );
 
-    toast.info('Please Wait Till The Transaction Succeeds')
+    toast.info("Please Wait Till The Transaction Succeeds");
 
-    singleContract.methods.withdraw(amount).send({ from: address })
-      .on('receipt', receipt => {
-        toast.success('Wormhole Withdrawal Success')
+    singleContract.methods
+      .withdraw(amount)
+      .send({ from: address })
+      .on("receipt", (receipt) => {
+        toast.success("Wormhole Withdrawal Success");
         getBalance();
       })
       .on("error", (error, reciept) => {
-        toast.error(error.message)
-        console.log(error)
-      })
-  }
+        toast.error(error.message);
+        console.log(error);
+      });
+  };
 
   const singleStake = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
 
     if (singleInputAmount < 1 || !singleInputAmount) {
-      toast.error('Enter An Amount Greater Than 1 ONEverse token')
+      toast.error("Enter An Amount Greater Than 1 ONEverse token");
       return;
     }
 
-    const amount = Web3.utils.toBN(String(Math.floor(singleInputAmount)) + "0".repeat(18))
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress)
+    const amount = Web3.utils.toBN(
+      String(Math.floor(singleInputAmount)) + "0".repeat(18)
+    );
+    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
 
-    toast.info('Approve Transaction To Allow ONEverse token spending')
+    toast.info("Approve Transaction To Allow ONEverse token spending");
 
-    tokenContract.methods.approve(singleContractAddress, amount).send({ from: address })
-      .on('receipt', receipt => {
-        toast.info('Please wait...')
-        singleContract.methods.stake(amount).send({ from: address })
-          .on('receipt', receipt => {
-            toast.success('Your tokens have been sent into the Wormhole! - Amount: ' + singleInputAmount);
+    tokenContract.methods
+      .approve(singleContractAddress, amount)
+      .send({ from: address })
+      .on("receipt", (receipt) => {
+        toast.info("Please wait...");
+        singleContract.methods
+          .stake(amount)
+          .send({ from: address })
+          .on("receipt", (receipt) => {
+            toast.success(
+              "Your tokens have been sent into the Wormhole! - Amount: " +
+                singleInputAmount
+            );
             getBalance();
           })
-          .on('error', (error, receipt) => {
+          .on("error", (error, receipt) => {
             toast.error(error.message);
-            console.log(error, receipt)
+            console.log(error, receipt);
           });
       })
-      .on('error', (error, receipt) => {
+      .on("error", (error, receipt) => {
         toast.error(error.message);
         console.log(error, receipt);
       });
-  }
+  };
 
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItems1, setCheckedItems1] = useState({});
@@ -1847,31 +1999,35 @@ const Staking = () => {
   const [selectedAll2, setSelectedAll2] = useState(false);
 
   const checkNFTHandle = (name, checked, tab) => {
-    if (tab == 'unstaked') {
+    if (tab == "unstaked") {
       !checked && setSelectedAll(false);
       setCheckedItems({ ...checkedItems, [name]: checked });
-    } else if (tab == 'staked') {
+    } else if (tab == "staked") {
       !checked && setSelectedAll1(false);
       setCheckedItems1({ ...checkedItems1, [name]: checked });
-    } else if (tab == 'rewarded') {
+    } else if (tab == "rewarded") {
       !checked && setSelectedAll2(false);
       setCheckedItems2({ ...checkedItems2, [name]: checked });
     }
-  }
+  };
 
   useEffect(() => {
-    const defaultSelect = currentItems && currentItems.reduce(function (result, item) {
-      result[item["name"]] = false;
-      return result;
-    }, {});
+    const defaultSelect =
+      currentItems &&
+      currentItems.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
     setCheckedItems(defaultSelect);
   }, [currentItems]);
 
   useEffect(() => {
-    const defaultSelect = stakedItems && stakedItems.reduce(function (result, item) {
-      result[item["name"]] = false;
-      return result;
-    }, {});
+    const defaultSelect =
+      stakedItems &&
+      stakedItems.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
     setCheckedItems1(defaultSelect);
   }, [stakedItems]);
 
@@ -1882,7 +2038,7 @@ const Staking = () => {
     }, {});
     setCheckedItems(selected);
     setSelectedAll(true);
-  }
+  };
 
   const selectAllNFT1 = () => {
     const selected = stakedItems.reduce(function (result, item) {
@@ -1891,7 +2047,7 @@ const Staking = () => {
     }, {});
     setCheckedItems1(selected);
     setSelectedAll1(true);
-  }
+  };
 
   const selectAllNFT2 = () => {
     const selected = rewardItems.reduce(function (result, item) {
@@ -1900,44 +2056,50 @@ const Staking = () => {
     }, {});
     setCheckedItems2(selected);
     setSelectedAll2(true);
-  }
+  };
 
   const deselectAllNFT = () => {
-    const defaultSelect = currentItems && currentItems.reduce(function (result, item) {
-      result[item["name"]] = false;
-      return result;
-    }, {});
+    const defaultSelect =
+      currentItems &&
+      currentItems.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
     setCheckedItems(defaultSelect);
     setSelectedAll(false);
-  }
+  };
 
   const deselectAllNFT1 = () => {
-    const defaultSelect = stakedItems && stakedItems.reduce(function (result, item) {
-      result[item["name"]] = false;
-      return result;
-    }, {});
+    const defaultSelect =
+      stakedItems &&
+      stakedItems.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
     setCheckedItems1(defaultSelect);
     setSelectedAll1(false);
-  }
+  };
 
   const deselectAllNFT2 = () => {
-    const defaultSelect = rewardItems && rewardItems.reduce(function (result, item) {
-      result[item["name"]] = false;
-      return result;
-    }, {});
+    const defaultSelect =
+      rewardItems &&
+      rewardItems.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
     setCheckedItems2(defaultSelect);
     setSelectedAll2(false);
-  }
+  };
 
   const nftStake = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
-    const notEmpty = Object.values(checkedItems).some(val => val === true);
+    const notEmpty = Object.values(checkedItems).some((val) => val === true);
 
     if (!notEmpty) {
-      toast.error('Please select at least one nft to stake');
+      toast.error("Please select at least one nft to stake");
       return;
     }
 
@@ -1945,7 +2107,7 @@ const Staking = () => {
       return checkedItems[elem.name];
     }
 
-    let filtered = currentItems.filter(isSelected).map((a) => a.id)
+    let filtered = currentItems.filter(isSelected).map((a) => a.id);
 
     const ethers = require("ethers");
     const provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
@@ -1954,39 +2116,46 @@ const Staking = () => {
     const contract = new ethers.Contract(nftAddress, nftABI, _signer);
 
     try {
-      const checkApproval = await contract.isApprovedForAll(address, nftContractAddress);
+      const checkApproval = await contract.isApprovedForAll(
+        address,
+        nftContractAddress
+      );
       if (!checkApproval) {
-        const setApproval = await contract.setApprovalForAll(nftContractAddress, true);
+        const setApproval = await contract.setApprovalForAll(
+          nftContractAddress,
+          true
+        );
         await setApproval.wait();
       }
       const transaction = await nftContract.stakeNFT(filtered);
       const finishTxn = await transaction.wait();
-      toast.success(`${filtered.length} Nfts successfully staked.`)
+      toast.success(`${filtered.length} Nfts successfully staked.`);
       getNFTBalance();
       deselectAllNFT1();
-    }
-    catch (e) {
+    } catch (e) {
       console.log(e);
     }
-  }
+  };
 
   const nftClaim = async () => {
-    const notEmpty = Object.values(checkedItems2).some(val => val === true);
+    const notEmpty = Object.values(checkedItems2).some((val) => val === true);
 
     if (!notEmpty) {
-      toast.error('Please select at least one nft to claim');
+      toast.error("Please select at least one nft to claim");
       return;
     }
 
     try {
-      let ids = []
-      rewardItems.forEach(elem => {
-        if (checkedItems2[elem.name])
-          ids.push(elem.id)
+      let ids = [];
+      rewardItems.forEach((elem) => {
+        if (checkedItems2[elem.name]) ids.push(elem.id);
       });
 
-      const webRequest = await axios.get("https://oneverse-backend.vercel.app/api/price");
-      const { signature, address, types, voucher, finalPrice } = webRequest.data;
+      const webRequest = await axios.get(
+        "https://oneverse-backend.vercel.app/api/price"
+      );
+      const { signature, address, types, voucher, finalPrice } =
+        webRequest.data;
 
       const ethers = require("ethers");
 
@@ -1994,30 +2163,40 @@ const Staking = () => {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: `0x${(1666600000).toString(16)}` }],
       });
-      const _provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
+      const _provider1 = new ethers.providers.Web3Provider(
+        web3.currentProvider
+      );
       const _signer = await _provider1.getSigner();
-      let add = await _signer.getAddress()
-      let _nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress)
-      const transaction = await _nftContract.methods?.claimRewards(ids.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add, gas: 3000000 });
+      let add = await _signer.getAddress();
+      let _nftContract = new web3.eth.Contract(
+        nftContractABI,
+        nftContractAddress
+      );
+      const transaction = await _nftContract.methods
+        ?.claimRewards(
+          ids.map((e) => e.toString()),
+          [voucher.price, voucher.time, signature]
+        )
+        .send({ from: add, gas: 3000000 });
 
-      toast.success(`${ids.length} NFts were successfully claimed.`)
+      toast.success(`${ids.length} NFts were successfully claimed.`);
       getNFTBalance();
       deselectAllNFT2();
     } catch (error) {
-      toast.error(error.message)
-      console.log(error)
+      toast.error(error.message);
+      console.log(error);
     }
-  }
+  };
 
   const nftUnstake = async () => {
     if (!address) {
-      toast.error('Please connect your wallet');
+      toast.error("Please connect your wallet");
       return;
     }
-    const notEmpty = Object.values(checkedItems1).some(val => val === true);
+    const notEmpty = Object.values(checkedItems1).some((val) => val === true);
 
     if (!notEmpty) {
-      toast.error('Please select at least one nft to unstake');
+      toast.error("Please select at least one nft to unstake");
       return;
     }
 
@@ -2025,11 +2204,14 @@ const Staking = () => {
       return checkedItems1[elem.name];
     }
 
-    let filtered = stakedItems.filter(isSelected).map((a) => a.id)
+    let filtered = stakedItems.filter(isSelected).map((a) => a.id);
 
     try {
-      const webRequest = await axios.get("https://oneverse-backend.vercel.app/api/price");
-      const { signature, address, types, voucher, finalPrice } = webRequest.data;
+      const webRequest = await axios.get(
+        "https://oneverse-backend.vercel.app/api/price"
+      );
+      const { signature, address, types, voucher, finalPrice } =
+        webRequest.data;
 
       const ethers = require("ethers");
 
@@ -2037,21 +2219,30 @@ const Staking = () => {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: `0x${(1666600000).toString(16)}` }],
       });
-      const _provider1 = new ethers.providers.Web3Provider(web3.currentProvider);
+      const _provider1 = new ethers.providers.Web3Provider(
+        web3.currentProvider
+      );
       const _signer = await _provider1.getSigner();
-      let add = await _signer.getAddress()
-      let _nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress)
-      const transaction = await _nftContract.methods?.unstakeTokens(filtered.map(e => e.toString()), [voucher.price, voucher.time, signature]).send({ from: add, gas: 8000000 });
+      let add = await _signer.getAddress();
+      let _nftContract = new web3.eth.Contract(
+        nftContractABI,
+        nftContractAddress
+      );
+      const transaction = await _nftContract.methods
+        ?.unstakeTokens(
+          filtered.map((e) => e.toString()),
+          [voucher.price, voucher.time, signature]
+        )
+        .send({ from: add, gas: 8000000 });
 
-
-      toast.success(`${filtered.length} NFts were successfully unstaked.`)
+      toast.success(`${filtered.length} NFts were successfully unstaked.`);
       getNFTBalance();
       deselectAllNFT1();
     } catch (error) {
-      toast.error(error.message)
-      console.log(error)
+      toast.error(error.message);
+      console.log(error);
     }
-  }
+  };
 
   const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -2064,14 +2255,10 @@ const Staking = () => {
         aria-labelledby={`simple-tab-${index}`}
         {...other}
       >
-        {value === index && (
-          <Box>
-            {children}
-          </Box>
-        )}
+        {value === index && <Box>{children}</Box>}
       </div>
     );
-  }
+  };
 
   TabPanel.propTypes = {
     children: PropTypes.node,
@@ -2082,9 +2269,9 @@ const Staking = () => {
   const a11yProps = (index) => {
     return {
       id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
     };
-  }
+  };
 
   const [tabVal, setTabVal] = useState(0);
 
@@ -2095,18 +2282,18 @@ const Staking = () => {
   const [activePenalty, setActivePenalty] = useState(true);
 
   const handleTogglePenaty = () => {
-    setActivePenalty(!activePenalty)
-  }
+    setActivePenalty(!activePenalty);
+  };
 
   const [openUnlocksModal, setOpenUnlocksModal] = useState(false);
 
   const unlocksModalShow = () => {
     setOpenUnlocksModal(true);
-  }
+  };
 
   const handleModalClose = () => {
     setOpenUnlocksModal(false);
-  }
+  };
 
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -2119,15 +2306,15 @@ const Staking = () => {
         border: "1px solid #E9D758",
         borderRadius: "0",
         paddingTop: "0",
-        top: "10px"
+        top: "10px",
       },
     },
     disableScrollLock: true,
     anchorOrigin: {
       vertical: "bottom",
-      horizontal: "left"
+      horizontal: "left",
     },
-    getContentAnchorEl: null
+    getContentAnchorEl: null,
   };
 
   const [selectedStakedItems, setSelectedStakedItems] = useState([]);
@@ -2136,8 +2323,8 @@ const Staking = () => {
   };
 
   const formatAddress = (str) => {
-    return str ? str.slice(0, 5) + '...' + str.slice(str.length - 5) : '';
-  }
+    return str ? str.slice(0, 5) + "..." + str.slice(str.length - 5) : "";
+  };
 
   return (
     <Layout
@@ -2147,40 +2334,72 @@ const Staking = () => {
       onConnect={connectWallet}
       address={address}
     >
-      <Container disableGutters={matches} style={{ overflowX: matches ? "hidden" : "unset" }}>
+      <Container
+        disableGutters={matches}
+        style={{ overflowX: matches ? "hidden" : "unset" }}
+      >
         <Grid container spacing={5}>
           {!matches && (
             <Grid item md={2}>
               <Box className={classes.leftSide}>
-                <Link href="#" smooth={true} className={classes.leftMenu} style={{ textDecoration: "none" }} to="swap" duration={2000} spy={true}>
-                  <Typography variant="h2">
-                    LOCKED xGRAV STAKING
-                  </Typography>
+                <Link
+                  href="#"
+                  smooth={true}
+                  className={classes.leftMenu}
+                  style={{ textDecoration: "none" }}
+                  to="swap"
+                  duration={2000}
+                  spy={true}
+                >
+                  <Typography variant="h2">LOCKED xGRAV STAKING</Typography>
                 </Link>
-                <Link href="#" smooth={true} className={classes.leftMenu} style={{ textDecoration: "none" }} to="flexible" duration={2000} spy={true}>
-                  <Typography variant="h2">
-                    FLEXIBLE STAKING
-                  </Typography>
+                <Link
+                  href="#"
+                  smooth={true}
+                  className={classes.leftMenu}
+                  style={{ textDecoration: "none" }}
+                  to="flexible"
+                  duration={2000}
+                  spy={true}
+                >
+                  <Typography variant="h2">FLEXIBLE STAKING</Typography>
                 </Link>
-                <Link href="#" smooth={true} className={classes.leftMenu} style={{ textDecoration: "none" }} to="nft" duration={2000} spy={true}>
-                  <Typography variant="h2">
-                    PUFF STAKING
-                  </Typography>
+                <Link
+                  href="#"
+                  smooth={true}
+                  className={classes.leftMenu}
+                  style={{ textDecoration: "none" }}
+                  to="nft"
+                  duration={2000}
+                  spy={true}
+                >
+                  <Typography variant="h2">PUFF STAKING</Typography>
                 </Link>
-                <Link href="#" smooth={true} className={classes.leftMenu} style={{ textDecoration: "none" }} to="time" duration={2000} spy={true}>
-                  <Typography variant="h2">
-                    TIME LOCKED STAKING
-                  </Typography>
+                <Link
+                  href="#"
+                  smooth={true}
+                  className={classes.leftMenu}
+                  style={{ textDecoration: "none" }}
+                  to="time"
+                  duration={2000}
+                  spy={true}
+                >
+                  <Typography variant="h2">TIME LOCKED STAKING</Typography>
                 </Link>
                 <Box display="flex" flexWrap="wrap" justifyContent="center">
                   <Links href="https://twitter.com/ONEverseONE">
-                    <img width="20px" height="18px" src="/twitter.png" ></img>
+                    <img width="20px" height="18px" src="/twitter.png"></img>
                   </Links>
                   <Links href="https://discord.com/invite/oneverse">
                     <img width="20px" height="20px" src="/discord.png"></img>
                   </Links>
                   <Links href="https://ovexclusive.com/">
-                    <img width="20px" height="20px" style={{ marginRight: 0 }} src="/medium.png"></img>
+                    <img
+                      width="20px"
+                      height="20px"
+                      style={{ marginRight: 0 }}
+                      src="/medium.png"
+                    ></img>
                   </Links>
                   <Links href="https://t.me/ONEverseONEofficial">
                     <img width="20px" height="20px" src="/telegram.png"></img>
@@ -2196,35 +2415,67 @@ const Staking = () => {
             {matches && (
               <Box padding="50px 16px 40px 16px">
                 {address ? (
-                  <Button variant="outlined" size="medium" className={classes.connectBtn}>
-                    <Typography variant="h2">{formatAddress(address)}</Typography>
+                  <Button
+                    variant="outlined"
+                    size="medium"
+                    className={classes.connectBtn}
+                  >
+                    <Typography variant="h2">
+                      {formatAddress(address)}
+                    </Typography>
                   </Button>
                 ) : (
-                  <Button onClick={connectWallet} variant="outlined" size="medium" className={classes.connectBtn}>
+                  <Button
+                    onClick={connectWallet}
+                    variant="outlined"
+                    size="medium"
+                    className={classes.connectBtn}
+                  >
                     <Typography variant="h2">CONNECT</Typography>
                   </Button>
                 )}
               </Box>
             )}
-            <Box id="swap" className={classes.swapBlock} style={{ pointerEvents: "none", position: "relative", overflowX: "hidden" }}>
-              <Typography variant="h2" className={clsx(classes.blockTitle, classes.mobileLocked)}>
+            <Box
+              id="swap"
+              className={classes.swapBlock}
+              style={{
+                pointerEvents: "none",
+                position: "relative",
+                overflowX: "hidden",
+              }}
+            >
+              <Typography
+                variant="h2"
+                className={clsx(classes.blockTitle, classes.mobileLocked)}
+              >
                 INCOMING - LOCKED xGRAV
               </Typography>
-              {
-                !matches ? (
-                  <Box display="flex" position="absolute" className={classes.lockedRightTop}>
-                    <Typography className={classes.topLabelInfo}>1 GRAV = 1 xGRAV</Typography>
+              {!matches ? (
+                <Box
+                  display="flex"
+                  position="absolute"
+                  className={classes.lockedRightTop}
+                >
+                  <Typography className={classes.topLabelInfo}>
+                    1 GRAV = 1 xGRAV
+                  </Typography>
+                </Box>
+              ) : (
+                <Box display="flex" justifyContent="center" mt="50px">
+                  <Box
+                    style={{
+                      padding: "14px 33px",
+                      border: "1px solid #E9D758",
+                      width: "fit-content",
+                    }}
+                  >
+                    <Typography className={classes.topLabelInfo}>
+                      1 GRAV = 1 xGRAV
+                    </Typography>
                   </Box>
-                ) : (
-                  <Box display="flex" justifyContent="center" mt="50px" >
-                    <Box style={{
-                      padding: "14px 33px", border: "1px solid #E9D758", width: "fit-content"
-                    }}>
-                      <Typography className={classes.topLabelInfo}>1 GRAV = 1 xGRAV</Typography>
-                    </Box>
-                  </Box>
-                )
-              }
+                </Box>
+              )}
               <Box mt="65px" mb="40px" display={matches ? "block" : "flex"}>
                 <Box className={classes.iconBlock}>
                   <img src="token-icon1.png"></img>
@@ -2232,52 +2483,88 @@ const Staking = () => {
                 <Box flexGrow={1}>
                   <Box mb="16px" className={classes.whiteWrap}>
                     <Box mb="10px" display="flex">
-                      <Typography className={classes.antiGrav}>ANTI-GRAV // $xGRAV</Typography>
-                      <Box className={classes.whiteBg}>
-                      </Box>
+                      <Typography className={classes.antiGrav}>
+                        ANTI-GRAV // $xGRAV
+                      </Typography>
+                      <Box className={classes.whiteBg}></Box>
                     </Box>
-                    <Box display={matches ? "block" : "flex"} justifyContent="space-between">
-                      <Typography className={clsx(classes.antiGravDesc, classes.lockXgrav)}>Lock xGRAV for 4 MONTHS to receive 1:1 GRAV rewards</Typography>
-                      <Typography onClick={() => unlocksModalShow()} style={{ fontSize: "15px" }} className={classes.unlockModalLink}>UPCOMING UNLOCKS</Typography>
+                    <Box
+                      display={matches ? "block" : "flex"}
+                      justifyContent="space-between"
+                    >
+                      <Typography
+                        className={clsx(
+                          classes.antiGravDesc,
+                          classes.lockXgrav
+                        )}
+                      >
+                        Lock xGRAV for 4 MONTHS to receive 1:1 GRAV rewards
+                      </Typography>
+                      <Typography
+                        onClick={() => unlocksModalShow()}
+                        style={{ fontSize: "15px" }}
+                        className={classes.unlockModalLink}
+                      >
+                        UPCOMING UNLOCKS
+                      </Typography>
                     </Box>
                   </Box>
                   <Box className={classes.whiteWrap}>
                     <Box mb="10px" display="flex">
-                      <Typography className={classes.antiGrav}>xGRAV UTILITY</Typography>
-                      <Box className={classes.whiteBg}>
-                      </Box>
+                      <Typography className={classes.antiGrav}>
+                        xGRAV UTILITY
+                      </Typography>
+                      <Box className={classes.whiteBg}></Box>
                     </Box>
                     <Grid container>
                       <Grid item md={6}>
                         <Box display="flex" alignItems="start">
-                          <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
+                          <ArrowForwardIosIcon
+                            className={classes.forwardIcon}
+                          ></ArrowForwardIosIcon>
                           <Box>
-                            <Typography className={classes.antiGravDesc}>Upgrade Your Space Pod</Typography>
-                            <Typography className={classes.antiGravDescBottom}></Typography>
+                            <Typography className={classes.antiGravDesc}>
+                              Upgrade Your Space Pod
+                            </Typography>
+                            <Typography
+                              className={classes.antiGravDescBottom}
+                            ></Typography>
                           </Box>
                         </Box>
                       </Grid>
                       <Grid item md={6}>
                         <Box display="flex" alignItems="start">
-                          <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
+                          <ArrowForwardIosIcon
+                            className={classes.forwardIcon}
+                          ></ArrowForwardIosIcon>
                           <Box className={classes.itemMargin}>
-                            <Typography className={classes.antiGravDesc}>Power the Harmonex</Typography>
+                            <Typography className={classes.antiGravDesc}>
+                              Power the Harmonex
+                            </Typography>
                           </Box>
                         </Box>
                       </Grid>
                       <Grid item md={6}>
                         <Box display="flex" alignItems="start">
-                          <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
+                          <ArrowForwardIosIcon
+                            className={classes.forwardIcon}
+                          ></ArrowForwardIosIcon>
                           <Box className={classes.itemMargin}>
-                            <Typography className={classes.antiGravDesc}>PvP Games</Typography>
+                            <Typography className={classes.antiGravDesc}>
+                              PvP Games
+                            </Typography>
                           </Box>
                         </Box>
                       </Grid>
                       <Grid item md={6}>
                         <Box display="flex" alignItems="start">
-                          <ArrowForwardIosIcon className={classes.forwardIcon}></ArrowForwardIosIcon>
+                          <ArrowForwardIosIcon
+                            className={classes.forwardIcon}
+                          ></ArrowForwardIosIcon>
                           <Box className={classes.itemMargin}>
-                            <Typography className={classes.antiGravDesc}>Buy Collectibles</Typography>
+                            <Typography className={classes.antiGravDesc}>
+                              Buy Collectibles
+                            </Typography>
                           </Box>
                         </Box>
                       </Grid>
@@ -2287,12 +2574,28 @@ const Staking = () => {
               </Box>
               <Grid container spacing={3} className={classes.swapInputBlock}>
                 <Grid item md={4} xs={10}>
-                  <FormControl className={classes.stakedInput} variant="outlined">
-                    <InputLabel style={{ transition: "none" }} shrink={true} htmlFor="staked-html">STAKED</InputLabel>
+                  <FormControl
+                    className={classes.stakedInput}
+                    variant="outlined"
+                  >
+                    <InputLabel
+                      style={{ transition: "none" }}
+                      shrink={true}
+                      htmlFor="staked-html"
+                    >
+                      STAKED
+                    </InputLabel>
                     <OutlinedInput
                       id="staked-html"
                       type="text"
-                      endAdornment={<InputAdornment className={classes.unitLabel} position="end">xGRAV</InputAdornment>}
+                      endAdornment={
+                        <InputAdornment
+                          className={classes.unitLabel}
+                          position="end"
+                        >
+                          xGRAV
+                        </InputAdornment>
+                      }
                       notched
                       value={lockXgravStakedAmount}
                       labelWidth={70}
@@ -2300,12 +2603,28 @@ const Staking = () => {
                   </FormControl>
                 </Grid>
                 <Grid item md={4} xs={10}>
-                  <FormControl className={classes.stakedInput} variant="outlined">
-                    <InputLabel style={{ transition: "none" }} shrink={true} htmlFor="staked-html">REWARDS</InputLabel>
+                  <FormControl
+                    className={classes.stakedInput}
+                    variant="outlined"
+                  >
+                    <InputLabel
+                      style={{ transition: "none" }}
+                      shrink={true}
+                      htmlFor="staked-html"
+                    >
+                      REWARDS
+                    </InputLabel>
                     <OutlinedInput
                       id="staked-html"
                       type="text"
-                      endAdornment={<InputAdornment className={classes.unitLabel} position="end">GRAV</InputAdornment>}
+                      endAdornment={
+                        <InputAdornment
+                          className={classes.unitLabel}
+                          position="end"
+                        >
+                          GRAV
+                        </InputAdornment>
+                      }
                       notched
                       value={lockXgravPendingReward}
                       labelWidth={90}
@@ -2313,17 +2632,37 @@ const Staking = () => {
                   </FormControl>
                 </Grid>
                 <Grid item md={4} xs={10}>
-                  <Button variant="contained" onClick={() => { }} className={classes.claimBtn}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {}}
+                    className={classes.claimBtn}
+                  >
                     Claim
                   </Button>
                 </Grid>
               </Grid>
               <Grid container className={classes.stakeAndLockBlock}>
                 <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
-                  <Typography className={classes.stakeAndLockTitle} variant="h1">LOCKED xGRAV STAKING</Typography>
+                  <Typography
+                    className={classes.stakeAndLockTitle}
+                    variant="h1"
+                  >
+                    LOCKED xGRAV STAKING
+                  </Typography>
                 </Grid>
-                <Grid container item md={6} xs={12} className={classes.stakeAndLockRight}>
-                  <Grid item container xs={12} className={classes.stakeAndLockRightTop}>
+                <Grid
+                  container
+                  item
+                  md={6}
+                  xs={12}
+                  className={classes.stakeAndLockRight}
+                >
+                  <Grid
+                    item
+                    container
+                    xs={12}
+                    className={classes.stakeAndLockRightTop}
+                  >
                     <Grid item md={8}>
                       <FormControl variant="outlined">
                         <OutlinedInput
@@ -2332,36 +2671,73 @@ const Staking = () => {
                           value={lockXgravStakingInput}
                           onChange={(event) => {
                             dispatch({
-                              type: 'SET_XGRAV_LOCK_STAKE_AMOUNT',
-                              lockXgravStakingInput: event.target.value
+                              type: "SET_XGRAV_LOCK_STAKE_AMOUNT",
+                              lockXgravStakingInput: event.target.value,
                             });
                           }}
                         />
                       </FormControl>
                     </Grid>
                     <Grid item md={4}>
-                      <Box display="flex" alignItems="center" justifyContent="end" height="100%">
-                        <Typography className={clsx(classes.unitLabel1, classes.unitMobile)}>xGRAV</Typography>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="end"
+                        height="100%"
+                      >
+                        <Typography
+                          className={clsx(
+                            classes.unitLabel1,
+                            classes.unitMobile
+                          )}
+                        >
+                          xGRAV
+                        </Typography>
                         <Button className={classes.maxBtn}>MAX</Button>
                       </Box>
                     </Grid>
                   </Grid>
-                  <Grid container item xs={12} className={classes.stakeAndLockRightBottomRight}>
-                    <Button onClick={lockXgravStake} className={clsx(classes.stake6btn, classes.activeCta)}>STAKE</Button>
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    className={classes.stakeAndLockRightBottomRight}
+                  >
+                    <Button
+                      onClick={lockXgravStake}
+                      className={clsx(classes.stake6btn, classes.activeCta)}
+                    >
+                      STAKE
+                    </Button>
                   </Grid>
                 </Grid>
               </Grid>
               <Grid container className={classes.stakeAndLockBlock}>
                 <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
-                  <Typography className={clsx(classes.stakeAndLockTitle, classes.mb0)} variant="h1">LOCKED xGRAV STAKING</Typography>
-                  <Typography className={classes.penalty} variant="h1">WITH 50% PENALTY</Typography>
-                  <Switch checked={activePenalty}
+                  <Typography
+                    className={clsx(classes.stakeAndLockTitle, classes.mb0)}
+                    variant="h1"
+                  >
+                    LOCKED xGRAV STAKING
+                  </Typography>
+                  <Typography className={classes.penalty} variant="h1">
+                    WITH 50% PENALTY
+                  </Typography>
+                  <Switch
+                    checked={activePenalty}
                     onClick={() => handleTogglePenaty()}
                     value="active"
                     className={classes.toggleBtn}
-                    inputProps={{ 'aria-label': 'primary checkbox' }} />
+                    inputProps={{ "aria-label": "primary checkbox" }}
+                  />
                 </Grid>
-                <Grid container item md={6} xs={12} className={classes.stakeAndLockRight}>
+                <Grid
+                  container
+                  item
+                  md={6}
+                  xs={12}
+                  className={classes.stakeAndLockRight}
+                >
                   <Grid item xs={12} className={classes.stakeAndLockRightTop}>
                     <FormControl className={classes.formControl}>
                       <Select
@@ -2377,41 +2753,78 @@ const Staking = () => {
                             if (lockStakedRewards[elem]) {
                               sum += lockStakedRewards[elem].amount;
                             }
-                          })
+                          });
                           return `${sum} XGARV`;
                         }}
                         MenuProps={MenuProps}
                         className={classes.selectItems}
                       >
-                        {lockStakedIds && lockStakedIds.map((key, index) => (
-                          <MenuItem key={index} value={key} style={{
-                            background: "#06070E",
-                            border: "1px solid #333745",
-                            padding: "0",
-                            marginBottom: "5px"
-                          }}>
-                            <Checkbox style={{ color: "#E9D758", padding: "5px 10px" }} checked={selectedStakedItems.indexOf(key) > -1} />
-                            <Grid container>
-                              <Grid item md={6}>
-                                <Typography style={{ paddingLeft: "20px" }} className={classes.itemText} >{lockStakedRewards[key] && lockStakedRewards[key].amount} xGRAV</Typography>
+                        {lockStakedIds &&
+                          lockStakedIds.map((key, index) => (
+                            <MenuItem
+                              key={index}
+                              value={key}
+                              style={{
+                                background: "#06070E",
+                                border: "1px solid #333745",
+                                padding: "0",
+                                marginBottom: "5px",
+                              }}
+                            >
+                              <Checkbox
+                                style={{
+                                  color: "#E9D758",
+                                  padding: "5px 10px",
+                                }}
+                                checked={selectedStakedItems.indexOf(key) > -1}
+                              />
+                              <Grid container>
+                                <Grid item md={6}>
+                                  <Typography
+                                    style={{ paddingLeft: "20px" }}
+                                    className={classes.itemText}
+                                  >
+                                    {lockStakedRewards[key] &&
+                                      lockStakedRewards[key].amount}{" "}
+                                    xGRAV
+                                  </Typography>
+                                </Grid>
+                                <Grid item md={6}>
+                                  <Typography
+                                    style={{ paddingLeft: "20px" }}
+                                    className={classes.itemText}
+                                  >
+                                    {lockStakedRewards[key] &&
+                                      lockStakedRewards[key].rewards}
+                                  </Typography>
+                                </Grid>
                               </Grid>
-                              <Grid item md={6}>
-                                <Typography style={{ paddingLeft: "20px" }} className={classes.itemText} >{lockStakedRewards[key] && lockStakedRewards[key].rewards}</Typography>
-                              </Grid>
-                            </Grid>
-                          </MenuItem>
-                        ))}
+                            </MenuItem>
+                          ))}
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid container item xs={12} className={classes.stakeAndLockRightBottomRight}>
-                    {
-                      activePenalty ? (
-                        <Button onClick={lockXgravUnstake} className={clsx(classes.stake6btn, classes.activeCta)}>EARLY WITHDRAWAL</Button>
-                      ) : (
-                        <Button disabled={true} className={clsx(classes.stake6btn, classes.activeCta)}>EARLY WITHDRAWAL</Button>
-                      )
-                    }
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    className={classes.stakeAndLockRightBottomRight}
+                  >
+                    {activePenalty ? (
+                      <Button
+                        onClick={lockXgravUnstake}
+                        className={clsx(classes.stake6btn, classes.activeCta)}
+                      >
+                        EARLY WITHDRAWAL
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled={true}
+                        className={clsx(classes.stake6btn, classes.activeCta)}
+                      >
+                        EARLY WITHDRAWAL
+                      </Button>
+                    )}
                   </Grid>
                 </Grid>
               </Grid>
@@ -2423,42 +2836,106 @@ const Staking = () => {
               <Grid container className={classes.flexibleContent}>
                 <Grid item md={6} xs={12}>
                   <Box className={classes.leftFlexBlock}>
-                    <Typography variant="h1" className={classes.flyInto}>FLY INTO THE WORMHOLE</Typography>
-                    <FormControl className={classes.singleStakeInput} variant="outlined">
-                      <InputLabel style={{ transition: "none" }} shrink={true} htmlFor="staked-html">STAKE</InputLabel>
+                    <Typography variant="h1" className={classes.flyInto}>
+                      FLY INTO THE WORMHOLE
+                    </Typography>
+                    <FormControl
+                      className={classes.singleStakeInput}
+                      variant="outlined"
+                    >
+                      <InputLabel
+                        style={{ transition: "none" }}
+                        shrink={true}
+                        htmlFor="staked-html"
+                      >
+                        STAKE
+                      </InputLabel>
                       <OutlinedInput
                         id="staked-html"
                         type="number"
-                        endAdornment={<InputAdornment className={classes.unitLabel} position="end">GRAV</InputAdornment>}
+                        endAdornment={
+                          <InputAdornment
+                            className={classes.unitLabel}
+                            position="end"
+                          >
+                            GRAV
+                          </InputAdornment>
+                        }
                         notched
                         labelWidth={60}
                         onChange={handleSingleAmountChange}
                       />
                     </FormControl>
-                    <Typography variant="h1" className={classes.darkMatter}>~% APR</Typography>
-                    <ButtonGroup color="secondary" aria-label="outlined secondary button group">
-                      <Button onClick={singleStake} className={classes.stakeBtn}>STAKE</Button>
-                      <Button onClick={singleUnstake} className={classes.unstakeBtn}>UNSTAKE</Button>
+                    <Typography variant="h1" className={classes.darkMatter}>
+                      {APR}% APR
+                    </Typography>
+                    <ButtonGroup
+                      color="secondary"
+                      aria-label="outlined secondary button group"
+                    >
+                      <Button
+                        onClick={singleStake}
+                        className={classes.stakeBtn}
+                      >
+                        STAKE
+                      </Button>
+                      <Button
+                        onClick={singleUnstake}
+                        className={classes.unstakeBtn}
+                      >
+                        UNSTAKE
+                      </Button>
                     </ButtonGroup>
                   </Box>
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <Box className={classes.rewardBlock}>
                     <Box className={classes.stakedBlock}>
-                      <Typography className={classes.rewardLabel}>GRAV STAKED</Typography>
-                      <Box textAlign="right" display="flex" justifyContent="end">
-                        <Typography variant="h2" className={classes.stakedAmount}>{stakedAmount}</Typography>
-                        <Typography variant="h2" style={{ color: "#000" }}>GRAV</Typography>
+                      <Typography className={classes.rewardLabel}>
+                        GRAV STAKED
+                      </Typography>
+                      <Box
+                        textAlign="right"
+                        display="flex"
+                        justifyContent="end"
+                      >
+                        <Typography
+                          variant="h2"
+                          className={classes.stakedAmount}
+                        >
+                          {stakedAmount}
+                        </Typography>
+                        <Typography variant="h2" style={{ color: "#000" }}>
+                          GRAV
+                        </Typography>
                       </Box>
                     </Box>
                     <Box className={classes.rewardedBlock}>
-                      <Typography className={classes.rewardLabel}>GRAV REWARDS</Typography>
-                      <Box textAlign="right" display="flex" justifyContent="end">
-                        <Typography variant="h2" className={classes.rewardedAmount}>{pendingReward}</Typography>
-                        <Typography variant="h2" style={{ color: "#000" }}>GRAV</Typography>
+                      <Typography className={classes.rewardLabel}>
+                        GRAV REWARDS
+                      </Typography>
+                      <Box
+                        textAlign="right"
+                        display="flex"
+                        justifyContent="end"
+                      >
+                        <Typography
+                          variant="h2"
+                          className={classes.rewardedAmount}
+                        >
+                          {pendingReward}
+                        </Typography>
+                        <Typography variant="h2" style={{ color: "#000" }}>
+                          GRAV
+                        </Typography>
                       </Box>
                     </Box>
-                    <Button onClick={collectRewards} className={classes.collectBtn}>COLLECT</Button>
+                    <Button
+                      onClick={collectRewards}
+                      className={classes.collectBtn}
+                    >
+                      COLLECT
+                    </Button>
                   </Box>
                 </Grid>
               </Grid>
@@ -2469,163 +2946,575 @@ const Staking = () => {
               </Typography>
               <Grid container className={classes.nftStakingContent}>
                 <Grid item md={4} xs={12}>
-                  <Box className={classes.leftStakingBlock}>
-                  </Box>
+                  <Box className={classes.leftStakingBlock}></Box>
                 </Grid>
                 <Grid item md={8} xs={12}>
-                  <Box className={classes.stakingNFT} >
+                  <Box className={classes.stakingNFT}>
                     <Box className={classes.nftTitle}>
-                      <Typography variant="h1" className={classes.flyInto1}>INCUBATE YOUR PUFF</Typography>
-                      <Typography variant="h1" className={classes.darkMatter} style={{ marginBottom: "0" }}>Earn Variable xGRAV</Typography>
+                      <Typography variant="h1" className={classes.flyInto1}>
+                        INCUBATE YOUR PUFF
+                      </Typography>
+                      <Typography
+                        variant="h1"
+                        className={classes.darkMatter}
+                        style={{ marginBottom: "0" }}
+                      >
+                        Earn Variable xGRAV
+                      </Typography>
                     </Box>
                     <Box className={classes.nftNFTs}>
-                      <Box display={matches ? "block" : "flex"} alignItems="center" mb="33px">
-                        <Typography className={classes.myNft}>MY NFTs</Typography>
+                      <Box
+                        display={matches ? "block" : "flex"}
+                        alignItems="center"
+                        mb="33px"
+                      >
+                        <Typography className={classes.myNft}>
+                          MY NFTs
+                        </Typography>
                         <Tabs
                           className={classes.muiTabs}
                           TabIndicatorProps={{
-                            style: { display: 'none' }
+                            style: { display: "none" },
                           }}
-                          value={tabVal} onChange={tabHandleChange} aria-label="simple tabs example">
-                          <Tab className={classes.muiTab} label="UNSTAKED" {...a11yProps(0)} />
-                          <Tab className={classes.muiTab} label="STAKED" {...a11yProps(1)} />
-                          <Tab className={classes.muiTab} label="REWARDS" {...a11yProps(2)} />
+                          value={tabVal}
+                          onChange={tabHandleChange}
+                          aria-label="simple tabs example"
+                        >
+                          <Tab
+                            className={classes.muiTab}
+                            label="UNSTAKED"
+                            {...a11yProps(0)}
+                          />
+                          <Tab
+                            className={classes.muiTab}
+                            label="STAKED"
+                            {...a11yProps(1)}
+                          />
+                          <Tab
+                            className={classes.muiTab}
+                            label="REWARDS"
+                            {...a11yProps(2)}
+                          />
                         </Tabs>
                       </Box>
                       <Box>
                         <TabPanel value={tabVal} index={0}>
                           <Box display="flex" justifyContent="end">
-                            {
-                              checkedItems && Object.values(checkedItems).filter(item => item === true).length ? (
-                                <Button onClick={deselectAllNFT} className={classes.selectAllBtn}><CloseIcon style={{ fontSize: "15px" }}></CloseIcon> {checkedItems && Object.values(checkedItems).filter(item => item === true).length ? Object.values(checkedItems).filter(item => item === true).length : ''
-                                } SELECTED</Button>
-                              ) : (
-                                <Button onClick={selectAllNFT} className={classes.selectAllBtn}>Select All</Button>
-                              )
-                            }
+                            {checkedItems &&
+                            Object.values(checkedItems).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>{" "}
+                                {checkedItems &&
+                                Object.values(checkedItems).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}{" "}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
                           </Box>
                           <Box className={classes.nftScroll} id="nft-scroll">
-                            {currentItems && currentItems.map((item, index) => (
-                              <Box key={index}>
-                                <Box display="flex" className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingNFTBlock, classes.selectedNFT) : classes.stakingNFTBlock} >
-                                  <img className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingImg, classes.selectedNFT) : classes.stakingImg} src={item.url}></img>
-                                  <Box display="flex" justifyContent="space-between" className={classes.stakingWrap}>
-                                    <Box>
-                                      <Box display="flex" alignItems="center" mb="12px">
-                                        <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingInfo, classes.stakingInfoSelected) : classes.stakingInfo}>NAME</Typography>
-                                        <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>{item.name}</Typography>
+                            {currentItems &&
+                              currentItems.map((item, index) => (
+                                <Box key={index}>
+                                  <Box
+                                    display="flex"
+                                    className={
+                                      checkedItems && checkedItems[item.name]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <img
+                                      className={
+                                        checkedItems && checkedItems[item.name]
+                                          ? clsx(
+                                              classes.stakingImg,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingImg
+                                      }
+                                      src={item.url}
+                                    ></img>
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap}
+                                    >
+                                      <Box>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems &&
+                                              checkedItems[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo
+                                            }
+                                          >
+                                            NAME
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems &&
+                                              checkedItems[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.name}
+                                          </Typography>
+                                        </Box>
+                                        <Box display="flex" alignItems="center">
+                                          <Typography
+                                            className={
+                                              checkedItems &&
+                                              checkedItems[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo1,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo1
+                                            }
+                                          >
+                                            RARITY RANK
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems &&
+                                              checkedItems[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          ></Typography>
+                                        </Box>
                                       </Box>
-                                      <Box display="flex" alignItems="center">
-                                        <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingInfo1, classes.stakingInfoSelected) : classes.stakingInfo1}>RARITY RANK</Typography>
-                                        <Typography className={checkedItems && checkedItems[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}></Typography>
+                                      <Box display="flex" justifyContent="end">
+                                        {checkedItems &&
+                                        checkedItems[item.name] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                false,
+                                                "unstaked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                true,
+                                                "unstaked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
                                       </Box>
-                                    </Box>
-                                    <Box display="flex" justifyContent="end">
-                                      {checkedItems && checkedItems[item.name] ? (
-                                        <CloseIcon onClick={() => checkNFTHandle(item.name, false, 'unstaked')} className={classes.stakingCTA}></CloseIcon>
-                                      ) : (
-                                        <AddIcon onClick={() => checkNFTHandle(item.name, true, 'unstaked')} className={classes.stakingCTA}></AddIcon>
-                                      )}
                                     </Box>
                                   </Box>
                                 </Box>
-                              </Box>
-                            ))}
+                              ))}
                           </Box>
                           <Box display="flex" justifyContent="end">
-                            <Button onClick={nftStake} className={classes.nftStakeBtn}>STAKE {checkedItems && Object.values(checkedItems).filter(item => item === true).length ? Object.values(checkedItems).filter(item => item === true).length : ''
-                            } NFT</Button>
+                            <Button
+                              onClick={nftStake}
+                              className={classes.nftStakeBtn}
+                            >
+                              STAKE{" "}
+                              {checkedItems &&
+                              Object.values(checkedItems).filter(
+                                (item) => item === true
+                              ).length
+                                ? Object.values(checkedItems).filter(
+                                    (item) => item === true
+                                  ).length
+                                : ""}{" "}
+                              NFT
+                            </Button>
                           </Box>
                         </TabPanel>
                         <TabPanel value={tabVal} index={1}>
                           <Box display="flex" justifyContent="end">
-                            {
-                              checkedItems1 && Object.values(checkedItems1).filter(item => item === true).length ? (
-                                <Button onClick={deselectAllNFT1} className={classes.selectAllBtn}><CloseIcon style={{ fontSize: "15px" }}></CloseIcon> {checkedItems1 && Object.values(checkedItems1).filter(item => item === true).length ? Object.values(checkedItems1).filter(item => item === true).length : ''
-                                } SELECTED</Button>
-                              ) : (
-                                <Button onClick={selectAllNFT1} className={classes.selectAllBtn}>Select All</Button>
-                              )
-                            }
+                            {checkedItems1 &&
+                            Object.values(checkedItems1).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT1}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>{" "}
+                                {checkedItems1 &&
+                                Object.values(checkedItems1).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems1).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}{" "}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT1}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
                           </Box>
                           <Box className={classes.nftScroll} id="nft-scroll">
-                            {stakedItems && stakedItems.map((item, index) => (
-                              <Box key={index}>
-                                <Box display="flex" className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingNFTBlock, classes.selectedNFT) : classes.stakingNFTBlock} >
-                                  <img className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingImg, classes.selectedNFT) : classes.stakingImg} src={item.url}></img>
-                                  <Box display="flex" justifyContent="space-between" className={classes.stakingWrap}>
-                                    <Box>
-                                      <Box display="flex" alignItems="center" mb="12px">
-                                        <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingInfo, classes.stakingInfoSelected) : classes.stakingInfo}>NAME</Typography>
-                                        <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>{item.name}</Typography>
+                            {stakedItems &&
+                              stakedItems.map((item, index) => (
+                                <Box key={index}>
+                                  <Box
+                                    display="flex"
+                                    className={
+                                      checkedItems1 && checkedItems1[item.name]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <img
+                                      className={
+                                        checkedItems1 &&
+                                        checkedItems1[item.name]
+                                          ? clsx(
+                                              classes.stakingImg,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingImg
+                                      }
+                                      src={item.url}
+                                    ></img>
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap}
+                                    >
+                                      <Box>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems1 &&
+                                              checkedItems1[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo
+                                            }
+                                          >
+                                            NAME
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems1 &&
+                                              checkedItems1[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.name}
+                                          </Typography>
+                                        </Box>
+                                        <Box display="flex" alignItems="center">
+                                          <Typography
+                                            className={
+                                              checkedItems1 &&
+                                              checkedItems1[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo1,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo1
+                                            }
+                                          >
+                                            RARITY RANK
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems1 &&
+                                              checkedItems1[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          ></Typography>
+                                        </Box>
                                       </Box>
-                                      <Box display="flex" alignItems="center">
-                                        <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingInfo1, classes.stakingInfoSelected) : classes.stakingInfo1}>RARITY RANK</Typography>
-                                        <Typography className={checkedItems1 && checkedItems1[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}></Typography>
+                                      <Box display="flex" justifyContent="end">
+                                        {checkedItems1 &&
+                                        checkedItems1[item.name] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                false,
+                                                "staked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                true,
+                                                "staked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
                                       </Box>
-                                    </Box>
-                                    <Box display="flex" justifyContent="end">
-                                      {checkedItems1 && checkedItems1[item.name] ? (
-                                        <CloseIcon onClick={() => checkNFTHandle(item.name, false, 'staked')} className={classes.stakingCTA}></CloseIcon>
-                                      ) : (
-                                        <AddIcon onClick={() => checkNFTHandle(item.name, true, 'staked')} className={classes.stakingCTA}></AddIcon>
-                                      )}
                                     </Box>
                                   </Box>
                                 </Box>
-                              </Box>
-                            ))}
+                              ))}
                           </Box>
                           <Box display="flex" justifyContent="end">
-                            <Button onClick={nftUnstake} className={classes.nftStakeBtn}>UNSTAKE {checkedItems1 && Object.values(checkedItems1).filter(item => item === true).length ? Object.values(checkedItems1).filter(item => item === true).length : ''
-                            } NFT</Button>
+                            <Button
+                              onClick={nftUnstake}
+                              className={classes.nftStakeBtn}
+                            >
+                              UNSTAKE{" "}
+                              {checkedItems1 &&
+                              Object.values(checkedItems1).filter(
+                                (item) => item === true
+                              ).length
+                                ? Object.values(checkedItems1).filter(
+                                    (item) => item === true
+                                  ).length
+                                : ""}{" "}
+                              NFT
+                            </Button>
                           </Box>
                         </TabPanel>
                         <TabPanel value={tabVal} index={2}>
                           <Box display="flex" justifyContent="end">
-                            {
-                              checkedItems2 && Object.values(checkedItems2).filter(item => item === true).length ? (
-                                <Button onClick={deselectAllNFT2} className={classes.selectAllBtn}><CloseIcon style={{ fontSize: "15px" }}></CloseIcon> {checkedItems2 && Object.values(checkedItems2).filter(item => item === true).length ? Object.values(checkedItems2).filter(item => item === true).length : ''
-                                } SELECTED</Button>
-                              ) : (
-                                <Button onClick={selectAllNFT2} className={classes.selectAllBtn}>Select All</Button>
-                              )
-                            }
+                            {checkedItems2 &&
+                            Object.values(checkedItems2).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT2}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>{" "}
+                                {checkedItems2 &&
+                                Object.values(checkedItems2).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems2).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}{" "}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT2}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
                           </Box>
                           <Box className={classes.nftScroll} id="nft-scroll">
-                            {rewardItems && rewardItems.map((item, index) => (
-                              <Box key={index}>
-                                <Box display="flex" className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingNFTBlock, classes.selectedNFT) : classes.stakingNFTBlock} >
-                                  <img className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingImg, classes.selectedNFT) : classes.stakingImg} src={item.url}></img>
-                                  <Box display="flex" justifyContent="space-between" className={classes.stakingWrap}>
-                                    <Box>
-                                      <Box display="flex" alignItems="center" mb="12px">
-                                        <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingInfo, classes.stakingInfoSelected) : classes.stakingInfo}>NAME</Typography>
-                                        <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>{item.name}</Typography>
+                            {rewardItems &&
+                              rewardItems.map((item, index) => (
+                                <Box key={index}>
+                                  <Box
+                                    display="flex"
+                                    className={
+                                      checkedItems2 && checkedItems2[item.name]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <img
+                                      className={
+                                        checkedItems2 &&
+                                        checkedItems2[item.name]
+                                          ? clsx(
+                                              classes.stakingImg,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingImg
+                                      }
+                                      src={item.url}
+                                    ></img>
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap}
+                                    >
+                                      <Box>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems2 &&
+                                              checkedItems2[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo
+                                            }
+                                          >
+                                            NAME
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems2 &&
+                                              checkedItems2[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.name}
+                                          </Typography>
+                                        </Box>
+                                        <Box display="flex" alignItems="center">
+                                          <Typography
+                                            className={
+                                              checkedItems2 &&
+                                              checkedItems2[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo1,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo1
+                                            }
+                                          >
+                                            REWARDS
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems2 &&
+                                              checkedItems2[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.reward}
+                                          </Typography>
+                                        </Box>
                                       </Box>
-                                      <Box display="flex" alignItems="center">
-                                        <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingInfo1, classes.stakingInfoSelected) : classes.stakingInfo1}>REWARDS</Typography>
-                                        <Typography className={checkedItems2 && checkedItems2[item.name] ? clsx(classes.stakingName, classes.stakingNameSelect) : classes.stakingName}>{item.reward}</Typography>
+                                      <Box display="flex" justifyContent="end">
+                                        {checkedItems2 &&
+                                        checkedItems2[item.name] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                false,
+                                                "rewarded"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                true,
+                                                "rewarded"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
                                       </Box>
-                                    </Box>
-                                    <Box display="flex" justifyContent="end">
-                                      {checkedItems2 && checkedItems2[item.name] ? (
-                                        <CloseIcon onClick={() => checkNFTHandle(item.name, false, 'rewarded')} className={classes.stakingCTA}></CloseIcon>
-                                      ) : (
-                                        <AddIcon onClick={() => checkNFTHandle(item.name, true, 'rewarded')} className={classes.stakingCTA}></AddIcon>
-                                      )}
                                     </Box>
                                   </Box>
                                 </Box>
-                              </Box>
-                            ))}
+                              ))}
                           </Box>
                           <Box display="flex" justifyContent="space-between">
                             <Box className={classes.totalBlock}>
-                              <Typography className={classes.totalTitle}>TOTAL REWARDS $ </Typography>
-                              <Typography className={classes.gravAmount}>{totalRewards && totalRewards.toFixed(3)}  </Typography>
+                              <Typography className={classes.totalTitle}>
+                                TOTAL REWARDS ${" "}
+                              </Typography>
+                              <Typography className={classes.gravAmount}>
+                                {totalRewards && totalRewards.toFixed(3)}{" "}
+                              </Typography>
                             </Box>
-                            <Button onClick={nftClaim} className={classes.nftStakeBtn}>CLAIM</Button>
+                            <Button
+                              onClick={nftClaim}
+                              className={classes.nftStakeBtn}
+                            >
+                              CLAIM
+                            </Button>
                           </Box>
                         </TabPanel>
                       </Box>
@@ -2634,16 +3523,44 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            <Box id="time" className={classes.lockStakingBlock} style={{ position: "relative", overflowX: "hidden", pointerEvents: "none" }}>
+            <Box
+              id="time"
+              className={classes.lockStakingBlock}
+              style={{
+                position: "relative",
+                overflowX: "hidden",
+                pointerEvents: "none",
+              }}
+            >
               {!matches && (
-                <Box display="flex" position="absolute" style={{ right: "0px", top: "14px" }}>
-                  <Box width="217px" display="flex" justifyContent="space-around">
-                    <Typography className={classes.topLabel}>6 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
+                <Box
+                  display="flex"
+                  position="absolute"
+                  style={{ right: "0px", top: "14px" }}
+                >
+                  <Box
+                    width="217px"
+                    display="flex"
+                    justifyContent="space-around"
+                  >
+                    <Typography className={classes.topLabel}>
+                      6 MONTH
+                    </Typography>
+                    <Typography className={classes.topLabelInfo}>
+                      ~% APR
+                    </Typography>
                   </Box>
-                  <Box width="217px" display="flex" justifyContent="space-around">
-                    <Typography className={classes.topLabel}>12 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
+                  <Box
+                    width="217px"
+                    display="flex"
+                    justifyContent="space-around"
+                  >
+                    <Typography className={classes.topLabel}>
+                      12 MONTH
+                    </Typography>
+                    <Typography className={classes.topLabelInfo}>
+                      ~% APR
+                    </Typography>
                   </Box>
                 </Box>
               )}
@@ -2651,28 +3568,74 @@ const Staking = () => {
                 INCOMING - TIME LOCKED
               </Typography>
               <Typography variant="h2" className={classes.blockTitleDesc}>
-                <img style={{ marginRight: "10px" }} src="up-arrow.png"></img> Lock GRAV Token and Earn xGRAV <img style={{ marginLeft: "10px" }} src="up-arrow.png"></img>
+                <img style={{ marginRight: "10px" }} src="up-arrow.png"></img>{" "}
+                Lock GRAV Token and Earn xGRAV{" "}
+                <img style={{ marginLeft: "10px" }} src="up-arrow.png"></img>
               </Typography>
               {matches && (
                 <Box display="flex" flexDirection="column" alignItems="center">
-                  <Box width="217px" display="flex" flexDirection="column" style={{ border: "1px solid #E9D758", padding: "20px", textAlign: "center", marginBottom: "15px" }}>
-                    <Typography className={classes.topLabel}>6 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
+                  <Box
+                    width="217px"
+                    display="flex"
+                    flexDirection="column"
+                    style={{
+                      border: "1px solid #E9D758",
+                      padding: "20px",
+                      textAlign: "center",
+                      marginBottom: "15px",
+                    }}
+                  >
+                    <Typography className={classes.topLabel}>
+                      6 MONTH
+                    </Typography>
+                    <Typography className={classes.topLabelInfo}>
+                      ~% APR
+                    </Typography>
                   </Box>
-                  <Box width="217px" display="flex" flexDirection="column" style={{ border: "1px solid #E9D758", padding: "20px", textAlign: "center", marginBottom: "50px" }}>
-                    <Typography className={classes.topLabel}>6 MONTH</Typography>
-                    <Typography className={classes.topLabelInfo}>~% APR</Typography>
+                  <Box
+                    width="217px"
+                    display="flex"
+                    flexDirection="column"
+                    style={{
+                      border: "1px solid #E9D758",
+                      padding: "20px",
+                      textAlign: "center",
+                      marginBottom: "50px",
+                    }}
+                  >
+                    <Typography className={classes.topLabel}>
+                      6 MONTH
+                    </Typography>
+                    <Typography className={classes.topLabelInfo}>
+                      ~% APR
+                    </Typography>
                   </Box>
                 </Box>
               )}
               <Grid container spacing={3} className={classes.stakeInputBlock}>
                 <Grid item md={4} xs={10}>
-                  <FormControl className={classes.stakedInput} variant="outlined">
-                    <InputLabel style={{ transition: "none" }} shrink={true} htmlFor="staked-html">STAKED</InputLabel>
+                  <FormControl
+                    className={classes.stakedInput}
+                    variant="outlined"
+                  >
+                    <InputLabel
+                      style={{ transition: "none" }}
+                      shrink={true}
+                      htmlFor="staked-html"
+                    >
+                      STAKED
+                    </InputLabel>
                     <OutlinedInput
                       id="staked-html"
                       type="text"
-                      endAdornment={<InputAdornment className={classes.unitLabel} position="end">GRAV</InputAdornment>}
+                      endAdornment={
+                        <InputAdornment
+                          className={classes.unitLabel}
+                          position="end"
+                        >
+                          GRAV
+                        </InputAdornment>
+                      }
                       notched
                       value={lockStakedAmount}
                       labelWidth={70}
@@ -2680,12 +3643,28 @@ const Staking = () => {
                   </FormControl>
                 </Grid>
                 <Grid item md={4} xs={10}>
-                  <FormControl className={classes.stakedInput} variant="outlined">
-                    <InputLabel style={{ transition: "none" }} shrink={true} htmlFor="staked-html">REWARDS</InputLabel>
+                  <FormControl
+                    className={classes.stakedInput}
+                    variant="outlined"
+                  >
+                    <InputLabel
+                      style={{ transition: "none" }}
+                      shrink={true}
+                      htmlFor="staked-html"
+                    >
+                      REWARDS
+                    </InputLabel>
                     <OutlinedInput
                       id="staked-html"
                       type="text"
-                      endAdornment={<InputAdornment className={classes.unitLabel} position="end">xGRAV</InputAdornment>}
+                      endAdornment={
+                        <InputAdornment
+                          className={classes.unitLabel}
+                          position="end"
+                        >
+                          xGRAV
+                        </InputAdornment>
+                      }
                       notched
                       value={lockPendingReward}
                       labelWidth={90}
@@ -2700,19 +3679,49 @@ const Staking = () => {
               </Grid>
               <Grid container className={classes.stakeAndLockBlock}>
                 <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
-                  <Typography className={classes.stakeAndLockTitle} variant="h1">STAKE AND LOCK</Typography>
-                  <Typography className={classes.stakeAndLockSubTitle} variant="h1">BALANCE: <span style={{ color: '#fff', fontSize: "20px", marginLeft: "20px" }}>{lockStakedAmount}</span></Typography>
+                  <Typography
+                    className={classes.stakeAndLockTitle}
+                    variant="h1"
+                  >
+                    STAKE AND LOCK
+                  </Typography>
+                  <Typography
+                    className={classes.stakeAndLockSubTitle}
+                    variant="h1"
+                  >
+                    BALANCE:{" "}
+                    <span
+                      style={{
+                        color: "#fff",
+                        fontSize: "20px",
+                        marginLeft: "20px",
+                      }}
+                    >
+                      {lockStakedAmount}
+                    </span>
+                  </Typography>
                 </Grid>
-                <Grid container item md={6} xs={12} className={classes.stakeAndLockRight}>
-                  <Grid item container xs={12} className={classes.stakeAndLockRightTop}>
+                <Grid
+                  container
+                  item
+                  md={6}
+                  xs={12}
+                  className={classes.stakeAndLockRight}
+                >
+                  <Grid
+                    item
+                    container
+                    xs={12}
+                    className={classes.stakeAndLockRightTop}
+                  >
                     <Grid item md={8}>
                       <FormControl variant="outlined">
                         <OutlinedInput
                           placeholder="ENTER AMOUNT TO STAKE"
                           onChange={(event) => {
                             dispatch({
-                              type: 'SET_MONTH_STAKE_AMOUNT',
-                              monthStakingInputAmount: event.target.value
+                              type: "SET_MONTH_STAKE_AMOUNT",
+                              monthStakingInputAmount: event.target.value,
                             });
                           }}
                           className={classes.stakeAmountInput}
@@ -2720,29 +3729,77 @@ const Staking = () => {
                       </FormControl>
                     </Grid>
                     <Grid item md={4}>
-                      <Box display="flex" alignItems="center" justifyContent="end" height="100%">
-                        <Typography className={classes.unitLabel1}>GRAV</Typography>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="end"
+                        height="100%"
+                      >
+                        <Typography className={classes.unitLabel1}>
+                          GRAV
+                        </Typography>
                         <Button className={classes.maxBtn}>MAX</Button>
                       </Box>
                     </Grid>
                   </Grid>
                   <Grid container item xs={12}>
-                    <Grid item md={6} xs={12} className={classes.stakeAndLockRightBottomLeft}>
-                      <Button onClick={staking6Months} className={clsx(classes.stake6btn, classes.mobileCTA)}>STAKE 6 MONTHS</Button>
+                    <Grid
+                      item
+                      md={6}
+                      xs={12}
+                      className={classes.stakeAndLockRightBottomLeft}
+                    >
+                      <Button
+                        onClick={staking6Months}
+                        className={clsx(classes.stake6btn, classes.mobileCTA)}
+                      >
+                        STAKE 6 MONTHS
+                      </Button>
                     </Grid>
-                    <Grid item md={6} xs={12} className={classes.stakeAndLockRightBottomRight}>
-                      <Button onClick={staking12Month} className={classes.stake6btn}>STAKE 12 MONTHS</Button>
+                    <Grid
+                      item
+                      md={6}
+                      xs={12}
+                      className={classes.stakeAndLockRightBottomRight}
+                    >
+                      <Button
+                        onClick={staking12Month}
+                        className={classes.stake6btn}
+                      >
+                        STAKE 12 MONTHS
+                      </Button>
                     </Grid>
                   </Grid>
                 </Grid>
               </Grid>
               <Grid container className={classes.stakeAndLockBlock}>
                 <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
-                  <Typography className={classes.stakeAndLockTitle} variant="h1">DEPOSIT</Typography>
-                  <Typography className={classes.stakeAndLockSubTitle1} variant="h1">Add to your initial stake with zero additional time added!</Typography>
+                  <Typography
+                    className={classes.stakeAndLockTitle}
+                    variant="h1"
+                  >
+                    DEPOSIT
+                  </Typography>
+                  <Typography
+                    className={classes.stakeAndLockSubTitle1}
+                    variant="h1"
+                  >
+                    Add to your initial stake with zero additional time added!
+                  </Typography>
                 </Grid>
-                <Grid container item md={6} xs={12} className={classes.stakeAndLockRight}>
-                  <Grid item container xs={12} className={classes.stakeAndLockRightTop}>
+                <Grid
+                  container
+                  item
+                  md={6}
+                  xs={12}
+                  className={classes.stakeAndLockRight}
+                >
+                  <Grid
+                    item
+                    container
+                    xs={12}
+                    className={classes.stakeAndLockRightTop}
+                  >
                     <Grid item md={8}>
                       <FormControl variant="outlined">
                         <OutlinedInput
@@ -2750,31 +3807,64 @@ const Staking = () => {
                           className={classes.stakeAmountInput}
                           onChange={(event) => {
                             dispatch({
-                              type: 'SET_LOCK_DEPOSIT_AMOUNT',
-                              lockDepositAmount: event.target.value
+                              type: "SET_LOCK_DEPOSIT_AMOUNT",
+                              lockDepositAmount: event.target.value,
                             });
                           }}
                         />
                       </FormControl>
                     </Grid>
                     <Grid item md={4}>
-                      <Box display="flex" alignItems="center" justifyContent="end" height="100%">
-                        <Typography className={classes.unitLabel1}>GRAV</Typography>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="end"
+                        height="100%"
+                      >
+                        <Typography className={classes.unitLabel1}>
+                          GRAV
+                        </Typography>
                         <Button className={classes.maxBtn}>MAX</Button>
                       </Box>
                     </Grid>
                   </Grid>
-                  <Grid container item xs={12} className={classes.stakeAndLockRightBottomRight}>
-                    <Button onClick={lockDeposit} className={clsx(classes.stake6btn, classes.mobileCTA)}>DEPOSIT</Button>
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    className={classes.stakeAndLockRightBottomRight}
+                  >
+                    <Button
+                      onClick={lockDeposit}
+                      className={clsx(classes.stake6btn, classes.mobileCTA)}
+                    >
+                      DEPOSIT
+                    </Button>
                   </Grid>
                 </Grid>
               </Grid>
               <Grid container className={classes.stakeAndLockBlock}>
                 <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
-                  <Typography className={classes.stakeAndLockTitle} variant="h1">UNSTAKE</Typography>
+                  <Typography
+                    className={classes.stakeAndLockTitle}
+                    variant="h1"
+                  >
+                    UNSTAKE
+                  </Typography>
                 </Grid>
-                <Grid container item md={6} xs={12} className={classes.stakeAndLockRight}>
-                  <Grid item container xs={12} className={classes.stakeAndLockRightTop}>
+                <Grid
+                  container
+                  item
+                  md={6}
+                  xs={12}
+                  className={classes.stakeAndLockRight}
+                >
+                  <Grid
+                    item
+                    container
+                    xs={12}
+                    className={classes.stakeAndLockRightTop}
+                  >
                     <Grid item md={8}>
                       <FormControl variant="outlined">
                         <OutlinedInput
@@ -2782,37 +3872,62 @@ const Staking = () => {
                           className={classes.stakeAmountInput}
                           onChange={(event) => {
                             dispatch({
-                              type: 'SET_UNSTAKE_AMOUNT',
-                              lockUnstakeAmount: event.target.value
+                              type: "SET_UNSTAKE_AMOUNT",
+                              lockUnstakeAmount: event.target.value,
                             });
                           }}
                         />
                       </FormControl>
                     </Grid>
                     <Grid item md={4}>
-                      <Box display="flex" alignItems="center" justifyContent="end" height="100%">
-                        <Typography className={classes.unitLabel1}>GRAV</Typography>
-                        <Button onClick={() => {
-                          dispatch({
-                            type: 'SET_UNSTAKE_AMOUNT',
-                            lockUnstakeAmount: parseInt(lockStakedAmount)
-                          });
-                        }} className={classes.maxBtn}>MAX</Button>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="end"
+                        height="100%"
+                      >
+                        <Typography className={classes.unitLabel1}>
+                          GRAV
+                        </Typography>
+                        <Button
+                          onClick={() => {
+                            dispatch({
+                              type: "SET_UNSTAKE_AMOUNT",
+                              lockUnstakeAmount: parseInt(lockStakedAmount),
+                            });
+                          }}
+                          className={classes.maxBtn}
+                        >
+                          MAX
+                        </Button>
                       </Box>
                     </Grid>
                   </Grid>
-                  <Grid container item xs={12} className={classes.stakeAndLockRightBottomRight}>
-                    <Button onClick={lockUnStake} className={clsx(classes.stake6btn, classes.mobileCTA)}>UNSTAKE</Button>
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    className={classes.stakeAndLockRightBottomRight}
+                  >
+                    <Button
+                      onClick={lockUnStake}
+                      className={clsx(classes.stake6btn, classes.mobileCTA)}
+                    >
+                      UNSTAKE
+                    </Button>
                   </Grid>
                 </Grid>
               </Grid>
             </Box>
           </Grid>
-        </Grid >
-      </Container >
+        </Grid>
+      </Container>
       <ToastContainer />
-      <UnlocksModal open={openUnlocksModal} handleModalClose={handleModalClose}></UnlocksModal>
-    </Layout >
+      <UnlocksModal
+        open={openUnlocksModal}
+        handleModalClose={handleModalClose}
+      ></UnlocksModal>
+    </Layout>
   );
 };
 
