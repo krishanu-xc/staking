@@ -142,11 +142,13 @@ const Header = ({ onConnect, address }) => {
             </Link>
           </Grid>
         ))}
-        <Grid item> 
-          <Button size="medium" className={classes.gameBtn}>
-            <Typography variant="h2">TESTNET</Typography>
-          </Button> 
-          {address ?(
+        <Grid item>
+          <Link href="https://citizen.oneverse.one/">
+            <Button size="medium" className={classes.gameBtn}>
+              <Typography variant="h2">Citizen</Typography>
+            </Button>
+          </Link>
+          {address ? (
             <Button variant="outlined" size="medium" className={classes.connectBtn}>
               <Typography variant="h2">{formatAddress(address)}</Typography>
             </Button>

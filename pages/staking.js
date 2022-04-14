@@ -337,11 +337,17 @@ const useStyles = makeStyles((theme) => ({
     color: "#000",
     fontWeight: "normal",
     marginRight: "10px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "16px",
+    },
   },
   rewardedAmount: {
     color: "#000",
     fontWeight: "normal",
     marginRight: "10px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "16px",
+    },
   },
   stakingNFT: {
     width: "100%",
@@ -1512,8 +1518,8 @@ const Staking = () => {
 
     dispatch({
       type: "SET_STAKED_PENDING",
-      stakedAmount: temp.toFixed(10),
-      pendingReward: tempPending.toFixed(10),
+      stakedAmount: temp.toFixed(5),
+      pendingReward: tempPending.toFixed(5),
     });
   };
 
@@ -2387,13 +2393,13 @@ const Staking = () => {
                   <Typography variant="h2">TIME LOCKED STAKING</Typography>
                 </Link>
                 <Box display="flex" flexWrap="wrap" justifyContent="center">
-                  <Links href="https://twitter.com/ONEverseONE">
+                  <Links target="_blank" href="https://twitter.com/ONEverseONE">
                     <img width="20px" height="18px" src="/twitter.png"></img>
                   </Links>
-                  <Links href="https://discord.com/invite/oneverse">
+                  <Links target="_blank" href="https://discord.gg/ONEverse">
                     <img width="20px" height="20px" src="/discord.png"></img>
                   </Links>
-                  <Links href="https://ovexclusive.com/">
+                  <Links target="_blank" href="https://ovexclusive.com/">
                     <img
                       width="20px"
                       height="20px"
@@ -2401,10 +2407,16 @@ const Staking = () => {
                       src="/medium.png"
                     ></img>
                   </Links>
-                  <Links href="https://t.me/ONEverseONEofficial">
+                  <Links
+                    target="_blank"
+                    href="https://t.me/ONEverseONEofficial"
+                  >
                     <img width="20px" height="20px" src="/telegram.png"></img>
                   </Links>
-                  <Links href="https://www.reddit.com/r/ONEverse/">
+                  <Links
+                    target="_blank"
+                    href="https://www.reddit.com/r/ONEverse/"
+                  >
                     <img width="20px" height="20px" src="/reddit.png"></img>
                   </Links>
                 </Box>
