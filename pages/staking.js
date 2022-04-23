@@ -39,6 +39,10 @@ import {
   nftABI,
   lockXGRAVContractAddress,
   lockXGRAVAbi,
+  rarityStakingContractAddress,
+  rarityStakingContractABI,
+  harmoleculesContractAddress,
+  harmoleculesContractABI,
 } from "../public/config";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
@@ -58,6 +62,7 @@ import {
   Contract as MulticallContract,
 } from "ethers-multicall";
 import axios from "axios";
+import Countdown from "react-countdown";
 
 const useStyles = makeStyles((theme) => ({
   connectBtn: {
@@ -152,6 +157,20 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: "10px",
     },
   },
+  rarityStakingBlock: {
+    backgroundImage: "url('nft-staking-frame.png')",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "100% 100%",
+    backgroundPosition: "left",
+    padding: "0px 67px",
+    paddingBottom: "30px",
+    marginBottom: "100px",
+    [theme.breakpoints.down("xs")]: {
+      padding: "0px 16px",
+      backgroundSize: "216% 100%",
+      paddingBottom: "10px",
+    },
+  },
   blockTitle: {
     paddingTop: "16px",
     color: "#E9D758",
@@ -197,8 +216,22 @@ const useStyles = makeStyles((theme) => ({
     backgroundRepeat: "no-repeat",
     backgroundSize: "100% 100%",
     backgroundPosition: "center",
-    width: "448px",
-    height: "550px",
+    width: "430px",
+    height: "540px",
+    textAlign: "center",
+    [theme.breakpoints.down("xs")]: {
+      width: "100%",
+    },
+  },
+  rightRarityBlock: {
+    marginTop: "100px",
+    transform: "scaleX(-1)",
+    backgroundImage: "url('incubator-illo.png')",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "100% 100%",
+    backgroundPosition: "center",
+    width: "300px",
+    height: "360px",
     textAlign: "center",
     [theme.breakpoints.down("xs")]: {
       width: "100%",
@@ -409,6 +442,34 @@ const useStyles = makeStyles((theme) => ({
       lineHeight: "16px",
       width: "160px",
     },
+  },
+  rollBtn: {
+    borderRadius: "0",
+    background: "#E9D758",
+    color: "#000",
+    paddingTop: "4px",
+    paddingBottom: "4px",
+    width: "100px",
+    fontFamily: "Archivo",
+    fontStyle: "normal",
+    fontSize: "14px",
+    lineHeight: "18px",
+    fontWeight: 600,
+    "&:hover": {
+      backgroundColor: "#E9D758",
+    },
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
+      lineHeight: "16px",
+    },
+  },
+  countdownBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "1px solid #E9D758",
+    marginRight: "20px",
+    padding: "5px 20px",
   },
   nftUnStakeBtn: {
     borderRadius: "0",
@@ -1094,6 +1155,11 @@ const initialState = {
   stakedItems: null,
   rewardItems: null,
   totalRewards: "",
+  rarityContract: null,
+  currentItemsRarity: null,
+  stakedItemsRarity: null,
+  rewardItemsRarity: null,
+  totalRewardsRarity: "",
   lockXgravContract: null,
   lockXgravStakedAmount: "",
   lockXgravPendingReward: "",
@@ -1159,6 +1225,31 @@ const reducer = (state, action) => {
       return {
         ...state,
         totalRewards: action.totalRewards,
+      };
+    case "SET_RARITY_CONTRACT":
+      return {
+        ...state,
+        rarityContract: action.rarityContract,
+      };
+    case "SET_CURRENT_ITEMS_RARITY":
+      return {
+        ...state,
+        currentItemsRarity: action.currentItemsRarity,
+      };
+    case "SET_STAKED_ITEMS_RARITY":
+      return {
+        ...state,
+        stakedItemsRarity: action.stakedItemsRarity,
+      };
+    case "SET_REWARD_ITEMS_RARITY":
+      return {
+        ...state,
+        rewardItemsRarity: action.rewardItemsRarity,
+      };
+    case "SET_TOTAL_REWARDS_RARITY":
+      return {
+        ...state,
+        totalRewardsRarity: action.totalRewardsRarity,
       };
     case "SET_MONTH_STAKE_AMOUNT":
       return {
@@ -1242,6 +1333,11 @@ const Staking = () => {
     stakedItems,
     rewardItems,
     totalRewards,
+    rarityContract,
+    currentItemsRarity,
+    stakedItemsRarity,
+    rewardItemsRarity,
+    totalRewardsRarity,
     lockXgravContract,
     lockXgravStakedAmount,
     lockXgravPendingReward,
@@ -1357,23 +1453,38 @@ const Staking = () => {
     //   type: 'SET_XGRAV_LOCK_CONTRACT',
     //   lockXgravContract: lockXgravContracts
     // });
+
+    const harmoleculesContract = new ethers.Contract(
+      harmoleculesContractAddress,
+      harmoleculesContractABI,
+      _signer
+    );
+
+    dispatch({
+      type: "SET_RARITY_CONTRACT",
+      rarityContract: harmoleculesContract,
+    });
   };
 
   useEffect(() => {
     singleContract && getBalance();
   }, [singleContract]);
 
-  // useEffect(() => {
-  //   lockContract && getLockStakingBalance();
-  // }, [lockContract])
+  useEffect(() => {
+    lockContract && getLockStakingBalance();
+  }, [lockContract]);
 
-  // useEffect(() => {
-  //   lockXgravContract && getXgravLockStakingBalance();
-  // }, [lockXgravContract])
+  useEffect(() => {
+    lockXgravContract && getXgravLockStakingBalance();
+  }, [lockXgravContract]);
 
   useEffect(() => {
     nftContract && getNFTBalance();
   }, [nftContract]);
+
+  useEffect(() => {
+    rarityContract && getHarmoleculesNFT();
+  }, [rarityContract]);
 
   const getNFTBalance = async () => {
     const ethers = require("ethers");
@@ -1460,12 +1571,6 @@ const Staking = () => {
         key: json.dna,
         url: json.image,
       };
-      // return {
-      //   id: element,
-      //   name: element,
-      //   key: element,
-      //   url: '/buy-button.png'
-      // }
     });
     const result = await Promise.all(stakedPromises);
 
@@ -1494,16 +1599,154 @@ const Staking = () => {
     } catch (err) {
       console.log(err);
     }
+    axios
+      .get("https://oneverse-discord-bot.herokuapp.com/price")
+      .then((res) => {
+        const data = res.data;
+        const multiplier = data.decrease;
+        const _totalRewards = sumUpRewards * multiplier;
+        dispatch({
+          type: "SET_TOTAL_REWARDS",
+          totalRewards: _totalRewards,
+        });
+      });
 
     dispatch({
       type: "SET_REWARD_ITEMS",
       rewardItems: rewarding,
     });
+  };
 
-    dispatch({
-      type: "SET_TOTAL_REWARDS",
-      totalRewards: sumUpRewards,
-    });
+  const getHarmoleculesNFT = async () => {
+    const defaultUri =
+      "https://harmolecules.mypinata.cloud/ipfs/QmTQfazmn4sXcte6TjVmY7NkxNqj8meqjpXxtC2xuzg6cA/1.json";
+
+    try {
+      const balance = await rarityContract?.balanceOf(address);
+      const setupMultiCallContract = async (nftAddress, nftABI) => {
+        const provider = new ethers.providers.Web3Provider(
+          web3.currentProvider,
+          "any"
+        );
+        const ethcallProvider = new MulticallProvider(provider);
+
+        await ethcallProvider.init();
+        ethcallProvider._multicallAddress =
+          "0x34b415f4d3b332515e66f70595ace1dcf36254c5";
+
+        const multicallContract = new MulticallContract(nftAddress, nftABI);
+        return [ethcallProvider, multicallContract];
+      };
+
+      const [multicallProvider, multicallContract] =
+        await setupMultiCallContract(
+          harmoleculesContractAddress,
+          harmoleculesContractABI
+        );
+
+      let tokenCalls = [];
+      for (let i = 0; i < balance; i++) {
+        tokenCalls.push(multicallContract.tokenOfOwnerByIndex(address, i));
+      }
+
+      const userTokens = (await multicallProvider?.all(tokenCalls)).map((e) =>
+        e.toString()
+      );
+
+      const promises = userTokens.map(async (element) => {
+        try {
+          const uri = await rarityContract.tokenURI(element);
+          const response = await fetch(uri || defaultUri);
+          if (!response.ok) throw new Error(response.statusText);
+          const json = await response.json();
+          return {
+            id: element,
+            name: uri ? json.name : `#${element}`,
+            key: json.dna,
+            url: json.image,
+          };
+          // return {
+          //   id: element,
+          //   name: element,
+          //   key: element,
+          //   url: '/buy-button.png'
+          // }
+        } catch (err) {
+          console.log(err);
+        }
+      });
+      const itemsArr = await Promise.all(promises);
+
+      dispatch({
+        type: "SET_CURRENT_ITEMS_RARITY",
+        currentItemsRarity: itemsArr,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    try {
+      const providerRarity = new ethers.providers.Web3Provider(
+        web3.currentProvider
+      );
+      const _signer = providerRarity.getSigner();
+
+      const contract = new ethers.Contract(
+        rarityStakingContractAddress,
+        rarityStakingContractABI,
+        _signer
+      );
+
+      const stakedOnes = await contract.getUserStaked(address);
+      const stakedIds = stakedOnes.map((e) => Number(e));
+
+      const stakedPromises = stakedIds.map(async (element) => {
+        const uri = await rarityContract.tokenURI(element);
+        const response = await fetch(uri || defaultUri);
+
+        if (!response.ok) throw new Error(response.statusText);
+
+        const json = await response.json();
+        return {
+          id: element,
+          name: uri ? json.name : `#${element}`,
+          key: json.dna,
+          url: json.image,
+        };
+      });
+      const result = await Promise.all(stakedPromises);
+
+      dispatch({
+        type: "SET_STAKED_ITEMS_RARITY",
+        stakedItemsRarity: result,
+      });
+
+      const rewarding = result.map(async (el) => {
+        el.stakedInfo = await contract.stakedInfo(el.id);
+        return el;
+      });
+      const rewardingResult = await Promise.all(rewarding);
+      const _rewardItemsRarity = rewardingResult.map((el) => {
+        const rollTime =
+          ethers.utils.formatUnits(el.stakedInfo.lastRoll, 0) * 1000;
+        const info = {
+          id: el.id,
+          name: el.name,
+          key: el.key,
+          url: el.url,
+          rollWhen: rollTime,
+        };
+        console.log(info);
+        return info;
+      });
+
+      dispatch({
+        type: "SET_REWARD_ITEMS_RARITY",
+        rewardItemsRarity: _rewardItemsRarity,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const getBalance = async () => {
@@ -1524,27 +1767,27 @@ const Staking = () => {
   };
 
   const getAPR = async () => {
-    const rewardRate = await singleContract.methods
-      .rewardRate()
-      .call({ from: address });
-    const parsedRewardRate = parseInt(rewardRate);
+    try {
+      const rewardRate = await singleContract.methods
+        .rewardRate()
+        .call({ from: address });
+      const parsedRewardRate = parseInt(rewardRate);
 
-    const totalReward = parsedRewardRate * 60 * 60 * 24 * 365; // Reward in an year
-    console.log("Reward rate");
-    console.log(parsedRewardRate);
+      const totalReward = parsedRewardRate * 60 * 60 * 24 * 365; // Reward in an year
 
-    let url = "https://api.harmony.one";
-    const customHttpProvider = new ethers.providers.JsonRpcProvider(url);
-    const totalTokensStaked = await customHttpProvider.getStorageAt(
-      "0x84653568E292677F2bE042E8E109DCbacb44aa5d",
-      "0x0000000000000000000000000000000000000000000000000000000000000007"
-    );
-    const parsedTokens = parseInt(totalTokensStaked);
-    console.log(parsedTokens);
-    const apr = (totalReward / parsedTokens) * 100;
+      let url = "https://api.harmony.one";
+      const customHttpProvider = new ethers.providers.JsonRpcProvider(url);
+      const totalTokensStaked = await customHttpProvider.getStorageAt(
+        "0x84653568E292677F2bE042E8E109DCbacb44aa5d",
+        "0x0000000000000000000000000000000000000000000000000000000000000007"
+      );
+      const parsedTokens = parseInt(totalTokensStaked);
+      const apr = (totalReward / parsedTokens) * 100;
 
-    setAPR(apr.toFixed(2));
-    console.log(apr);
+      setAPR(apr.toFixed(2));
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
@@ -2000,9 +2243,15 @@ const Staking = () => {
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItems1, setCheckedItems1] = useState({});
   const [checkedItems2, setCheckedItems2] = useState({});
+  const [checkedItems3, setCheckedItems3] = useState({});
+  const [checkedItems4, setCheckedItems4] = useState({});
+  const [checkedItems5, setCheckedItems5] = useState({});
   const [selectedAll, setSelectedAll] = useState(false);
   const [selectedAll1, setSelectedAll1] = useState(false);
   const [selectedAll2, setSelectedAll2] = useState(false);
+  const [selectedAll3, setSelectedAll3] = useState(false);
+  const [selectedAll4, setSelectedAll4] = useState(false);
+  const [selectedAll5, setSelectedAll5] = useState(false);
 
   const checkNFTHandle = (name, checked, tab) => {
     if (tab == "unstaked") {
@@ -2014,6 +2263,15 @@ const Staking = () => {
     } else if (tab == "rewarded") {
       !checked && setSelectedAll2(false);
       setCheckedItems2({ ...checkedItems2, [name]: checked });
+    } else if (tab == "unstaked_rarity") {
+      !checked && setSelectedAll3(false);
+      setCheckedItems3({ ...checkedItems3, [name]: checked });
+    } else if (tab == "staked_rarity") {
+      !checked && setSelectedAll3(false);
+      setCheckedItems4({ ...checkedItems4, [name]: checked });
+    } else if (tab == "rewarded_rarity") {
+      !checked && setSelectedAll3(false);
+      setCheckedItems5({ ...checkedItems5, [name]: checked });
     }
   };
 
@@ -2036,6 +2294,26 @@ const Staking = () => {
       }, {});
     setCheckedItems1(defaultSelect);
   }, [stakedItems]);
+
+  useEffect(() => {
+    const defaultSelect =
+      currentItemsRarity &&
+      currentItemsRarity.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
+    setCheckedItems2(defaultSelect);
+  }, [currentItemsRarity]);
+
+  useEffect(() => {
+    const defaultSelect =
+      stakedItemsRarity &&
+      stakedItemsRarity.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
+    setCheckedItems3(defaultSelect);
+  }, [stakedItemsRarity]);
 
   const selectAllNFT = () => {
     const selected = currentItems.reduce(function (result, item) {
@@ -2062,6 +2340,33 @@ const Staking = () => {
     }, {});
     setCheckedItems2(selected);
     setSelectedAll2(true);
+  };
+
+  const selectAllNFT3 = () => {
+    const selected = currentItemsRarity.reduce(function (result, item) {
+      result[item["name"]] = true;
+      return result;
+    }, {});
+    setCheckedItems3(selected);
+    setSelectedAll3(true);
+  };
+
+  const selectAllNFT4 = () => {
+    const selected = stakedItemsRarity.reduce(function (result, item) {
+      result[item["name"]] = true;
+      return result;
+    }, {});
+    setCheckedItems4(selected);
+    setSelectedAll4(true);
+  };
+
+  const selectAllNFT5 = () => {
+    const selected = rewardItemsRarity.reduce(function (result, item) {
+      result[item["name"]] = true;
+      return result;
+    }, {});
+    setCheckedItems5(selected);
+    setSelectedAll5(true);
   };
 
   const deselectAllNFT = () => {
@@ -2095,6 +2400,39 @@ const Staking = () => {
       }, {});
     setCheckedItems2(defaultSelect);
     setSelectedAll2(false);
+  };
+
+  const deselectAllNFT3 = () => {
+    const defaultSelect =
+      currentItemsRarity &&
+      currentItemsRarity.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
+    setCheckedItems3(defaultSelect);
+    setSelectedAll3(false);
+  };
+
+  const deselectAllNFT4 = () => {
+    const defaultSelect =
+      stakedItemsRarity &&
+      stakedItemsRarity.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
+    setCheckedItems4(defaultSelect);
+    setSelectedAll4(false);
+  };
+
+  const deselectAllNFT5 = () => {
+    const defaultSelect =
+      rewardItemsRarity &&
+      rewardItemsRarity.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
+    setCheckedItems5(defaultSelect);
+    setSelectedAll5(false);
   };
 
   const nftStake = async () => {
@@ -2137,7 +2475,7 @@ const Staking = () => {
       const finishTxn = await transaction.wait();
       toast.success(`${filtered.length} Nfts successfully staked.`);
       getNFTBalance();
-      deselectAllNFT1();
+      deselectAllNFT();
     } catch (e) {
       console.log(e);
     }
@@ -2158,7 +2496,7 @@ const Staking = () => {
       });
 
       const webRequest = await axios.get(
-        "https://oneverse-backend.vercel.app/api/price"
+        "https://oneverse-discord-bot.herokuapp.com/price"
       );
       const { signature, address, types, voucher, finalPrice } =
         webRequest.data;
@@ -2194,6 +2532,92 @@ const Staking = () => {
     }
   };
 
+  const rarityStake = async () => {
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
+    const notEmpty = Object.values(checkedItems3).some((val) => val === true);
+
+    if (!notEmpty) {
+      toast.error("Please select at least one nft to stake");
+      return;
+    }
+
+    function isSelected(elem) {
+      return checkedItems3[elem.name];
+    }
+
+    let filtered = currentItemsRarity.filter(isSelected).map((a) => a.id);
+
+    const providerRarity = new ethers.providers.Web3Provider(
+      web3.currentProvider
+    );
+    const _signer = providerRarity.getSigner();
+
+    const contract = new ethers.Contract(
+      rarityStakingContractAddress,
+      rarityStakingContractABI,
+      _signer
+    );
+
+    const nftContract = new ethers.Contract(
+      harmoleculesContractAddress,
+      harmoleculesContractABI,
+      _signer
+    );
+
+    try {
+      const baseURL =
+        "https://oneverse-discord-bot.herokuapp.com/tokenSignature/";
+      const promises = filtered.map(async (id) => {
+        const isInitialised = await contract.tokenRarity(id);
+        const isNotInitialised =
+          ethers.utils.formatEther(isInitialised) === "0.0";
+        if (isNotInitialised) {
+          const res = await axios.get(baseURL + id);
+          const data = res.data;
+          const _id = id;
+          const _rarity = data.rarity;
+          const body = [_id, _rarity, data.signature];
+          return body;
+        }
+        return;
+      });
+
+      const toInitialise = await Promise.all(promises);
+      const toInitialiseFiltered = toInitialise.filter(
+        (el) => el !== undefined
+      );
+
+      const setApproval = await nftContract.setApprovalForAll(
+        rarityStakingContractAddress,
+        true
+      );
+      await setApproval.wait();
+
+      if (toInitialiseFiltered.length) {
+        toast.info(
+          `Initializing Rarity for ${toInitialiseFiltered.length} NFTs`
+        );
+        const initializeRarity = await contract.initializeRarity(
+          toInitialiseFiltered
+        );
+        await initializeRarity.wait();
+        toast.success(`Initialized ${toInitialiseFiltered.length} Nfts.`);
+      }
+      toast.info(`Staking ${filtered.length} Nfts.`);
+      const stakeTokens = await contract?.stakeTokens(filtered);
+      await stakeTokens.wait();
+      toast.success(`${filtered.length} Nfts successfully staked.`);
+      getHarmoleculesNFT();
+      deselectAllNFT3();
+    } catch (e) {
+      toast.error(e.message);
+      console.log(e);
+    }
+  };
+
   const nftUnstake = async () => {
     if (!address) {
       toast.error("Please connect your wallet");
@@ -2214,7 +2638,7 @@ const Staking = () => {
 
     try {
       const webRequest = await axios.get(
-        "https://oneverse-backend.vercel.app/api/price"
+        "https://oneverse-discord-bot.herokuapp.com/price"
       );
       const { signature, address, types, voucher, finalPrice } =
         webRequest.data;
@@ -2247,6 +2671,84 @@ const Staking = () => {
     } catch (error) {
       toast.error(error.message);
       console.log(error);
+    }
+  };
+
+  const rarityUnstake = async () => {
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
+    const notEmpty = Object.values(checkedItems4).some((val) => val === true);
+
+    if (!notEmpty) {
+      toast.error("Please select at least one nft to unstake");
+      return;
+    }
+
+    function isSelected(elem) {
+      return checkedItems4[elem.name];
+    }
+
+    let filtered = stakedItemsRarity.filter(isSelected).map((a) => a.id);
+
+    const providerRarity = new ethers.providers.Web3Provider(
+      web3.currentProvider
+    );
+    const _signer = providerRarity.getSigner();
+
+    const contract = new ethers.Contract(
+      rarityStakingContractAddress,
+      rarityStakingContractABI,
+      _signer
+    );
+
+    try {
+      toast.info(`Unstaking ${filtered.length} Nfts.`);
+      const unstake = await contract?.unstakeTokens(filtered);
+      await unstake.wait();
+      toast.success(`${filtered.length} Nfts successfully unstaked.`);
+      getHarmoleculesNFT();
+      deselectAllNFT4();
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+
+  const rarityClaim = async () => {
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
+    const notEmpty = Object.values(checkedItems3).some((val) => val === true);
+
+    if (!notEmpty) {
+      toast.error("Please select at least one nft to stake");
+      return;
+    }
+
+    function isSelected(elem) {
+      return checkedItems3[elem.name];
+    }
+
+    let filtered = currentItemsRarity.filter(isSelected).map((a) => a.id);
+
+    const ethers = require("ethers");
+    const providerRarity = new ethers.providers.Web3Provider(
+      web3.currentProvider
+    );
+    const _signer = providerRarity.getSigner();
+
+    const contract = new ethers.Contract(
+      rarityStakingContractAddress,
+      rarityStakingContractABI,
+      _signer
+    );
+
+    try {
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -2381,6 +2883,18 @@ const Staking = () => {
                 >
                   <Typography variant="h2">PUFF STAKING</Typography>
                 </Link>
+
+                <Link
+                  href="#"
+                  smooth={true}
+                  className={classes.leftMenu}
+                  style={{ textDecoration: "none" }}
+                  to="rarity"
+                  duration={2000}
+                  spy={true}
+                >
+                  <Typography variant="h2">RARITY STAKING</Typography>
+                </Link>
                 <Link
                   href="#"
                   smooth={true}
@@ -2423,6 +2937,8 @@ const Staking = () => {
               </Box>
             </Grid>
           )}
+
+          {/* Main Content */}
           <Grid item md={10} xs={12}>
             {matches && (
               <Box padding="50px 16px 40px 16px">
@@ -3532,6 +4048,569 @@ const Staking = () => {
                       </Box>
                     </Box>
                   </Box>
+                </Grid>
+              </Grid>
+            </Box>
+            <Box id="rarity" className={classes.rarityStakingBlock}>
+              <Typography variant="h2" className={classes.blockTitle}>
+                RARITY STAKING
+              </Typography>
+              <Grid container className={classes.nftStakingContent}>
+                <Grid item md={8} xs={12}>
+                  <Box className={classes.stakingNFT}>
+                    <Box className={classes.nftTitle}>
+                      <Typography variant="h1" className={classes.flyInto1}>
+                        HARMOLECULE SPECTROSCOPY
+                      </Typography>
+                      <Typography
+                        variant="h1"
+                        className={classes.darkMatter}
+                        style={{ marginBottom: "0" }}
+                      >
+                        Stake your harmolecule NFTs
+                      </Typography>
+                    </Box>
+                    <Box className={classes.nftNFTs}>
+                      <Box
+                        display={matches ? "block" : "flex"}
+                        alignItems="center"
+                        mb="33px"
+                      >
+                        <Typography className={classes.myNft}>
+                          MY NFTs
+                        </Typography>
+                        <Tabs
+                          className={classes.muiTabs}
+                          TabIndicatorProps={{
+                            style: { display: "none" },
+                          }}
+                          value={tabVal}
+                          onChange={tabHandleChange}
+                          aria-label="simple tabs example"
+                        >
+                          <Tab
+                            className={classes.muiTab}
+                            label="UNSTAKED"
+                            {...a11yProps(0)}
+                          />
+                          <Tab
+                            className={classes.muiTab}
+                            label="STAKED"
+                            {...a11yProps(1)}
+                          />
+                          <Tab
+                            className={classes.muiTab}
+                            label="REWARDS"
+                            {...a11yProps(2)}
+                          />
+                        </Tabs>
+                      </Box>
+                      <Box>
+                        <TabPanel value={tabVal} index={0}>
+                          <Box display="flex" justifyContent="end">
+                            {checkedItems3 &&
+                            Object.values(checkedItems3).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT3}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>{" "}
+                                {checkedItems3 &&
+                                Object.values(checkedItems3).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems3).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}{" "}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT3}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
+                          </Box>
+                          <Box className={classes.nftScroll} id="nft-scroll">
+                            {currentItemsRarity &&
+                              currentItemsRarity.map((item, index) => (
+                                <Box key={index}>
+                                  <Box
+                                    display="flex"
+                                    className={
+                                      checkedItems3 && checkedItems3[item.name]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <img
+                                      className={
+                                        checkedItems3 &&
+                                        checkedItems3[item.name]
+                                          ? clsx(
+                                              classes.stakingImg,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingImg
+                                      }
+                                      src={item.url}
+                                    ></img>
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap}
+                                    >
+                                      <Box>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo
+                                            }
+                                          >
+                                            NAME
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.name}
+                                          </Typography>
+                                        </Box>
+                                        <Box display="flex" alignItems="center">
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo1,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo1
+                                            }
+                                          >
+                                            RARITY RANK
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          ></Typography>
+                                        </Box>
+                                      </Box>
+                                      <Box display="flex" justifyContent="end">
+                                        {checkedItems3 &&
+                                        checkedItems3[item.name] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                false,
+                                                "unstaked_rarity"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                true,
+                                                "unstaked_rarity"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                </Box>
+                              ))}
+                          </Box>
+                          <Box display="flex" justifyContent="end">
+                            <Button
+                              onClick={rarityStake}
+                              className={classes.nftStakeBtn}
+                            >
+                              STAKE{" "}
+                              {checkedItems3 &&
+                              Object.values(checkedItems3).filter(
+                                (item) => item === true
+                              ).length
+                                ? Object.values(checkedItems3).filter(
+                                    (item) => item === true
+                                  ).length
+                                : ""}{" "}
+                              NFT
+                            </Button>
+                          </Box>
+                        </TabPanel>
+                        <TabPanel value={tabVal} index={1}>
+                          <Box display="flex" justifyContent="end">
+                            {checkedItems4 &&
+                            Object.values(checkedItems4).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT4}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>{" "}
+                                {checkedItems4 &&
+                                Object.values(checkedItems4).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems4).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}{" "}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT4}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
+                          </Box>
+                          <Box className={classes.nftScroll} id="nft-scroll">
+                            {stakedItemsRarity &&
+                              stakedItemsRarity.map((item, index) => (
+                                <Box key={index}>
+                                  <Box
+                                    display="flex"
+                                    className={
+                                      checkedItems4 && checkedItems4[item.name]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <img
+                                      className={
+                                        checkedItems4 &&
+                                        checkedItems4[item.name]
+                                          ? clsx(
+                                              classes.stakingImg,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingImg
+                                      }
+                                      src={item.url}
+                                    ></img>
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap}
+                                    >
+                                      <Box>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems4 &&
+                                              checkedItems4[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo
+                                            }
+                                          >
+                                            NAME
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems4 &&
+                                              checkedItems4[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.name}
+                                          </Typography>
+                                        </Box>
+                                        <Box display="flex" alignItems="center">
+                                          <Typography
+                                            className={
+                                              checkedItems4 &&
+                                              checkedItems4[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo1,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo1
+                                            }
+                                          >
+                                            RARITY RANK
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems4 &&
+                                              checkedItems4[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          ></Typography>
+                                        </Box>
+                                      </Box>
+                                      <Box display="flex" justifyContent="end">
+                                        {checkedItems4 &&
+                                        checkedItems4[item.name] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                false,
+                                                "staked_rarity"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                true,
+                                                "staked_rarity"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                </Box>
+                              ))}
+                          </Box>
+                          <Box display="flex" justifyContent="end">
+                            <Button
+                              onClick={rarityUnstake}
+                              className={classes.nftStakeBtn}
+                            >
+                              UNSTAKE{" "}
+                              {checkedItems4 &&
+                              Object.values(checkedItems4).filter(
+                                (item) => item === true
+                              ).length
+                                ? Object.values(checkedItems4).filter(
+                                    (item) => item === true
+                                  ).length
+                                : ""}{" "}
+                              NFT
+                            </Button>
+                          </Box>
+                        </TabPanel>
+                        <TabPanel value={tabVal} index={2}>
+                          <Box className={classes.nftScroll} id="nft-scroll">
+                            {rewardItemsRarity &&
+                              rewardItemsRarity.map((item, index) => {
+                                return (
+                                  <Box key={index}>
+                                    <Box
+                                      display="flex"
+                                      className={
+                                        checkedItems5 &&
+                                        checkedItems5[item.name]
+                                          ? clsx(
+                                              classes.stakingNFTBlock,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingNFTBlock
+                                      }
+                                    >
+                                      <img
+                                        className={
+                                          checkedItems5 &&
+                                          checkedItems5[item.name]
+                                            ? clsx(
+                                                classes.stakingImg,
+                                                classes.selectedNFT
+                                              )
+                                            : classes.stakingImg
+                                        }
+                                        src={item.url}
+                                      ></img>
+                                      <Box
+                                        display="flex"
+                                        justifyContent="space-between"
+                                        className={classes.stakingWrap}
+                                      >
+                                        <Box>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            mb="12px"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems5 &&
+                                                checkedItems5[item.name]
+                                                  ? clsx(
+                                                      classes.stakingInfo,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo
+                                              }
+                                            >
+                                              NAME
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems5 &&
+                                                checkedItems5[item.name]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {item.name}
+                                            </Typography>
+                                          </Box>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems5 &&
+                                                checkedItems5[item.name]
+                                                  ? clsx(
+                                                      classes.stakingInfo1,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo1
+                                              }
+                                            >
+                                              REWARDS
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems5 &&
+                                                checkedItems5[item.name]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {item.reward}
+                                            </Typography>
+                                          </Box>
+                                        </Box>
+                                        <Box
+                                          display="flex"
+                                          justifyContent="end"
+                                        >
+                                          <Button
+                                            onClick={() =>
+                                              rollForReward(item.id)
+                                            }
+                                            className={classes.rollBtn}
+                                            disabled={
+                                              item.rollWhen +
+                                                12 * 60 * 60 * 1000 >
+                                              Date.now()
+                                            }
+                                          >
+                                            {item.rollWhen +
+                                              12 * 60 * 60 * 1000 >
+                                            Date.now() ? (
+                                              <Countdown
+                                                daysInHours
+                                                date={
+                                                  item.rollWhen +
+                                                  12 * 60 * 60 * 1000
+                                                }
+                                              />
+                                            ) : (
+                                              "Roll"
+                                            )}
+                                          </Button>
+                                        </Box>
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                );
+                              })}
+                          </Box>
+                          <Box display="flex" justifyContent="space-between">
+                            <Box className={classes.totalBlock}>
+                              <Typography className={classes.totalTitle}>
+                                TOTAL REWARDS ${" "}
+                              </Typography>
+                              <Typography className={classes.gravAmount}>
+                                {totalRewards && totalRewards.toFixed(3)}{" "}
+                              </Typography>
+                            </Box>
+                            <Button
+                              onClick={rarityClaim}
+                              className={classes.nftStakeBtn}
+                            >
+                              CLAIM
+                            </Button>
+                          </Box>
+                        </TabPanel>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid item md={4} xs={12}>
+                  <Box className={classes.rightRarityBlock}></Box>
                 </Grid>
               </Grid>
             </Box>
