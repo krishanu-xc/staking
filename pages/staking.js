@@ -1722,11 +1722,21 @@ const Staking = () => {
       });
 
       const rewarding = result.map(async (el) => {
-        el.stakedInfo = await contract.stakedInfo(el.id);
+        const stakedInfo = await contract.stakedInfo(el.id);
+        const rewards = await contract.getRewards(el.id);
+        const [_stakedInfo, _rewards] = await Promise.all([
+          stakedInfo,
+          rewards,
+        ]);
+        el.stakedInfo = _stakedInfo;
+        el.rewards = _rewards;
+        console.log(el);
         return el;
       });
       const rewardingResult = await Promise.all(rewarding);
+      let _totalRewardsRarity = 0;
       const _rewardItemsRarity = rewardingResult.map((el) => {
+        _totalRewardsRarity += ethers.utils.formatEther(el.rewards);
         const rollTime =
           ethers.utils.formatUnits(el.stakedInfo.lastRoll, 0) * 1000;
         const info = {
@@ -1735,6 +1745,7 @@ const Staking = () => {
           key: el.key,
           url: el.url,
           rollWhen: rollTime,
+          rewards: ethers.utils.formatEther(el.rewards),
         };
         console.log(info);
         return info;
@@ -1743,6 +1754,11 @@ const Staking = () => {
       dispatch({
         type: "SET_REWARD_ITEMS_RARITY",
         rewardItemsRarity: _rewardItemsRarity,
+      });
+
+      dispatch({
+        type: "SET_TOTAL_REWARDS_RARITY",
+        totalRewardsRarity: _totalRewardsRarity,
       });
     } catch (e) {
       console.log(e);
@@ -2721,7 +2737,7 @@ const Staking = () => {
       toast.error("Please connect your wallet");
       return;
     }
-    const notEmpty = Object.values(checkedItems3).some((val) => val === true);
+    const notEmpty = Object.values(checkedItems5).some((val) => val === true);
 
     if (!notEmpty) {
       toast.error("Please select at least one nft to stake");
@@ -2729,7 +2745,7 @@ const Staking = () => {
     }
 
     function isSelected(elem) {
-      return checkedItems3[elem.name];
+      return checkedItems5[elem.name];
     }
 
     let filtered = currentItemsRarity.filter(isSelected).map((a) => a.id);
@@ -2747,6 +2763,12 @@ const Staking = () => {
     );
 
     try {
+      toast.info("Claiming Rewards!");
+      const claimRewards = await contract.claimRewards(filtered);
+      const transaction = await claimRewards.wait();
+      console.log(transaction);
+      toast.info("Fetching rewards");
+      getHarmoleculesNFT();
     } catch (e) {
       console.log(e);
     }
@@ -3993,7 +4015,7 @@ const Staking = () => {
                                                 : classes.stakingName
                                             }
                                           >
-                                            {item.reward}
+                                            {item.rewards}
                                           </Typography>
                                         </Box>
                                       </Box>
@@ -4548,7 +4570,9 @@ const Staking = () => {
                                                   : classes.stakingName
                                               }
                                             >
-                                              {item.reward}
+                                              {parseFloat(item.rewards).toFixed(
+                                                4
+                                              )}
                                             </Typography>
                                           </Box>
                                         </Box>
@@ -4581,6 +4605,30 @@ const Staking = () => {
                                               "Roll"
                                             )}
                                           </Button>
+                                          {checkedItems5 &&
+                                          checkedItems5[item.name] ? (
+                                            <CloseIcon
+                                              onClick={() =>
+                                                checkNFTHandle(
+                                                  item.name,
+                                                  false,
+                                                  "rewarded_rarity"
+                                                )
+                                              }
+                                              className={classes.stakingCTA}
+                                            ></CloseIcon>
+                                          ) : (
+                                            <AddIcon
+                                              onClick={() =>
+                                                checkNFTHandle(
+                                                  item.name,
+                                                  true,
+                                                  "rewarded_rarity"
+                                                )
+                                              }
+                                              className={classes.stakingCTA}
+                                            ></AddIcon>
+                                          )}
                                         </Box>
                                       </Box>
                                     </Box>
@@ -4594,7 +4642,10 @@ const Staking = () => {
                                 TOTAL REWARDS ${" "}
                               </Typography>
                               <Typography className={classes.gravAmount}>
-                                {totalRewards && totalRewards.toFixed(3)}{" "}
+                                {totalRewardsRarity &&
+                                  parseFloat(totalRewardsRarity).toFixed(
+                                    4
+                                  )}{" "}
                               </Typography>
                             </Box>
                             <Button
