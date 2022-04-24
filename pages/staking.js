@@ -463,6 +463,13 @@ const useStyles = makeStyles((theme) => ({
       lineHeight: "16px",
     },
   },
+  selectedRollBtn: {
+    background: "#000",
+    color: "#E9D758",
+    "&:hover": {
+      backgroundColor: "#000",
+    },
+  },
   countdownBtn: {
     display: "flex",
     alignItems: "center",
@@ -1736,7 +1743,7 @@ const Staking = () => {
       const rewardingResult = await Promise.all(rewarding);
       let _totalRewardsRarity = 0;
       const _rewardItemsRarity = rewardingResult.map((el) => {
-        _totalRewardsRarity += ethers.utils.formatEther(el.rewards);
+        _totalRewardsRarity += parseFloat(ethers.utils.formatEther(el.rewards));
         const rollTime =
           ethers.utils.formatUnits(el.stakedInfo.lastRoll, 0) * 1000;
         const info = {
@@ -1755,6 +1762,8 @@ const Staking = () => {
         type: "SET_REWARD_ITEMS_RARITY",
         rewardItemsRarity: _rewardItemsRarity,
       });
+
+      console.log(_totalRewardsRarity);
 
       dispatch({
         type: "SET_TOTAL_REWARDS_RARITY",
@@ -1799,7 +1808,7 @@ const Staking = () => {
       );
       const parsedTokens = parseInt(totalTokensStaked);
       const apr = (totalReward / parsedTokens) * 100;
-
+      console.log(apr);
       setAPR(apr.toFixed(2));
     } catch (e) {
       console.log(e);
@@ -2748,7 +2757,7 @@ const Staking = () => {
       return checkedItems5[elem.name];
     }
 
-    let filtered = currentItemsRarity.filter(isSelected).map((a) => a.id);
+    let filtered = rewardItemsRarity.filter(isSelected).map((a) => a.id);
 
     const ethers = require("ethers");
     const providerRarity = new ethers.providers.Web3Provider(
@@ -2762,12 +2771,15 @@ const Staking = () => {
       _signer
     );
 
+    console.log(filtered);
+
     try {
       toast.info("Claiming Rewards!");
       const claimRewards = await contract.claimRewards(filtered);
       const transaction = await claimRewards.wait();
       console.log(transaction);
-      toast.info("Fetching rewards");
+      toast.success(`${filtered.length} rewards claimed!`);
+      toast.info("Updating rewards");
       getHarmoleculesNFT();
     } catch (e) {
       console.log(e);
@@ -2986,7 +2998,7 @@ const Staking = () => {
                 )}
               </Box>
             )}
-            <Box
+            {/* <Box
               id="swap"
               className={classes.swapBlock}
               style={{
@@ -3378,7 +3390,7 @@ const Staking = () => {
                   </Grid>
                 </Grid>
               </Grid>
-            </Box>
+            </Box> */}
             <Box id="flexible" className={classes.flexibleBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
                 FLEX STAKING
@@ -4475,6 +4487,37 @@ const Staking = () => {
                           </Box>
                         </TabPanel>
                         <TabPanel value={tabVal} index={2}>
+                          <Box display="flex" justifyContent="end">
+                            {checkedItems5 &&
+                            Object.values(checkedItems5).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT5}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>
+                                {checkedItems5 &&
+                                Object.values(checkedItems5).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems5).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT5}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
+                          </Box>
                           <Box className={classes.nftScroll} id="nft-scroll">
                             {rewardItemsRarity &&
                               rewardItemsRarity.map((item, index) => {
@@ -4584,7 +4627,15 @@ const Staking = () => {
                                             onClick={() =>
                                               rollForReward(item.id)
                                             }
-                                            className={classes.rollBtn}
+                                            className={
+                                              checkedItems5 &&
+                                              checkedItems5[item.name]
+                                                ? clsx([
+                                                    classes.rollBtn,
+                                                    classes.selectedRollBtn,
+                                                  ])
+                                                : classes.rollBtn
+                                            }
                                             disabled={
                                               item.rollWhen +
                                                 12 * 60 * 60 * 1000 >
