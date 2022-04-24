@@ -1792,6 +1792,7 @@ const Staking = () => {
   };
 
   const getAPR = async () => {
+    console.log("APR Called");
     try {
       const rewardRate = await singleContract.methods
         .rewardRate()
@@ -1816,8 +1817,9 @@ const Staking = () => {
   };
 
   useEffect(() => {
+    console.log("Effect used");
     address && getAPR();
-  }, [address]);
+  }, [singleContract]);
 
   const getLockStakingBalance = async () => {
     const total = await lockContract.methods
