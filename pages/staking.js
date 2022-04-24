@@ -2889,17 +2889,6 @@ const Staking = () => {
                   smooth={true}
                   className={classes.leftMenu}
                   style={{ textDecoration: "none" }}
-                  to="swap"
-                  duration={2000}
-                  spy={true}
-                >
-                  <Typography variant="h2">LOCKED xGRAV STAKING</Typography>
-                </Link>
-                <Link
-                  href="#"
-                  smooth={true}
-                  className={classes.leftMenu}
-                  style={{ textDecoration: "none" }}
                   to="flexible"
                   duration={2000}
                   spy={true}
