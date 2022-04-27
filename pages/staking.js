@@ -1630,6 +1630,7 @@ const Staking = () => {
       );
 
       console.log("Rewards");
+      console.log(rewards);
       for (let i = 0; i < result.length; i++) {
         const element = result[i];
         element.rewards = rewards[i];
@@ -1645,18 +1646,24 @@ const Staking = () => {
       .then((res) => {
         const data = res.data;
         const multiplier = data.decrease;
+        console.log(multiplier);
         const _totalRewards = sumUpRewards * multiplier;
+        const _finalRewards = finalRewards.map((e) => {
+          console.log(e.rewards);
+          e.rewards *= multiplier;
+          console.log(e.rewards);
+          return e;
+        });
+        dispatch({
+          type: "SET_REWARD_ITEMS",
+          rewardItems: _finalRewards,
+        });
         dispatch({
           type: "SET_TOTAL_REWARDS",
           totalRewards: _totalRewards,
         });
         setLoading2(false);
       });
-
-    dispatch({
-      type: "SET_REWARD_ITEMS",
-      rewardItems: finalRewards,
-    });
 
     console.log("Staked items recieved");
     console.log(Date.now() - startTime);
@@ -4130,7 +4137,7 @@ const Staking = () => {
                                                   : classes.stakingName
                                               }
                                             >
-                                              {parseInt(item.rewards).toFixed(
+                                              {parseFloat(item.rewards).toFixed(
                                                 4
                                               )}
                                             </Typography>
