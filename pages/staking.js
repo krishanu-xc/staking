@@ -1496,15 +1496,16 @@ const Staking = () => {
   }, [rarityContract]);
 
   const getNFTBalance = async () => {
+    const startTime = Date.now();
     setLoading(true);
     setLoading1(true);
     setLoading2(true);
 
     let provider = new ethers.providers.JsonRpcProvider(
-      "https://api.harmony.one"
+      "https://rpc.hermesdefi.io/"
     );
 
-    // const address = "0xd307E05d076aC868B7A7FB321f662a5F047502ea";
+    const address = "0xd307E05d076aC868B7A7FB321f662a5F047502ea";
 
     //Contract
     const contract = new ethers.Contract(nftAddress, nftABI, provider);
@@ -1526,22 +1527,57 @@ const Staking = () => {
       const multicallContract = new MulticallContract(nftAddress, nftABI);
       return [ethcallProvider, multicallContract];
     };
-    const [multicallProvider, multicallContract] = await setupMultiCallContract(
-      nftAddress,
-      nftABI
-    );
-    let tokenCalls = [];
-    for (let i = 0; i < balance; i++) {
-      console.log(i);
-      tokenCalls.push(multicallContract.tokenOfOwnerByIndex(address, i));
-    }
-    console.log(tokenCalls);
-    const userTokens = (await multicallProvider?.all(tokenCalls)).map((e) =>
-      e.toString()
-    );
 
-    const promises = userTokens.map(async (element) => {
-      try {
+    let tokenCalls = [];
+    let result;
+
+    try {
+      const [multicallProvider, multicallContract] =
+        await setupMultiCallContract(nftAddress, nftABI);
+      for (let i = 0; i < balance; i++) {
+        console.log(i);
+        tokenCalls.push(multicallContract.tokenOfOwnerByIndex(address, i));
+      }
+      console.log(tokenCalls);
+      const userTokens = (await multicallProvider?.all(tokenCalls)).map((e) =>
+        e.toString()
+      );
+
+      const promises = userTokens.map(async (element) => {
+        try {
+          const uri = await contract.tokenURI(element);
+          const response = await fetch(uri);
+
+          if (!response.ok) throw new Error(response.statusText);
+
+          const json = await response.json();
+          return {
+            id: element,
+            name: json.name,
+            key: json.dna,
+            url: json.image,
+          };
+          // return {
+          //   id: element,
+          //   name: element,
+          //   key: element,
+          //   url: '/buy-button.png'
+          // }
+        } catch (err) {
+          console.log(err);
+        }
+      });
+      const itemsArr = await Promise.all(promises);
+      dispatch({
+        type: "SET_CURRENT_ITEMS",
+        currentItems: itemsArr,
+      });
+      setLoading(false);
+
+      const stakedOnes = await nftContract.getUserStaked(address);
+      const stakedIds = stakedOnes.map((e) => Number(e));
+
+      const stakedPromises = stakedIds.map(async (element) => {
         const uri = await contract.tokenURI(element);
         const response = await fetch(uri);
 
@@ -1554,65 +1590,55 @@ const Staking = () => {
           key: json.dna,
           url: json.image,
         };
-        // return {
-        //   id: element,
-        //   name: element,
-        //   key: element,
-        //   url: '/buy-button.png'
-        // }
-      } catch (err) {
-        console.log(err);
-      }
-    });
-    const itemsArr = await Promise.all(promises);
-    dispatch({
-      type: "SET_CURRENT_ITEMS",
-      currentItems: itemsArr,
-    });
-    setLoading(false);
+      });
+      result = await Promise.all(stakedPromises);
+      setLoading1(false);
 
-    const stakedOnes = await nftContract.getUserStaked(address);
-    const stakedIds = stakedOnes.map((e) => Number(e));
+      dispatch({
+        type: "SET_STAKED_ITEMS",
+        stakedItems: result,
+      });
 
-    const stakedPromises = stakedIds.map(async (element) => {
-      const uri = await contract.tokenURI(element);
-      const response = await fetch(uri);
+      console.log("Staked items recieved");
+      console.log(Date.now() - startTime);
+    } catch (error) {
+      console.log(error);
+    }
 
-      if (!response.ok) throw new Error(response.statusText);
-
-      const json = await response.json();
-      return {
-        id: element,
-        name: json.name,
-        key: json.dna,
-        url: json.image,
-      };
-    });
-    const result = await Promise.all(stakedPromises);
-    setLoading1(false);
-
-    dispatch({
-      type: "SET_STAKED_ITEMS",
-      stakedItems: result,
-    });
-
-    let rewarding = [];
+    let finalRewards = [];
     let sumUpRewards = 0;
     try {
+      let rewarding = [];
+      const [multicallProvider, multicallContract] =
+        await setupMultiCallContract(nftContractAddress, nftContractABI);
+      console.log(result);
       for (let i = 0; i < result.length; i++) {
         const element = result[i];
         // getRewardsByID
-        const res = await nftContract.getReward(element.id);
-
-        rewarding.push({
-          id: element.id,
-          name: element.name,
-          key: element.id,
-          url: element.url,
-          rewards: res / Math.pow(10, 18),
-        });
-        sumUpRewards += res / Math.pow(10, 18);
+        rewarding.push(multicallContract.getReward(element.id));
+        // const res = await nftContract.getReward(element.id);
+        // rewarding.push({
+        //   id: element.id,
+        //   name: element.name,
+        //   key: element.id,
+        //   url: element.url,
+        //   rewards: res / Math.pow(10, 18),
+        // });
+        // sumUpRewards += res / Math.pow(10, 18);
       }
+      console.log(rewarding);
+      const rewards = (await multicallProvider?.all(rewarding)).map((e) =>
+        ethers.utils.formatEther(e)
+      );
+
+      console.log("Rewards");
+      for (let i = 0; i < result.length; i++) {
+        const element = result[i];
+        element.rewards = rewards[i];
+        finalRewards.push(element);
+        sumUpRewards += new Number(rewards[i]);
+      }
+      console.log(sumUpRewards);
     } catch (err) {
       console.log(err);
     }
@@ -1631,8 +1657,11 @@ const Staking = () => {
 
     dispatch({
       type: "SET_REWARD_ITEMS",
-      rewardItems: rewarding,
+      rewardItems: finalRewards,
     });
+
+    console.log("Staked items recieved");
+    console.log(Date.now() - startTime);
   };
 
   const getHarmoleculesNFT = async () => {
