@@ -1505,8 +1505,6 @@ const Staking = () => {
       "https://rpc.hermesdefi.io/"
     );
 
-    const address = "0xd307E05d076aC868B7A7FB321f662a5F047502ea";
-
     //Contract
     const contract = new ethers.Contract(nftAddress, nftABI, provider);
     console.log("balancia:");
