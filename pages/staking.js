@@ -1507,9 +1507,7 @@ const Staking = () => {
 
     //Contract
     const contract = new ethers.Contract(nftAddress, nftABI, provider);
-    console.log("balancia:");
     const balance = await contract.balanceOf(address);
-    console.log(balance);
 
     const setupMultiCallContract = async (nftAddress, nftABI) => {
       const provider = new ethers.providers.Web3Provider(
@@ -1533,10 +1531,8 @@ const Staking = () => {
       const [multicallProvider, multicallContract] =
         await setupMultiCallContract(nftAddress, nftABI);
       for (let i = 0; i < balance; i++) {
-        console.log(i);
         tokenCalls.push(multicallContract.tokenOfOwnerByIndex(address, i));
       }
-      console.log(tokenCalls);
       const userTokens = (await multicallProvider?.all(tokenCalls)).map((e) =>
         e.toString()
       );
@@ -1596,9 +1592,6 @@ const Staking = () => {
         type: "SET_STAKED_ITEMS",
         stakedItems: result,
       });
-
-      console.log("Staked items recieved");
-      console.log(Date.now() - startTime);
     } catch (error) {
       console.log(error);
     }
@@ -1609,7 +1602,6 @@ const Staking = () => {
       let rewarding = [];
       const [multicallProvider, multicallContract] =
         await setupMultiCallContract(nftContractAddress, nftContractABI);
-      console.log(result);
       for (let i = 0; i < result.length; i++) {
         const element = result[i];
         // getRewardsByID
@@ -1624,49 +1616,37 @@ const Staking = () => {
         // });
         // sumUpRewards += res / Math.pow(10, 18);
       }
-      console.log(rewarding);
       const rewards = (await multicallProvider?.all(rewarding)).map((e) =>
         ethers.utils.formatEther(e)
       );
 
-      console.log("Rewards");
-      console.log(rewards);
       for (let i = 0; i < result.length; i++) {
         const element = result[i];
         element.rewards = rewards[i];
         finalRewards.push(element);
         sumUpRewards += new Number(rewards[i]);
       }
-      console.log(sumUpRewards);
     } catch (err) {
       console.log(err);
     }
-    axios
-      .get("https://oneverse-discord-bot.herokuapp.com/price")
-      .then((res) => {
-        const data = res.data;
-        const multiplier = data.decrease;
-        console.log(multiplier);
-        const _totalRewards = sumUpRewards * multiplier;
-        const _finalRewards = finalRewards.map((e) => {
-          console.log(e.rewards);
-          e.rewards *= multiplier;
-          console.log(e.rewards);
-          return e;
-        });
-        dispatch({
-          type: "SET_REWARD_ITEMS",
-          rewardItems: _finalRewards,
-        });
-        dispatch({
-          type: "SET_TOTAL_REWARDS",
-          totalRewards: _totalRewards,
-        });
-        setLoading2(false);
+    axios.get("https://oneverse-backend.onrender.com/price").then((res) => {
+      const data = res.data;
+      const multiplier = data.decrease;
+      const _totalRewards = sumUpRewards * multiplier;
+      const _finalRewards = finalRewards.map((e) => {
+        e.rewards *= multiplier;
+        return e;
       });
-
-    console.log("Staked items recieved");
-    console.log(Date.now() - startTime);
+      dispatch({
+        type: "SET_REWARD_ITEMS",
+        rewardItems: _finalRewards,
+      });
+      dispatch({
+        type: "SET_TOTAL_REWARDS",
+        totalRewards: _totalRewards,
+      });
+      setLoading2(false);
+    });
   };
 
   const getHarmoleculesNFT = async () => {
@@ -1782,7 +1762,6 @@ const Staking = () => {
         ]);
         el.stakedInfo = _stakedInfo;
         el.rewards = _rewards;
-        console.log(el);
         return el;
       });
       const rewardingResult = await Promise.all(rewarding);
@@ -1799,7 +1778,6 @@ const Staking = () => {
           rollWhen: rollTime,
           rewards: ethers.utils.formatEther(el.rewards),
         };
-        console.log(info);
         return info;
       });
 
@@ -1807,8 +1785,6 @@ const Staking = () => {
         type: "SET_REWARD_ITEMS_RARITY",
         rewardItemsRarity: _rewardItemsRarity,
       });
-
-      console.log(_totalRewardsRarity);
 
       dispatch({
         type: "SET_TOTAL_REWARDS_RARITY",
@@ -1853,7 +1829,6 @@ const Staking = () => {
       );
       const parsedTokens = parseInt(totalTokensStaked);
       const apr = (totalReward / parsedTokens) * 100;
-      console.log(apr);
       setAPR(apr.toFixed(2));
     } catch (e) {
       console.log(e);
@@ -2822,13 +2797,10 @@ const Staking = () => {
       _signer
     );
 
-    console.log(filtered);
-
     try {
       toast.info("Claiming Rewards!");
       const claimRewards = await contract.claimRewards(filtered);
       const transaction = await claimRewards.wait();
-      console.log(transaction);
       toast.success(`${filtered.length} rewards claimed!`);
       toast.info("Updating rewards");
       getHarmoleculesNFT();
