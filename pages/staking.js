@@ -2547,7 +2547,7 @@ const Staking = () => {
       });
 
       const webRequest = await axios.get(
-        "https://oneverse-discord-bot.herokuapp.com/price"
+        "https://oneverse-backend.onrender.com/price"
       );
       const { signature, address, types, voucher, finalPrice } =
         webRequest.data;
@@ -2689,7 +2689,7 @@ const Staking = () => {
 
     try {
       const webRequest = await axios.get(
-        "https://oneverse-discord-bot.herokuapp.com/price"
+        "https://oneverse-backend.onrender.com/price"
       );
       const { signature, address, types, voucher, finalPrice } =
         webRequest.data;
