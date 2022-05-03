@@ -467,7 +467,7 @@ const useStyles = makeStyles((theme) => ({
   },
   selectedRollBtn: {
     background: "#000",
-    color: "#E9D758",
+    color: "#fff",
     "&:hover": {
       backgroundColor: "#000",
     },
@@ -1371,7 +1371,8 @@ const Staking = () => {
         package: WalletConnectProvider, // required
         options: {
           rpc: {
-            1666600000: "https://api.harmony.one",
+            // 1666600000: "https://api.harmony.one",
+            1666700000: "https://api.s0.b.hmny.io",
           },
           network: "harmony mainnet",
         },
@@ -1653,29 +1654,45 @@ const Staking = () => {
     const defaultUri =
       "https://harmolecules.mypinata.cloud/ipfs/QmTQfazmn4sXcte6TjVmY7NkxNqj8meqjpXxtC2xuzg6cA/1.json";
 
+    const setupMultiCallContract = async (nftAddress, nftABI) => {
+      const provider = new ethers.providers.Web3Provider(
+        web3.currentProvider,
+        "any"
+      );
+      const ethcallProvider = new MulticallProvider(provider);
+
+      await ethcallProvider.init();
+      ethcallProvider._multicallAddress =
+        "0x34b415f4d3b332515e66f70595ace1dcf36254c5";
+
+      const multicallContract = new MulticallContract(nftAddress, nftABI);
+      return [ethcallProvider, multicallContract];
+    };
+
+    const [multicallProvider, multicallContract] = await setupMultiCallContract(
+      harmoleculesContractAddress,
+      harmoleculesContractABI
+    );
+
+    const [multicallProvider2, multicallContract2] =
+      await setupMultiCallContract(
+        rarityStakingContractAddress,
+        rarityStakingContractABI
+      );
+
+    const providerRarity = new ethers.providers.Web3Provider(
+      web3.currentProvider
+    );
+    const _signer = providerRarity.getSigner();
+
+    const contract = new ethers.Contract(
+      rarityStakingContractAddress,
+      rarityStakingContractABI,
+      _signer
+    );
+
     try {
       const balance = await rarityContract?.balanceOf(address);
-      const setupMultiCallContract = async (nftAddress, nftABI) => {
-        const provider = new ethers.providers.Web3Provider(
-          web3.currentProvider,
-          "any"
-        );
-        const ethcallProvider = new MulticallProvider(provider);
-
-        await ethcallProvider.init();
-        ethcallProvider._multicallAddress =
-          "0x34b415f4d3b332515e66f70595ace1dcf36254c5";
-
-        const multicallContract = new MulticallContract(nftAddress, nftABI);
-        return [ethcallProvider, multicallContract];
-      };
-
-      const [multicallProvider, multicallContract] =
-        await setupMultiCallContract(
-          harmoleculesContractAddress,
-          harmoleculesContractABI
-        );
-
       let tokenCalls = [];
       for (let i = 0; i < balance; i++) {
         tokenCalls.push(multicallContract.tokenOfOwnerByIndex(address, i));
@@ -1718,26 +1735,13 @@ const Staking = () => {
     }
 
     try {
-      const providerRarity = new ethers.providers.Web3Provider(
-        web3.currentProvider
-      );
-      const _signer = providerRarity.getSigner();
-
-      const contract = new ethers.Contract(
-        rarityStakingContractAddress,
-        rarityStakingContractABI,
-        _signer
-      );
-
       const stakedOnes = await contract.getUserStaked(address);
       const stakedIds = stakedOnes.map((e) => Number(e));
 
       const stakedPromises = stakedIds.map(async (element) => {
         const uri = await rarityContract.tokenURI(element);
         const response = await fetch(uri || defaultUri);
-
         if (!response.ok) throw new Error(response.statusText);
-
         const json = await response.json();
         return {
           id: element,
@@ -1753,18 +1757,23 @@ const Staking = () => {
         stakedItemsRarity: result,
       });
 
-      const rewarding = result.map(async (el) => {
-        const stakedInfo = await contract.stakedInfo(el.id);
-        const rewards = await contract.getRewards(el.id);
-        const [_stakedInfo, _rewards] = await Promise.all([
-          stakedInfo,
-          rewards,
-        ]);
-        el.stakedInfo = _stakedInfo;
-        el.rewards = _rewards;
+      const infoPromises = result.map((el) => {
+        return multicallContract2.stakedInfo(el.id);
+      });
+      const rewardsPromises = result.map((el) => {
+        return multicallContract2.getRewards(el.id);
+      });
+
+      const infoTokens = await multicallProvider2.all(infoPromises);
+      const rewardsTokens = await multicallProvider2.all(rewardsPromises);
+
+      const rewardingResult = result.map((el, i) => {
+        console.log(el);
+        el.stakedInfo = infoTokens[i];
+        el.rewards = rewardsTokens[i];
         return el;
       });
-      const rewardingResult = await Promise.all(rewarding);
+
       let _totalRewardsRarity = 0;
       const _rewardItemsRarity = rewardingResult.map((el) => {
         _totalRewardsRarity += parseFloat(ethers.utils.formatEther(el.rewards));
@@ -2284,6 +2293,17 @@ const Staking = () => {
         console.log(error, receipt);
       });
   };
+
+  // useEffect(() => {
+  //   if (rarityContract) {
+  //     console.log(rarityContract);
+  //     rarityContract.on("RaffleWin", (user, tokenId, win) => {
+  //       console.log(user);
+  //       console.log(tokenId);
+  //       console.log(win);
+  //     });
+  //   }
+  // }, [rarityContract]);
 
   const [checkedItems, setCheckedItems] = useState({});
   const [checkedItems1, setCheckedItems1] = useState({});
@@ -2809,6 +2829,32 @@ const Staking = () => {
     }
   };
 
+  const raffleRoll = async (id) => {
+    try {
+      const providerRarity = new ethers.providers.Web3Provider(
+        web3.currentProvider
+      );
+      const _signer = providerRarity.getSigner();
+
+      const contract = new ethers.Contract(
+        rarityStakingContractAddress,
+        rarityStakingContractABI,
+        _signer
+      );
+
+      const transaction = await contract?.raffleRoll([id]);
+      toast.info("Initializing Raffle Roll");
+      const result = await transaction.wait();
+      console.log(result);
+      if (result.events[0]?.args?.win) {
+        toast.success("Congratulations! You've won.");
+      } else toast.error("Better luck next time.");
+    } catch (error) {
+      toast.error(error.data?.message);
+      console.log(error);
+    }
+  };
+
   const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
 
@@ -2839,9 +2885,14 @@ const Staking = () => {
   };
 
   const [tabVal, setTabVal] = useState(0);
+  const [tabValRarity, setTabValRarity] = useState(0);
 
   const tabHandleChange = (event, newValue) => {
     setTabVal(newValue);
+  };
+
+  const tabHandleChangeRarity = (event, newValue) => {
+    setTabValRarity(newValue);
   };
 
   const [activePenalty, setActivePenalty] = useState(true);
@@ -4207,8 +4258,8 @@ const Staking = () => {
                           TabIndicatorProps={{
                             style: { display: "none" },
                           }}
-                          value={tabVal}
-                          onChange={tabHandleChange}
+                          value={tabValRarity}
+                          onChange={tabHandleChangeRarity}
                           aria-label="simple tabs example"
                         >
                           <Tab
@@ -4229,7 +4280,7 @@ const Staking = () => {
                         </Tabs>
                       </Box>
                       <Box>
-                        <TabPanel value={tabVal} index={0}>
+                        <TabPanel value={tabValRarity} index={0}>
                           <Box display="flex" justifyContent="end">
                             {checkedItems3 &&
                             Object.values(checkedItems3).filter(
@@ -4414,7 +4465,7 @@ const Staking = () => {
                             </Button>
                           </Box>
                         </TabPanel>
-                        <TabPanel value={tabVal} index={1}>
+                        <TabPanel value={tabValRarity} index={1}>
                           <Box display="flex" justifyContent="end">
                             {checkedItems4 &&
                             Object.values(checkedItems4).filter(
@@ -4454,7 +4505,7 @@ const Staking = () => {
                               stakedItemsRarity.map((item, index) => (
                                 <LazyLoad
                                   height={90}
-                                  scrollContainer={"#rarity-scroll"}
+                                  scrollContainer={"#rarity-scroll-staked"}
                                 >
                                   <Box key={index}>
                                     <Box
@@ -4602,7 +4653,7 @@ const Staking = () => {
                             </Button>
                           </Box>
                         </TabPanel>
-                        <TabPanel value={tabVal} index={2}>
+                        <TabPanel value={tabValRarity} index={2}>
                           <Box display="flex" justifyContent="end">
                             {checkedItems5 &&
                             Object.values(checkedItems5).filter(
@@ -4748,7 +4799,7 @@ const Staking = () => {
                                           >
                                             <Button
                                               onClick={() =>
-                                                rollForReward(item.id)
+                                                raffleRoll(item.id)
                                               }
                                               className={
                                                 checkedItems5 &&
@@ -4758,11 +4809,6 @@ const Staking = () => {
                                                       classes.selectedRollBtn,
                                                     ])
                                                   : classes.rollBtn
-                                              }
-                                              disabled={
-                                                item.rollWhen +
-                                                  12 * 60 * 60 * 1000 >
-                                                Date.now()
                                               }
                                             >
                                               {item.rollWhen +
