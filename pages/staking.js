@@ -25,7 +25,7 @@ import FormControl from "@material-ui/core/FormControl";
 import clsx from "clsx";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import Web3 from "web3";
 import {
   singleContractAddress,
@@ -65,6 +65,7 @@ import {
 import axios from "axios";
 import Countdown from "react-countdown";
 import LazyLoad from "react-lazyload";
+import Web3Context from "context/Web3Context";
 
 const useStyles = makeStyles((theme) => ({
   connectBtn: {
@@ -1323,9 +1324,10 @@ const Staking = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const { address, setAddress } = useContext(Web3Context);
+
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
-    address,
     web3,
     singleContract,
     stakedAmount,
@@ -1412,12 +1414,9 @@ const Staking = () => {
       });
     });
 
-    const address = await web3.eth.getAccounts();
+    const _address = await web3.eth.getAccounts();
 
-    dispatch({
-      type: "SET_ADDRESS",
-      address: address[0],
-    });
+    setAddress(_address[0]);
 
     dispatch({
       type: "SET_WEB3",
@@ -1805,6 +1804,7 @@ const Staking = () => {
   };
 
   const getBalance = async () => {
+    console.log(address);
     const stakedAmount = await singleContract.methods
       .balances(address)
       .call({ from: address });
@@ -2939,6 +2939,7 @@ const Staking = () => {
   };
 
   const formatAddress = (str) => {
+    console.log(str);
     return str ? str.slice(0, 5) + "..." + str.slice(str.length - 5) : "";
   };
 

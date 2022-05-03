@@ -82,6 +82,10 @@ export const Web3Provider = (props) => {
     const [] = await Promise.all([]);
   };
 
+  functionsToExport.setAddress = async (_address) => {
+    setAddress(_address);
+  };
+
   functionsToExport.getHarmoleculesNFT = async () => {
     try {
       const balance = await contractObjects?.harmoleculesContract?.balanceOf(
