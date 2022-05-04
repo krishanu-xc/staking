@@ -24,6 +24,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import clsx from "clsx";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Modal from "@mui/material/Modal";
 
 import React, { useContext, useEffect, useReducer, useState } from "react";
 import Web3 from "web3";
@@ -253,6 +254,13 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "22px",
     color: "#E9D758",
   },
+  flyInto2: {
+    fontWeight: "600",
+    fontSize: "20px",
+    lineHeight: "22px",
+    color: "#E9D758",
+    marginBottom: 10,
+  },
   stakeOv: {
     fontWeight: "600",
     fontSize: "16px",
@@ -410,6 +418,15 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "20px",
     padding: "5px 20px",
   },
+  totalBlock2: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "1px solid #E9D758",
+    marginRight: "20px",
+    padding: "5px 20px",
+    marginTop: "20px",
+  },
   totalTitle: {
     fontStyle: "normal",
     fontWeight: "600",
@@ -417,6 +434,13 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "17px",
     color: "#FFFFFF",
     marginRight: "50px",
+  },
+  totalTitle2: {
+    fontStyle: "normal",
+    fontWeight: "600",
+    fontSize: "14px",
+    lineHeight: "17px",
+    color: "#FFFFFF",
   },
   gravAmount: {
     fontStyle: "normal",
@@ -432,6 +456,52 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: "10px",
     paddingBottom: "10px",
     width: "217px",
+    fontFamily: "Archivo",
+    fontStyle: "normal",
+    fontSize: "16px",
+    lineHeight: "18px",
+    fontWeight: 600,
+    "&:hover": {
+      backgroundColor: "#E9D758",
+    },
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
+      lineHeight: "16px",
+      width: "160px",
+    },
+  },
+  closeBtn: {
+    borderRadius: "0",
+    background: "#E9D758",
+    color: "#000",
+    paddingTop: "6px",
+    paddingBottom: "6px",
+    width: "150px",
+    fontFamily: "Archivo",
+    fontStyle: "normal",
+    fontSize: "16px",
+    lineHeight: "18px",
+    fontWeight: 600,
+    marginLeft: "auto",
+    marginRight: "auto",
+    "&:hover": {
+      backgroundColor: "#E9D758",
+    },
+    marginTop: "20px",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
+      lineHeight: "16px",
+      width: "120px",
+    },
+  },
+  rarityStakeBtn: {
+    marginLeft: "6px",
+    borderRadius: "0",
+    background: "#E9D758",
+    color: "#000",
+    paddingTop: "10px",
+    paddingBottom: "10px",
+    width: "160px",
     fontFamily: "Archivo",
     fontStyle: "normal",
     fontSize: "16px",
@@ -1144,6 +1214,25 @@ const useStyles = makeStyles((theme) => ({
     color: "#FFFFFF",
     fontSize: "16px",
     fontFamily: "Archivo",
+  },
+  modal: {
+    display: "flex",
+    flexDirection: "column",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 300,
+    backgroundColor: "#121212",
+    border: "1px solid #E9D758",
+    padding: 10,
+  },
+  modalResult: {
+    border: "1px solid #E9D758",
+    display: "flex",
+    justifyContent: "space-between",
+    padding: 6,
+    marginTop: 6,
   },
 }));
 
@@ -2324,6 +2413,10 @@ const Staking = () => {
   const [loading4, setLoading4] = useState(false);
   const [loading5, setLoading5] = useState(false);
 
+  const [raffleModalOpen, setRaffleModalOpen] = useState(false);
+  const [raffleResult, setRaffleResult] = useState([]);
+  const [raffleWon, setRaffleWon] = useState(0);
+
   const checkNFTHandle = (name, checked, tab) => {
     if (tab == "unstaked") {
       !checked && setSelectedAll(false);
@@ -2846,9 +2939,67 @@ const Staking = () => {
       toast.info("Initializing Raffle Roll");
       const result = await transaction.wait();
       console.log(result);
-      if (result.events[0]?.args?.win) {
-        toast.success("Congratulations! You've won.");
-      } else toast.error("Better luck next time.");
+      console.log(result.events);
+      const _raffleResult = [];
+      let _raffleWon = 0;
+      result.events.forEach((event) => {
+        if (event.args) {
+          if (event.args[2]) _raffleWon++;
+          _raffleResult.push({
+            id: ethers.utils.formatUnits(event.args[1], 0),
+            result: event.args[2],
+          });
+        }
+      });
+      console.log(_raffleResult);
+      setRaffleResult(_raffleResult);
+      setRaffleWon(_raffleWon);
+      setRaffleModalOpen(true);
+    } catch (error) {
+      toast.error(error.data?.message);
+      console.log(error);
+    }
+  };
+
+  const raffleRollSelected = async () => {
+    try {
+      const getIdFromName = (name) => parseInt(name.slice(1));
+      const keys = Object.keys(checkedItems5);
+      const _id = keys
+        .filter((el) => checkedItems5[el])
+        .map((el) => getIdFromName(el));
+
+      if (_id.length) {
+        const providerRarity = new ethers.providers.Web3Provider(
+          web3.currentProvider
+        );
+        const _signer = providerRarity.getSigner();
+
+        const contract = new ethers.Contract(
+          rarityStakingContractAddress,
+          rarityStakingContractABI,
+          _signer
+        );
+        const transaction = await contract?.raffleRoll(_id);
+        toast.info("Initializing Raffle Roll");
+        const result = await transaction.wait();
+        console.log(result.events);
+        const _raffleResult = [];
+        let _raffleWon = 0;
+        result.events.forEach((event) => {
+          if (event.args) {
+            if (event.args[2]) _raffleWon++;
+            _raffleResult.push({
+              id: ethers.utils.formatUnits(event.args[1], 0),
+              result: event.args[2],
+            });
+          }
+        });
+        console.log(_raffleResult);
+        setRaffleResult(_raffleResult);
+        setRaffleWon(_raffleWon);
+        setRaffleModalOpen(true);
+      } else toast.info("Please select a valid item", { theme: "dark" });
     } catch (error) {
       toast.error(error.data?.message);
       console.log(error);
@@ -4871,8 +5022,14 @@ const Staking = () => {
                               </Typography>
                             </Box>
                             <Button
+                              onClick={raffleRollSelected}
+                              className={classes.rarityStakeBtn}
+                            >
+                              ROLL
+                            </Button>
+                            <Button
                               onClick={rarityClaim}
-                              className={classes.nftStakeBtn}
+                              className={classes.rarityStakeBtn}
                             >
                               CLAIM
                             </Button>
@@ -4893,7 +5050,6 @@ const Staking = () => {
               style={{
                 position: "relative",
                 overflowX: "hidden",
-                pointerEvents: "none",
               }}
             >
               {!matches && (
@@ -4929,7 +5085,7 @@ const Staking = () => {
                 </Box>
               )}
               <Typography variant="h2" className={classes.blockTitle}>
-                INCOMING - TIME LOCKED
+                TIME LOCKED
               </Typography>
               <Typography variant="h2" className={classes.blockTitleDesc}>
                 <img style={{ marginRight: "10px" }} src="up-arrow.png"></img>{" "}
@@ -4976,71 +5132,7 @@ const Staking = () => {
                   </Box>
                 </Box>
               )}
-              <Grid container spacing={3} className={classes.stakeInputBlock}>
-                <Grid item md={4} xs={10}>
-                  <FormControl
-                    className={classes.stakedInput}
-                    variant="outlined"
-                  >
-                    <InputLabel
-                      style={{ transition: "none" }}
-                      shrink={true}
-                      htmlFor="staked-html"
-                    >
-                      STAKED
-                    </InputLabel>
-                    <OutlinedInput
-                      id="staked-html"
-                      type="text"
-                      endAdornment={
-                        <InputAdornment
-                          className={classes.unitLabel}
-                          position="end"
-                        >
-                          GRAV
-                        </InputAdornment>
-                      }
-                      notched
-                      value={lockStakedAmount}
-                      labelWidth={70}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item md={4} xs={10}>
-                  <FormControl
-                    className={classes.stakedInput}
-                    variant="outlined"
-                  >
-                    <InputLabel
-                      style={{ transition: "none" }}
-                      shrink={true}
-                      htmlFor="staked-html"
-                    >
-                      REWARDS
-                    </InputLabel>
-                    <OutlinedInput
-                      id="staked-html"
-                      type="text"
-                      endAdornment={
-                        <InputAdornment
-                          className={classes.unitLabel}
-                          position="end"
-                        >
-                          xGRAV
-                        </InputAdornment>
-                      }
-                      notched
-                      value={lockPendingReward}
-                      labelWidth={90}
-                    />
-                  </FormControl>
-                </Grid>
-                {/* <Grid item md={4} xs={10}>
-                  <Button variant="contained" onClick={getRewards} className={classes.claimBtn}>
-                    Claim
-                  </Button>
-                </Grid> */}
-              </Grid>
+
               <Grid container className={classes.stakeAndLockBlock}>
                 <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
                   <Typography
@@ -5136,157 +5228,59 @@ const Staking = () => {
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid container className={classes.stakeAndLockBlock}>
-                <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
-                  <Typography
-                    className={classes.stakeAndLockTitle}
-                    variant="h1"
-                  >
-                    DEPOSIT
-                  </Typography>
-                  <Typography
-                    className={classes.stakeAndLockSubTitle1}
-                    variant="h1"
-                  >
-                    Add to your initial stake with zero additional time added!
-                  </Typography>
-                </Grid>
-                <Grid
-                  container
-                  item
-                  md={6}
-                  xs={12}
-                  className={classes.stakeAndLockRight}
-                >
-                  <Grid
-                    item
-                    container
-                    xs={12}
-                    className={classes.stakeAndLockRightTop}
-                  >
-                    <Grid item md={8}>
-                      <FormControl variant="outlined">
-                        <OutlinedInput
-                          placeholder="ENTER AMOUNT TO DEPOSIT"
-                          className={classes.stakeAmountInput}
-                          onChange={(event) => {
-                            dispatch({
-                              type: "SET_LOCK_DEPOSIT_AMOUNT",
-                              lockDepositAmount: event.target.value,
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4}>
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="end"
-                        height="100%"
-                      >
-                        <Typography className={classes.unitLabel1}>
-                          GRAV
-                        </Typography>
-                        <Button className={classes.maxBtn}>MAX</Button>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    container
-                    item
-                    xs={12}
-                    className={classes.stakeAndLockRightBottomRight}
-                  >
-                    <Button
-                      onClick={lockDeposit}
-                      className={clsx(classes.stake6btn, classes.mobileCTA)}
-                    >
-                      DEPOSIT
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid container className={classes.stakeAndLockBlock}>
-                <Grid item md={6} xs={12} className={classes.stakeAndLockLeft}>
-                  <Typography
-                    className={classes.stakeAndLockTitle}
-                    variant="h1"
-                  >
-                    UNSTAKE
-                  </Typography>
-                </Grid>
-                <Grid
-                  container
-                  item
-                  md={6}
-                  xs={12}
-                  className={classes.stakeAndLockRight}
-                >
-                  <Grid
-                    item
-                    container
-                    xs={12}
-                    className={classes.stakeAndLockRightTop}
-                  >
-                    <Grid item md={8}>
-                      <FormControl variant="outlined">
-                        <OutlinedInput
-                          placeholder="ENTER AMOUNT TO UNSTAKE"
-                          className={classes.stakeAmountInput}
-                          onChange={(event) => {
-                            dispatch({
-                              type: "SET_UNSTAKE_AMOUNT",
-                              lockUnstakeAmount: event.target.value,
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={4}>
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="end"
-                        height="100%"
-                      >
-                        <Typography className={classes.unitLabel1}>
-                          GRAV
-                        </Typography>
-                        <Button
-                          onClick={() => {
-                            dispatch({
-                              type: "SET_UNSTAKE_AMOUNT",
-                              lockUnstakeAmount: parseInt(lockStakedAmount),
-                            });
-                          }}
-                          className={classes.maxBtn}
-                        >
-                          MAX
-                        </Button>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    container
-                    item
-                    xs={12}
-                    className={classes.stakeAndLockRightBottomRight}
-                  >
-                    <Button
-                      onClick={lockUnStake}
-                      className={clsx(classes.stake6btn, classes.mobileCTA)}
-                    >
-                      UNSTAKE
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
             </Box>
           </Grid>
         </Grid>
       </Container>
       <ToastContainer />
+      <Modal
+        open={raffleModalOpen}
+        onClose={() => setRaffleModalOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className={classes.modal}>
+          <Typography variant="h1" className={classes.flyInto2}>
+            RAFFLE RESULT
+          </Typography>
+          <Box style={{ maxHeight: 400, overflow: "scroll" }}>
+            {raffleResult.length &&
+              raffleResult.map((el) => {
+                return (
+                  <>
+                    <Box className={classes.modalResult}>
+                      <Grid style={{ color: "#E9D758", fontWeight: "800" }}>
+                        #{el.id}
+                      </Grid>
+                      <Grid
+                        style={
+                          el.result
+                            ? { color: "#E9D758", fontWeight: "800" }
+                            : { fontWeight: "800" }
+                        }
+                      >
+                        {el.result ? "WON" : "LOST"}
+                      </Grid>
+                    </Box>
+                  </>
+                );
+              })}
+          </Box>
+          <Box style={{ display: "flex", justifyContent: "space-between" }}>
+            <Box className={classes.totalBlock2}>
+              <Typography className={classes.totalTitle2}>
+                WON {raffleWon}/{raffleResult.length}
+              </Typography>
+            </Box>
+            <Button
+              onClick={() => setRaffleModalOpen(false)}
+              className={classes.closeBtn}
+            >
+              <CloseIcon style={{ fontSize: "15px" }}></CloseIcon> CLOSE
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
       <UnlocksModal
         open={openUnlocksModal}
         handleModalClose={handleModalClose}

@@ -5,6 +5,8 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import theme from "theme";
 import { Web3Provider } from "context/Web3Context";
+import { ToastContainer } from "react-toastify";
+import "./style.css";
 
 export default function MyApp(props) {
   const { Component, pageProps } = props;
