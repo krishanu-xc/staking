@@ -936,6 +936,19 @@ const useStyles = makeStyles((theme) => ({
       padding: "10px 15px 20px 15px",
     },
   },
+  statCard: {
+    height: "100%",
+    padding: "12px 20px 10px 20px",
+    marginLeft: "30px",
+    backgroundImage: "url('nft-staking-frame.png')",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "100% 100%",
+    backgroundPosition: "center",
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: "0",
+      padding: "20px",
+    },
+  },
   selectAllBtn: {
     width: "110px",
     padding: "3px 0",
@@ -962,6 +975,24 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       marginBottom: "10px",
     },
+  },
+  myNft2: {
+    fontStyle: "normal",
+    fontSize: "14px",
+    lineHeight: "17px",
+    color: "#E9D758",
+    [theme.breakpoints.down("xs")]: {
+      marginBottom: "10px",
+    },
+  },
+  bigNumber: {
+    marginTop: "10px",
+    fontFamily: "Archivo",
+    fontStyle: "normal",
+    fontWeight: "800",
+    fontSize: "22px",
+    lineHeight: "17px",
+    color: "#ffffff",
   },
   muiTab: {
     fontFamily: "Archivo",
@@ -1070,6 +1101,13 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #333745",
     marginBottom: "12px",
     cursor: "pointer",
+  },
+  stakingNFTBlock2: {
+    width: "100%",
+    background: "#06070E",
+    border: "1px solid #333745",
+    padding: "16px",
+    marginBottom: "10px",
   },
   selectedNFT: {
     borderColor: "#E9D758",
@@ -1298,7 +1336,6 @@ const initialState = {
   stakedItemsRarity: null,
   rewardItemsRarity: null,
   totalRewardsRarity: "",
-
   lockXgravContract: null,
   lockXgravStakedAmount: "",
   lockXgravPendingReward: "",
@@ -1306,6 +1343,9 @@ const initialState = {
   lockXgravWithdrawal: "",
   lockStakedIds: [],
   lockStakedRewards: {},
+  totalGravsStaked: null,
+  totalRewardsLocked: null,
+  totalAmountLocked: null,
 };
 
 const reducer = (state, action) => {
@@ -1463,6 +1503,23 @@ const reducer = (state, action) => {
         ...state,
         lockedStakingContract: action.lockedStakingContract,
       };
+    case "SET_TOTAL_GRAVS_STAKED":
+      return {
+        ...state,
+        totalGravsStaked: action.totalGravsStaked,
+      };
+
+    case "SET_TOTAL_REWARDS_LOCKED":
+      return {
+        ...state,
+        totalRewardsLocked: action.totalRewardsLocked,
+      };
+
+    case "SET_TOTAL_AMOUNT_LOCKED":
+      return {
+        ...state,
+        totalAmountLocked: action.totalAmountLocked,
+      };
     default:
       throw new Error();
   }
@@ -1509,6 +1566,9 @@ const Staking = () => {
     lockXgravWithdrawal,
     lockStakedIds,
     lockStakedRewards,
+    totalGravsStaked,
+    totalRewardsLocked,
+    totalAmountLocked,
   } = state;
 
   const [APR, setAPR] = useState("~");
@@ -2027,8 +2087,11 @@ const Staking = () => {
       });
 
       const _stakeData = await multicallProvider?.all(stakeTokens);
+      let totalAmount = 0;
 
       const stakeData = _stakeData.map((el, index) => {
+        totalAmount += parseFloat(ethers.utils.formatEther(el.amount));
+        console.log(totalAmount);
         return {
           id: stakedIds[index],
           amount: ethers.utils.formatEther(el.amount),
@@ -2057,9 +2120,15 @@ const Staking = () => {
         completedItemsLocked: _completedItemsLocked,
       });
 
+      dispatch({
+        type: "SET_TOTAL_AMOUNT_LOCKED",
+        totalAmountLocked: totalAmount,
+      });
+
       //rewards
 
       const rewardsTokens = [];
+      const totalRewards = 0;
 
       stakedIds.forEach((el) => {
         rewardsTokens.push(multicallContract?.getReward(address, el));
@@ -2070,10 +2139,27 @@ const Staking = () => {
       );
 
       console.log(_rewardsData);
+      _rewardsData.forEach((el) => (totalRewards += parseFloat(el)));
+
+      dispatch({
+        type: "SET_TOTAL_REWARDS_LOCKED",
+        totalRewardsLocked: totalRewards,
+      });
 
       dispatch({
         type: "SET_LOCK_STAKED_REWARDS",
         lockStakedRewards: _rewardsData,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    //Get total gravs staked
+    try {
+      const totalGravs = await tokenContract?.balanceOf(lockContractAddress);
+      dispatch({
+        type: "SET_TOTAL_GRAVS_STAKED",
+        totalGravsStaked: ethers.utils.formatEther(totalGravs),
       });
     } catch (error) {
       console.log(error);
@@ -5188,7 +5274,7 @@ const Staking = () => {
                         marginLeft: "20px",
                       }}
                     >
-                      {lockStakedAmount}
+                      {parseFloat(lockStakedAmount).toFixed(4)}
                     </span>
                   </Typography>
                 </Grid>
@@ -5242,7 +5328,20 @@ const Staking = () => {
                   <Grid container item xs={12}>
                     <Grid
                       item
-                      md={6}
+                      md={4}
+                      xs={12}
+                      className={classes.stakeAndLockRightBottomLeft}
+                    >
+                      <Button
+                        onClick={() => lockedStake(0)}
+                        className={clsx(classes.stake6btn, classes.mobileCTA)}
+                      >
+                        3 MONTHS
+                      </Button>
+                    </Grid>
+                    <Grid
+                      item
+                      md={4}
                       xs={12}
                       className={classes.stakeAndLockRightBottomLeft}
                     >
@@ -5250,12 +5349,12 @@ const Staking = () => {
                         onClick={() => lockedStake(1)}
                         className={clsx(classes.stake6btn, classes.mobileCTA)}
                       >
-                        STAKE 6 MONTHS
+                        6 MONTHS
                       </Button>
                     </Grid>
                     <Grid
                       item
-                      md={6}
+                      md={4}
                       xs={12}
                       className={classes.stakeAndLockRightBottomRight}
                     >
@@ -5263,7 +5362,7 @@ const Staking = () => {
                         onClick={() => lockedStake(2)}
                         className={classes.stake6btn}
                       >
-                        STAKE 12 MONTHS
+                        12 MONTHS
                       </Button>
                     </Grid>
                   </Grid>
@@ -5988,7 +6087,63 @@ const Staking = () => {
                   </Box>
                 </Grid>
                 <Grid item md={4} xs={12}>
-                  <Box className={classes.rightRarityBlock}></Box>
+                  <Box
+                    className={classes.statCard}
+                    display="flex"
+                    flexDirection="column"
+                  >
+                    <Typography className={classes.myNft2}>STATS</Typography>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      flex={1}
+                      flexDirection="column"
+                    >
+                      <Box
+                        className={classes.stakingNFTBlock2}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        flexDirection="column"
+                      >
+                        <Typography className={classes.myNft2}>
+                          TOTAL STAKED GRAVS
+                        </Typography>
+                        <Typography className={classes.bigNumber}>
+                          {parseInt(totalGravsStaked)}
+                        </Typography>
+                      </Box>
+                      <Box
+                        className={classes.stakingNFTBlock2}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        flexDirection="column"
+                      >
+                        <Typography className={classes.myNft2}>
+                          YOUR STAKED GRAVS
+                        </Typography>
+                        <Typography className={classes.bigNumber}>
+                          {parseInt(totalAmountLocked)}
+                        </Typography>
+                      </Box>
+                      <Box
+                        className={classes.stakingNFTBlock2}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        flexDirection="column"
+                      >
+                        <Typography className={classes.myNft2}>
+                          UNCLAIMED REWARDS
+                        </Typography>
+                        <Typography className={classes.bigNumber}>
+                          {parseFloat(totalRewardsLocked).toFixed(4)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
                 </Grid>
               </Grid>
             </Box>
