@@ -470,6 +470,28 @@ const useStyles = makeStyles((theme) => ({
       width: "160px",
     },
   },
+  nftStakeBtn2: {
+    borderRadius: "0",
+    border: "1px solid #E9D758",
+    color: "#fff",
+    paddingTop: "10px",
+    paddingBottom: "10px",
+    width: "217px",
+    fontFamily: "Archivo",
+    fontStyle: "normal",
+    fontSize: "16px",
+    lineHeight: "18px",
+    fontWeight: 600,
+    "&:hover": {
+      backgroundColor: "#E9D758",
+      color: "#121212",
+    },
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "15px",
+      lineHeight: "16px",
+      width: "160px",
+    },
+  },
   closeBtn: {
     borderRadius: "0",
     background: "#E9D758",
@@ -986,6 +1008,13 @@ const useStyles = makeStyles((theme) => ({
       padding: "10px",
     },
   },
+  stakingWrap2: {
+    padding: "16px",
+    flexGrow: "1",
+    [theme.breakpoints.down("xs")]: {
+      padding: "10px",
+    },
+  },
   stakingInfo: {
     fontWeight: "600",
     fontSize: "12px",
@@ -993,6 +1022,16 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: "0.05em",
     color: "#FFFFFF",
     marginRight: "70px",
+    [theme.breakpoints.down("xs")]: {
+      marginRight: "15px",
+    },
+  },
+  stakingInfo2: {
+    fontWeight: "600",
+    fontSize: "12px",
+    lineHeight: "13px",
+    letterSpacing: "0.05em",
+    color: "#FFFFFF",
     [theme.breakpoints.down("xs")]: {
       marginRight: "15px",
     },
@@ -1259,6 +1298,7 @@ const initialState = {
   stakedItemsRarity: null,
   rewardItemsRarity: null,
   totalRewardsRarity: "",
+
   lockXgravContract: null,
   lockXgravStakedAmount: "",
   lockXgravPendingReward: "",
@@ -1350,6 +1390,16 @@ const reducer = (state, action) => {
         ...state,
         totalRewardsRarity: action.totalRewardsRarity,
       };
+    case "SET_ONGOING_ITEMS_LOCKED":
+      return {
+        ...state,
+        ongoingItemsLocked: action.ongoingItemsLocked,
+      };
+    case "SET_COMPLETED_ITEMS_LOCKED":
+      return {
+        ...state,
+        completedItemsLocked: action.completedItemsLocked,
+      };
     case "SET_MONTH_STAKE_AMOUNT":
       return {
         ...state,
@@ -1403,6 +1453,16 @@ const reducer = (state, action) => {
         lockXgravStakedAmount: action.lockXgravStakedAmount,
         lockXgravPendingReward: action.lockXgravPendingReward,
       };
+    case "SET_LOCK_STAKED_AMOUNT":
+      return {
+        ...state,
+        lockStakedAmount: action.lockStakedAmount,
+      };
+    case "SET_LOCKED_STAKING_CONTRACT":
+      return {
+        ...state,
+        lockedStakingContract: action.lockedStakingContract,
+      };
     default:
       throw new Error();
   }
@@ -1412,6 +1472,7 @@ const Staking = () => {
   const classes = useStyles();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
+  const matchesMd = useMediaQuery(theme.breakpoints.up("md"));
 
   const { address, setAddress } = useContext(Web3Context);
 
@@ -1438,6 +1499,9 @@ const Staking = () => {
     stakedItemsRarity,
     rewardItemsRarity,
     totalRewardsRarity,
+    ongoingItemsLocked,
+    completedItemsLocked,
+    lockedStakingContract,
     lockXgravContract,
     lockXgravStakedAmount,
     lockXgravPendingReward,
@@ -1562,6 +1626,17 @@ const Staking = () => {
       type: "SET_RARITY_CONTRACT",
       rarityContract: harmoleculesContract,
     });
+
+    const _lockedStakingContract = new ethers.Contract(
+      lockContractAddress,
+      lockAbi,
+      _signer
+    );
+
+    dispatch({
+      type: "SET_LOCKED_STAKING_CONTRACT",
+      lockedStakingContract: _lockedStakingContract,
+    });
   };
 
   useEffect(() => {
@@ -1583,6 +1658,10 @@ const Staking = () => {
   useEffect(() => {
     rarityContract && getHarmoleculesNFT();
   }, [rarityContract]);
+
+  useEffect(() => {
+    lockedStakingContract && getLockedStakingData();
+  }, [lockedStakingContract]);
 
   const getNFTBalance = async () => {
     const startTime = Date.now();
@@ -1892,6 +1971,135 @@ const Staking = () => {
     }
   };
 
+  const getLockedStakingData = async () => {
+    //Token contract setup
+    const providerLocked = new ethers.providers.Web3Provider(
+      web3.currentProvider
+    );
+    const _signer = providerLocked.getSigner();
+
+    const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, _signer);
+
+    //Multicall contract setup
+    const setupMultiCallContract = async (nftAddress, nftABI) => {
+      const provider = new ethers.providers.Web3Provider(
+        web3.currentProvider,
+        "any"
+      );
+      const ethcallProvider = new MulticallProvider(provider);
+
+      await ethcallProvider.init();
+      ethcallProvider._multicallAddress =
+        "0x34b415f4d3b332515e66f70595ace1dcf36254c5";
+
+      const multicallContract = new MulticallContract(nftAddress, nftABI);
+      return [ethcallProvider, multicallContract];
+    };
+
+    const [multicallProvider, multicallContract] = await setupMultiCallContract(
+      lockContractAddress,
+      lockAbi
+    );
+
+    //Get Balance
+    try {
+      const result = await tokenContract?.balanceOf(address);
+      dispatch({
+        type: "SET_LOCK_STAKED_AMOUNT",
+        lockStakedAmount: ethers.utils.formatEther(result),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    //Get Stake Data
+    try {
+      //ongoing data
+      const stakeIdLast = await lockedStakingContract?.userId(address);
+      const iter = ethers.utils.formatUnits(stakeIdLast, 0);
+
+      const stakeTokens = [];
+
+      for (let index = 1; index <= iter; index++) {
+        stakeTokens.push(multicallContract?.userStaked(address, index));
+      }
+
+      const _stakeData = await multicallProvider?.all(stakeTokens);
+
+      const stakeData = _stakeData.map((el, index) => {
+        return {
+          id: index + 1,
+          amount: ethers.utils.formatEther(el.amount),
+          durationCode: ethers.utils.formatUnits(el.durationCode, 0),
+          stakeTime: parseInt(ethers.utils.formatUnits(el.stakeTime, 0) * 1000),
+        };
+      });
+
+      const _completedItemsLocked = [];
+      const _ongoingItemsLocked = [];
+
+      stakeData.forEach((el) => {
+        if (el.amount > 0) {
+          const months = decodeDuration(el.durationCode);
+          if (el.stakeTime + months * 30 * 24 * 60 * 60 * 1000 > Date.now())
+            _ongoingItemsLocked.push(el);
+          else _completedItemsLocked.push(el);
+        }
+      });
+
+      dispatch({
+        type: "SET_ONGOING_ITEMS_LOCKED",
+        ongoingItemsLocked: _ongoingItemsLocked,
+      });
+
+      dispatch({
+        type: "SET_COMPLETED_ITEMS_LOCKED",
+        completedItemsLocked: _completedItemsLocked,
+      });
+
+      //rewards
+
+      const rewardsTokens = [];
+
+      for (let index = 1; index <= iter; index++) {
+        rewardsTokens.push(multicallContract?.getReward(address, index));
+      }
+
+      const _rewardsData = (await multicallProvider?.all(rewardsTokens)).map(
+        (el) => ethers.utils.formatEther(el)
+      );
+
+      console.log(_rewardsData);
+
+      dispatch({
+        type: "SET_LOCK_STAKED_REWARDS",
+        lockStakedRewards: _rewardsData,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleMaxLocked = () => {
+    dispatch({
+      type: "SET_MONTH_STAKE_AMOUNT",
+      monthStakingInputAmount: lockStakedAmount,
+    });
+  };
+
+  const decodeDuration = (durationCode) => {
+    switch (durationCode) {
+      case "0":
+        return 3;
+      case "1":
+        return 6;
+      case "2":
+        return 12;
+      default:
+        return 0;
+    }
+  };
+
   const getBalance = async () => {
     console.log(address);
     const stakedAmount = await singleContract.methods
@@ -1977,329 +2185,6 @@ const Staking = () => {
         toast.error(error.message);
         console.log(error);
       });
-  };
-
-  const getXgravLockStakingBalance = async () => {
-    // TODO
-    try {
-      const getStakedIDs = await lockXgravContract.methods
-        .getStakedIDs(address)
-        .call({ from: address });
-
-      let totalStakedAmt = 0;
-      let rewardsAmount = 0;
-      let stakedRewards = {};
-      for (let index = 0; index < getStakedIDs.length; index++) {
-        const element = getStakedIDs[index];
-        let temp = await lockXgravContract.methods
-          .getStakeInfo(element)
-          .call({ from: address });
-        totalStakedAmt += temp.amount / Math.pow(10, 18);
-        let tempReward = await lockXgravContract.methods
-          .getCurrentRewards(element)
-          .call({ from: address });
-        stakedRewards[element] = {
-          amount: temp.amount / Math.pow(10, 18),
-          rewards: tempReward / Math.pow(10, 18),
-        };
-        rewardsAmount += tempReward / Math.pow(10, 18);
-      }
-
-      dispatch({
-        type: "SET_LOCK_STAKED_IDS",
-        lockStakedIds: getStakedIDs,
-      });
-
-      dispatch({
-        type: "SET_LOCK_STAKED_REWARDS",
-        lockStakedRewards: stakedRewards,
-      });
-
-      dispatch({
-        type: "SET_XGRAV_LOCK_STAKED_PENDING",
-        lockXgravStakedAmount: totalStakedAmt.toFixed(3),
-        lockXgravPendingReward: rewardsAmount.toFixed(3),
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const lockXgravStake = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    if (lockXgravStakingInput < 1 || !lockXgravStakingInput) {
-      toast.error("Enter An Amount Greater Than 1 ONEverse token");
-      return;
-    }
-
-    const amount = Web3.utils.toBN(
-      String(Math.floor(lockXgravStakingInput)) + "0".repeat(18)
-    );
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-
-    toast.info("Approve Transaction To Allow ONEverse token spending");
-
-    tokenContract.methods
-      .approve(lockXGRAVContractAddress, amount)
-      .send({ from: address })
-      .on("receipt", (receipt) => {
-        toast.info("Confirm staking transaction");
-        lockXgravContract.methods
-          .lockTokens(amount)
-          .send({ from: address })
-          .on("receipt", (receipt) => {
-            toast.success(
-              "Your tokens have been staked! - Amount:" + lockXgravStakingInput
-            );
-            getXgravLockStakingBalance();
-          })
-          .on("error", (error, receipt) => {
-            toast.error(error.message);
-            console.log(error);
-          });
-      })
-      .on("error", (error, receipt) => {
-        toast.error(error.message);
-        console.log(error);
-      });
-  };
-
-  const lockXgravUnstake = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    if (selectedStakedItems.length < 1 || !selectedStakedItems.length) {
-      toast.error("Enter An Amount Greater Than 1");
-      return;
-    }
-
-    toast.info("Please Wait Till The Transaction Succeeds");
-
-    lockXgravContract.methods
-      .batchWithdraw(selectedStakedItems)
-      .send({ from: address })
-      .on("receipt", (receipt) => {
-        toast.success("Withdrawal Success");
-        getXgravLockStakingBalance();
-      })
-      .on("error", (error, reciept) => {
-        toast.error(error.message);
-        console.log(error);
-      });
-  };
-
-  const staking6Months = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    if (monthStakingInputAmount < 1 || !monthStakingInputAmount) {
-      toast.error("Enter An Amount Greater Than 1 ONEverse token");
-      return;
-    }
-
-    const amount = Web3.utils.toBN(
-      String(Math.floor(monthStakingInputAmount)) + "0".repeat(18)
-    );
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-
-    toast.info("Approve Transaction To Allow ONEverse token spending");
-
-    tokenContract.methods
-      .approve(lockContractAddress, amount)
-      .send({ from: address })
-      .on("receipt", (receipt) => {
-        toast.info("Confirm staking transaction");
-        try {
-          lockContract.methods
-            .stake(amount, 182)
-            .send({ from: address })
-            .on("receipt", (receipt) => {
-              toast.success(
-                "Your tokens have been secured in the Wormhole for six months! - Amount:" +
-                  monthStakingInputAmount
-              );
-              getLockStakingBalance();
-            })
-            .on("error", (error, receipt) => {
-              toast.error(error.message);
-              console.log(error);
-            });
-        } catch (err) {
-          console.log(err);
-        }
-      })
-      .on("error", (error, receipt) => {
-        toast.error(error.message);
-        console.log(error);
-      });
-  };
-
-  const staking12Month = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    if (monthStakingInputAmount < 1 || !monthStakingInputAmount) {
-      toast.error("Enter An Amount Greater Than 1 ONEverse token");
-      return;
-    }
-
-    const amount = Web3.utils.toBN(
-      String(Math.floor(monthStakingInputAmount)) + "0".repeat(18)
-    );
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-
-    toast.info("Approve Transaction To Allow ONEverse token spending");
-
-    tokenContract.methods
-      .approve(lockContractAddress, amount)
-      .send({ from: address })
-      .on("receipt", (receipt) => {
-        toast.info("Please wait...");
-        toast.info("Confirm staking transaction");
-        try {
-          lockContract.methods
-            .stake(amount, 365)
-            .send({ from: address })
-            .on("receipt", (receipt) => {
-              toast.success(
-                "Your tokens have been secured in the Wormhole for one year! - Amount:" +
-                  monthStakingInputAmount
-              );
-              getLockStakingBalance();
-            })
-            .on("error", (error, receipt) => {
-              toast.error(error.message);
-              console.log(error);
-            });
-        } catch (err) {
-          console.log(err);
-        }
-      })
-      .on("error", (error, receipt) => {
-        toast.error(error.message);
-        console.log(error);
-      });
-  };
-
-  const lockUnStake = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    if (lockUnstakeAmount < 1 || !lockUnstakeAmount) {
-      toast.error("Enter An Amount Greater Than 1");
-      return;
-    }
-
-    const amount = Web3.utils.toBN(
-      String(Math.floor(lockUnstakeAmount)) + "0".repeat(18)
-    );
-
-    toast.info("Please Wait Till The Transaction Succeeds");
-    try {
-      await lockContract.methods
-        .updatecurrentStakingTime()
-        .call({ from: address });
-
-      lockContract.methods
-        .unstake(amount)
-        .send({ from: address })
-        .on("receipt", (receipt) => {
-          toast.success("Wormhole Withdrawal Success");
-          toast.info(
-            "Please Note Withdrawal Includes Current Reward Obtained!"
-          );
-          getLockStakingBalance();
-        })
-        .on("error", (error, reciept) => {
-          toast.error(error.message);
-          console.log(error);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const lockDeposit = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    if (lockDepositAmount < 1 || !lockDepositAmount) {
-      toast.error("Enter An Amount Greater Than 1");
-      return;
-    }
-
-    const amount = Web3.utils.toBN(
-      String(Math.floor(lockDepositAmount)) + "0".repeat(18)
-    );
-    const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-
-    toast.info("Approve Transaction To Allow ONEverse token spending");
-    try {
-      await lockContract.methods
-        .updatecurrentStakingTime()
-        .call({ from: address });
-
-      tokenContract.methods
-        .approve(lockContractAddress, amount)
-        .send({ from: address })
-        .on("receipt", (receipt) => {
-          lockContract.methods
-            .deposit(amount)
-            .send({ from: address })
-            .on("receipt", (receipt) => {
-              toast.success(
-                "Your tokens have been added to the Wormhole! - Amount:" +
-                  lockDepositAmount
-              );
-              getLockStakingBalance();
-            })
-            .on("error", (error, receipt) => {
-              toast.error(error.message);
-              console.log(error);
-            });
-        })
-        .on("error", (error, receipt) => {
-          toast.error(error.message);
-          console.log(error);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const getRewards = async () => {
-    if (!address) {
-      toast.error("Please Connect Your Wallet", "error");
-      return;
-    }
-    try {
-      lockContract.methods
-        ._transferRewards()
-        .send({ from: address })
-        .on("receipt", (receipt) => {
-          toast.success("You have successfully transferred your rewards!");
-          getLockStakingBalance();
-        })
-        .on("error", (error, receipt) => {
-          console.error(receipt);
-        });
-    } catch (err) {
-      console.log(err);
-    }
   };
 
   const handleSingleAmountChange = (event) => {
@@ -2400,12 +2285,17 @@ const Staking = () => {
   const [checkedItems3, setCheckedItems3] = useState({});
   const [checkedItems4, setCheckedItems4] = useState({});
   const [checkedItems5, setCheckedItems5] = useState({});
+  const [checkedItems6, setCheckedItems6] = useState({});
+  const [checkedItems7, setCheckedItems7] = useState({});
+
   const [selectedAll, setSelectedAll] = useState(false);
   const [selectedAll1, setSelectedAll1] = useState(false);
   const [selectedAll2, setSelectedAll2] = useState(false);
   const [selectedAll3, setSelectedAll3] = useState(false);
   const [selectedAll4, setSelectedAll4] = useState(false);
   const [selectedAll5, setSelectedAll5] = useState(false);
+  const [selectedAll6, setSelectedAll6] = useState(false);
+  const [selectedAll7, setSelectedAll7] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loading1, setLoading1] = useState(false);
   const [loading2, setLoading2] = useState(false);
@@ -2431,11 +2321,17 @@ const Staking = () => {
       !checked && setSelectedAll3(false);
       setCheckedItems3({ ...checkedItems3, [name]: checked });
     } else if (tab == "staked_rarity") {
-      !checked && setSelectedAll3(false);
+      !checked && setSelectedAll4(false);
       setCheckedItems4({ ...checkedItems4, [name]: checked });
     } else if (tab == "rewarded_rarity") {
-      !checked && setSelectedAll3(false);
+      !checked && setSelectedAll5(false);
       setCheckedItems5({ ...checkedItems5, [name]: checked });
+    } else if (tab == "ongoing_locked") {
+      !checked && setSelectedAll6(false);
+      setCheckedItems6({ ...checkedItems6, [name]: checked });
+    } else if (tab == "completed_locked") {
+      !checked && setSelectedAll7(false);
+      setCheckedItems7({ ...checkedItems7, [name]: checked });
     }
   };
 
@@ -2533,6 +2429,24 @@ const Staking = () => {
     setSelectedAll5(true);
   };
 
+  const selectAllNFT6 = () => {
+    const selected = ongoingItemsLocked.reduce(function (result, item) {
+      result[item["id"]] = true;
+      return result;
+    }, {});
+    setCheckedItems6(selected);
+    setSelectedAll6(true);
+  };
+
+  const selectAllNFT7 = () => {
+    const selected = completedItemsLocked.reduce(function (result, item) {
+      result[item["name"]] = true;
+      return result;
+    }, {});
+    setCheckedItems7(selected);
+    setSelectedAll7(true);
+  };
+
   const deselectAllNFT = () => {
     const defaultSelect =
       currentItems &&
@@ -2599,6 +2513,28 @@ const Staking = () => {
     setSelectedAll5(false);
   };
 
+  const deselectAllNFT6 = () => {
+    const defaultSelect =
+      ongoingItemsLocked &&
+      ongoingItemsLocked.reduce(function (result, item) {
+        result[item["id"]] = false;
+        return result;
+      }, {});
+    setCheckedItems6(defaultSelect);
+    setSelectedAll6(false);
+  };
+
+  const deselectAllNFT7 = () => {
+    const defaultSelect =
+      completedItemsLocked &&
+      completedItemsLocked.reduce(function (result, item) {
+        result[item["name"]] = false;
+        return result;
+      }, {});
+    setCheckedItems7(defaultSelect);
+    setSelectedAll7(false);
+  };
+
   const nftStake = async () => {
     if (!address) {
       toast.error("Please connect your wallet");
@@ -2642,6 +2578,62 @@ const Staking = () => {
       deselectAllNFT();
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const nftUnstake = async () => {
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
+    const notEmpty = Object.values(checkedItems1).some((val) => val === true);
+
+    if (!notEmpty) {
+      toast.error("Please select at least one nft to unstake");
+      return;
+    }
+
+    function isSelected(elem) {
+      return checkedItems1[elem.name];
+    }
+
+    let filtered = stakedItems.filter(isSelected).map((a) => a.id);
+
+    try {
+      const webRequest = await axios.get(
+        "https://oneverse-backend.onrender.com/price"
+      );
+      const { signature, address, types, voucher, finalPrice } =
+        webRequest.data;
+
+      const ethers = require("ethers");
+
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: `0x${(1666600000).toString(16)}` }],
+      });
+      const _provider1 = new ethers.providers.Web3Provider(
+        web3.currentProvider
+      );
+      const _signer = await _provider1.getSigner();
+      let add = await _signer.getAddress();
+      let _nftContract = new web3.eth.Contract(
+        nftContractABI,
+        nftContractAddress
+      );
+      const transaction = await _nftContract.methods
+        ?.unstakeTokens(
+          filtered.map((e) => e.toString()),
+          [voucher.price, voucher.time, signature]
+        )
+        .send({ from: add, gas: 8000000 });
+
+      toast.success(`${filtered.length} NFts were successfully unstaked.`);
+      getNFTBalance();
+      deselectAllNFT1();
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
     }
   };
 
@@ -2779,62 +2771,6 @@ const Staking = () => {
     } catch (e) {
       toast.error(e.message);
       console.log(e);
-    }
-  };
-
-  const nftUnstake = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-    const notEmpty = Object.values(checkedItems1).some((val) => val === true);
-
-    if (!notEmpty) {
-      toast.error("Please select at least one nft to unstake");
-      return;
-    }
-
-    function isSelected(elem) {
-      return checkedItems1[elem.name];
-    }
-
-    let filtered = stakedItems.filter(isSelected).map((a) => a.id);
-
-    try {
-      const webRequest = await axios.get(
-        "https://oneverse-backend.onrender.com/price"
-      );
-      const { signature, address, types, voucher, finalPrice } =
-        webRequest.data;
-
-      const ethers = require("ethers");
-
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: `0x${(1666600000).toString(16)}` }],
-      });
-      const _provider1 = new ethers.providers.Web3Provider(
-        web3.currentProvider
-      );
-      const _signer = await _provider1.getSigner();
-      let add = await _signer.getAddress();
-      let _nftContract = new web3.eth.Contract(
-        nftContractABI,
-        nftContractAddress
-      );
-      const transaction = await _nftContract.methods
-        ?.unstakeTokens(
-          filtered.map((e) => e.toString()),
-          [voucher.price, voucher.time, signature]
-        )
-        .send({ from: add, gas: 8000000 });
-
-      toast.success(`${filtered.length} NFts were successfully unstaked.`);
-      getNFTBalance();
-      deselectAllNFT1();
-    } catch (error) {
-      toast.error(error.message);
-      console.log(error);
     }
   };
 
@@ -3006,6 +2942,99 @@ const Staking = () => {
     }
   };
 
+  const lockedStake = async (durationCode) => {
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
+
+    const amount = ethers.utils.parseEther(monthStakingInputAmount);
+
+    console.log(amount);
+
+    const providerLocked = new ethers.providers.Web3Provider(
+      web3.currentProvider
+    );
+    const _signer = providerLocked.getSigner();
+
+    const lockedStakingContract = new ethers.Contract(
+      lockContractAddress,
+      lockAbi,
+      _signer
+    );
+
+    const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, _signer);
+
+    try {
+      const increaseBal = await tokenContract.increaseAllowance(
+        lockContractAddress,
+        amount
+      );
+      await increaseBal.wait();
+
+      toast.success(`Staking ${monthStakingInputAmount} GRAVs...`);
+
+      const result = await lockedStakingContract.stake(
+        [amount],
+        [durationCode]
+      );
+      const transaction = await result.wait();
+      toast.success(`Successfully staked ${monthStakingInputAmount} GRAVs!`);
+    } catch (e) {
+      toast.error(e.message);
+      console.log(e);
+    }
+  };
+
+  const lockedClaim = async () => {
+    const keys = Object.keys(checkedItems6);
+    const _id = keys.filter((el) => checkedItems6[el]);
+
+    console.log(_id);
+
+    if (_id.length) {
+      const transaction = await lockedStakingContract?.claimReward(_id);
+      const result = await transaction.wait();
+      console.log(result);
+      await getLockedStakingData();
+      toast.success(`Claimed ${_id.length} Rewards!`);
+      deselectAllNFT6();
+      deselectAllNFT7();
+    }
+  };
+
+  const lockedUnstake = async () => {
+    const keys = Object.keys(checkedItems7);
+    const _id = keys.filter((el) => checkedItems7[el]);
+
+    console.log(_id);
+
+    // if (_id.length) {
+    //   const transaction = await lockedStakingContract?.unstake(_id);
+    //   const result = await transaction.wait();
+    //   console.log(result);
+    //   await getLockedStakingData();
+    //   toast.success(`Force Unstaked ${_id.length} Stakes!`);
+    //   deselectAllNFT7();
+    // }
+  };
+
+  const lockedUnstakeForced = async () => {
+    const keys = Object.keys(checkedItems6);
+    const _id = keys.filter((el) => checkedItems6[el]);
+
+    console.log(_id);
+
+    if (_id.length) {
+      const transaction = await lockedStakingContract?.forceUnstake(_id);
+      const result = await transaction.wait();
+      console.log(result);
+      await getLockedStakingData();
+      toast.success(`Force Unstaked ${_id.length} Stakes!`);
+      deselectAllNFT6();
+    }
+  };
+
   const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
 
@@ -3037,6 +3066,7 @@ const Staking = () => {
 
   const [tabVal, setTabVal] = useState(0);
   const [tabValRarity, setTabValRarity] = useState(0);
+  const [tabValLocked, setTabValLocked] = useState(0);
 
   const tabHandleChange = (event, newValue) => {
     setTabVal(newValue);
@@ -3044,6 +3074,10 @@ const Staking = () => {
 
   const tabHandleChangeRarity = (event, newValue) => {
     setTabValRarity(newValue);
+  };
+
+  const tabHandleChangeLocked = (event, newValue) => {
+    setTabValLocked(newValue);
   };
 
   const [activePenalty, setActivePenalty] = useState(true);
@@ -4651,13 +4685,13 @@ const Staking = () => {
                           </Box>
                           <Box
                             className={classes.nftScroll}
-                            id="rarity-scroll-staked"
+                            id="rarity-staked-scroll"
                           >
                             {stakedItemsRarity &&
                               stakedItemsRarity.map((item, index) => (
                                 <LazyLoad
                                   height={90}
-                                  scrollContainer={"#rarity-scroll-staked"}
+                                  scrollContainer={"#rarity-staked-scroll"}
                                 >
                                   <Box key={index}>
                                     <Box
@@ -5174,6 +5208,7 @@ const Staking = () => {
                       <FormControl variant="outlined">
                         <OutlinedInput
                           placeholder="ENTER AMOUNT TO STAKE"
+                          value={monthStakingInputAmount}
                           onChange={(event) => {
                             dispatch({
                               type: "SET_MONTH_STAKE_AMOUNT",
@@ -5194,7 +5229,12 @@ const Staking = () => {
                         <Typography className={classes.unitLabel1}>
                           GRAV
                         </Typography>
-                        <Button className={classes.maxBtn}>MAX</Button>
+                        <Button
+                          onClick={handleMaxLocked}
+                          className={classes.maxBtn}
+                        >
+                          MAX
+                        </Button>
                       </Box>
                     </Grid>
                   </Grid>
@@ -5206,7 +5246,7 @@ const Staking = () => {
                       className={classes.stakeAndLockRightBottomLeft}
                     >
                       <Button
-                        onClick={staking6Months}
+                        onClick={() => lockedStake(1)}
                         className={clsx(classes.stake6btn, classes.mobileCTA)}
                       >
                         STAKE 6 MONTHS
@@ -5219,13 +5259,738 @@ const Staking = () => {
                       className={classes.stakeAndLockRightBottomRight}
                     >
                       <Button
-                        onClick={staking12Month}
+                        onClick={() => lockedStake(2)}
                         className={classes.stake6btn}
                       >
                         STAKE 12 MONTHS
                       </Button>
                     </Grid>
                   </Grid>
+                </Grid>
+              </Grid>
+
+              <Grid container className={classes.nftStakingContent}>
+                <Grid item md={8} xs={12}>
+                  <Box className={classes.stakingNFT}>
+                    <Box className={classes.nftNFTs}>
+                      <Box
+                        display={matches ? "block" : "flex"}
+                        alignItems="center"
+                        mb="33px"
+                      >
+                        <Typography className={classes.myNft}>
+                          STAKED GRAVs
+                        </Typography>
+                        <Tabs
+                          className={classes.muiTabs}
+                          TabIndicatorProps={{
+                            style: { display: "none" },
+                          }}
+                          value={tabValLocked}
+                          onChange={tabHandleChangeLocked}
+                          aria-label="simple tabs example"
+                        >
+                          <Tab
+                            className={classes.muiTab}
+                            label="ONGOING"
+                            {...a11yProps(0)}
+                          />
+                          <Tab
+                            className={classes.muiTab}
+                            label="COMPLETED"
+                            {...a11yProps(1)}
+                          />
+                        </Tabs>
+                      </Box>
+                      <Box>
+                        <TabPanel value={tabValLocked} index={0}>
+                          <Box display="flex" justifyContent="end">
+                            {checkedItems6 &&
+                            Object.values(checkedItems6).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT6}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>{" "}
+                                {checkedItems6 &&
+                                Object.values(checkedItems6).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems6).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}{" "}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT6}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
+                          </Box>
+                          <Box
+                            className={classes.nftScroll}
+                            id="locked-scroll-ongoing"
+                          >
+                            {ongoingItemsLocked &&
+                              ongoingItemsLocked.map((item, index) => (
+                                <LazyLoad
+                                  height={90}
+                                  scrollContainer={"#locked-scroll-ongoing"}
+                                >
+                                  <Box key={index}>
+                                    <Grid
+                                      container
+                                      display="flex"
+                                      className={
+                                        checkedItems6 && checkedItems6[item.id]
+                                          ? clsx(
+                                              classes.stakingNFTBlock,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingNFTBlock
+                                      }
+                                    >
+                                      <Grid
+                                        style={{
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                        }}
+                                        xs={12}
+                                        md={2}
+                                      >
+                                        <Box
+                                          style={
+                                            checkedItems6 &&
+                                            checkedItems6[item.id]
+                                              ? {
+                                                  fontSize: "32px",
+                                                  fontWeight: "800",
+                                                  color: "#121212",
+                                                }
+                                              : {
+                                                  fontSize: "32px",
+                                                  fontWeight: "800",
+                                                  color: "#E9D758",
+                                                }
+                                          }
+                                        >
+                                          {decodeDuration(item.durationCode)}
+                                        </Box>
+                                        <Box
+                                          style={
+                                            checkedItems6 &&
+                                            checkedItems6[item.id]
+                                              ? {
+                                                  fontWeight: "600",
+                                                  color: "#121212",
+                                                  marginTop: "-6px",
+                                                }
+                                              : {
+                                                  fontWeight: "800",
+                                                  color: "#E9D758",
+                                                  marginTop: "-6px",
+                                                }
+                                          }
+                                        >
+                                          MONTHS
+                                        </Box>
+                                      </Grid>
+
+                                      <Grid
+                                        container
+                                        display="flex"
+                                        justifyContent="space-between"
+                                        className={classes.stakingWrap2}
+                                        xs={12}
+                                        md={10}
+                                      >
+                                        <Grid xs={12} md={5}>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            mb="12px"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              AMOUNT
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.id]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {item.amount}
+                                            </Typography>
+                                          </Box>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              TIME LEFT
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.id]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              <Countdown
+                                                date={
+                                                  item.stakeTime +
+                                                  decodeDuration(
+                                                    item.durationCode
+                                                  ) *
+                                                    30 *
+                                                    24 *
+                                                    60 *
+                                                    60 *
+                                                    1000
+                                                }
+                                              />
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+                                        <Grid
+                                          xs={12}
+                                          md={5}
+                                          style={
+                                            matchesMd
+                                              ? { paddingLeft: "12px" }
+                                              : { paddingTop: "12px" }
+                                          }
+                                        >
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            mb="12px"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              REWARDS
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.id]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {parseFloat(
+                                                lockStakedRewards[index]
+                                              ).toFixed(4)}
+                                            </Typography>
+                                          </Box>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              APR
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems6 &&
+                                                checkedItems6[item.position]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {30} %
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+                                        <Grid
+                                          container
+                                          display="flex"
+                                          alignItems="center"
+                                          justifyContent="center"
+                                          xs={12}
+                                          md={2}
+                                        >
+                                          {checkedItems6 &&
+                                          checkedItems6[item.id] ? (
+                                            <CloseIcon
+                                              onClick={() =>
+                                                checkNFTHandle(
+                                                  item.id,
+                                                  false,
+                                                  "ongoing_locked"
+                                                )
+                                              }
+                                              className={classes.stakingCTA}
+                                            ></CloseIcon>
+                                          ) : (
+                                            <AddIcon
+                                              onClick={() =>
+                                                checkNFTHandle(
+                                                  item.id,
+                                                  true,
+                                                  "ongoing_locked"
+                                                )
+                                              }
+                                              className={classes.stakingCTA}
+                                            ></AddIcon>
+                                          )}
+                                        </Grid>
+                                      </Grid>
+                                    </Grid>
+                                  </Box>
+                                </LazyLoad>
+                              ))}
+                          </Box>
+                          <Box display="flex" justifyContent="space-between">
+                            <Button
+                              onClick={lockedUnstakeForced}
+                              className={classes.nftStakeBtn2}
+                            >
+                              FORCE UNSTAKE{" "}
+                              {checkedItems6 &&
+                              Object.values(checkedItems6).filter(
+                                (item) => item === true
+                              ).length
+                                ? "(" +
+                                  Object.values(checkedItems6).filter(
+                                    (item) => item === true
+                                  ).length +
+                                  ")"
+                                : ""}{" "}
+                            </Button>
+                            <Button
+                              onClick={lockedClaim}
+                              className={classes.nftStakeBtn}
+                            >
+                              CLAIM REWARDS{" "}
+                              {checkedItems6 &&
+                              Object.values(checkedItems6).filter(
+                                (item) => item === true
+                              ).length
+                                ? "(" +
+                                  Object.values(checkedItems6).filter(
+                                    (item) => item === true
+                                  ).length +
+                                  ")"
+                                : ""}{" "}
+                            </Button>
+                          </Box>
+                        </TabPanel>
+                        <TabPanel value={tabValLocked} index={1}>
+                          <Box display="flex" justifyContent="end">
+                            {checkedItems6 &&
+                            Object.values(checkedItems6).filter(
+                              (item) => item === true
+                            ).length ? (
+                              <Button
+                                onClick={deselectAllNFT7}
+                                className={classes.selectAllBtn}
+                              >
+                                <CloseIcon
+                                  style={{ fontSize: "15px" }}
+                                ></CloseIcon>{" "}
+                                {checkedItems7 &&
+                                Object.values(checkedItems7).filter(
+                                  (item) => item === true
+                                ).length
+                                  ? Object.values(checkedItems7).filter(
+                                      (item) => item === true
+                                    ).length
+                                  : ""}{" "}
+                                SELECTED
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={selectAllNFT7}
+                                className={classes.selectAllBtn}
+                              >
+                                Select All
+                              </Button>
+                            )}
+                          </Box>
+                          <Box
+                            className={classes.nftScroll}
+                            id="locked-scroll-completed"
+                          >
+                            {completedItemsLocked &&
+                              completedItemsLocked.map((item, index) => (
+                                <LazyLoad
+                                  height={90}
+                                  scrollContainer={"#locked-scroll-completed"}
+                                >
+                                  <Box key={index}>
+                                    <Grid
+                                      container
+                                      display="flex"
+                                      className={
+                                        checkedItems7 && checkedItems7[item.id]
+                                          ? clsx(
+                                              classes.stakingNFTBlock,
+                                              classes.selectedNFT
+                                            )
+                                          : classes.stakingNFTBlock
+                                      }
+                                    >
+                                      <Grid
+                                        style={{
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                        }}
+                                        xs={12}
+                                        md={2}
+                                      >
+                                        <Box
+                                          style={
+                                            checkedItems7 &&
+                                            checkedItems7[item.id]
+                                              ? {
+                                                  fontSize: "32px",
+                                                  fontWeight: "800",
+                                                  color: "#121212",
+                                                }
+                                              : {
+                                                  fontSize: "32px",
+                                                  fontWeight: "800",
+                                                  color: "#E9D758",
+                                                }
+                                          }
+                                        >
+                                          {decodeDuration(item.durationCode)}
+                                        </Box>
+                                        <Box
+                                          style={
+                                            checkedItems7 &&
+                                            checkedItems7[item.id]
+                                              ? {
+                                                  fontWeight: "600",
+                                                  color: "#121212",
+                                                  marginTop: "-6px",
+                                                }
+                                              : {
+                                                  fontWeight: "800",
+                                                  color: "#E9D758",
+                                                  marginTop: "-6px",
+                                                }
+                                          }
+                                        >
+                                          MONTHS
+                                        </Box>
+                                      </Grid>
+
+                                      <Grid
+                                        container
+                                        display="flex"
+                                        justifyContent="space-between"
+                                        className={classes.stakingWrap2}
+                                        xs={12}
+                                        md={10}
+                                      >
+                                        <Grid xs={12} md={5}>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            mb="12px"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              AMOUNT
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.id]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {item.amount}
+                                            </Typography>
+                                          </Box>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              TIME LEFT
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.id]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              <Countdown
+                                                date={
+                                                  item.stakeTime +
+                                                  decodeDuration(
+                                                    item.durationCode
+                                                  ) *
+                                                    30 *
+                                                    24 *
+                                                    60 *
+                                                    60 *
+                                                    1000
+                                                }
+                                              />
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+                                        <Grid
+                                          xs={12}
+                                          md={5}
+                                          style={
+                                            matchesMd
+                                              ? { paddingLeft: "12px" }
+                                              : { paddingTop: "12px" }
+                                          }
+                                        >
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            mb="12px"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              REWARDS
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.id]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {parseFloat(
+                                                lockStakedRewards[index]
+                                              ).toFixed(4)}
+                                            </Typography>
+                                          </Box>
+                                          <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                          >
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.id]
+                                                  ? clsx(
+                                                      classes.stakingInfo2,
+                                                      classes.stakingInfoSelected
+                                                    )
+                                                  : classes.stakingInfo2
+                                              }
+                                            >
+                                              APR
+                                            </Typography>
+                                            <Typography
+                                              className={
+                                                checkedItems7 &&
+                                                checkedItems7[item.position]
+                                                  ? clsx(
+                                                      classes.stakingName,
+                                                      classes.stakingNameSelect
+                                                    )
+                                                  : classes.stakingName
+                                              }
+                                            >
+                                              {30} %
+                                            </Typography>
+                                          </Box>
+                                        </Grid>
+                                        <Grid
+                                          container
+                                          display="flex"
+                                          alignItems="center"
+                                          justifyContent="center"
+                                          xs={12}
+                                          md={2}
+                                        >
+                                          {checkedItems7 &&
+                                          checkedItems7[item.id] ? (
+                                            <CloseIcon
+                                              onClick={() =>
+                                                checkNFTHandle(
+                                                  item.id,
+                                                  false,
+                                                  "completed_locked"
+                                                )
+                                              }
+                                              className={classes.stakingCTA}
+                                            ></CloseIcon>
+                                          ) : (
+                                            <AddIcon
+                                              onClick={() =>
+                                                checkNFTHandle(
+                                                  item.id,
+                                                  true,
+                                                  "completed_locked"
+                                                )
+                                              }
+                                              className={classes.stakingCTA}
+                                            ></AddIcon>
+                                          )}
+                                        </Grid>
+                                      </Grid>
+                                    </Grid>
+                                  </Box>
+                                </LazyLoad>
+                              ))}
+                          </Box>
+                          <Box display="flex" justifyContent="space-between">
+                            <Button
+                              onClick={lockedUnstake}
+                              className={classes.nftStakeBtn2}
+                            >
+                              UNSTAKE{" "}
+                              {checkedItems7 &&
+                              Object.values(checkedItems7).filter(
+                                (item) => item === true
+                              ).length
+                                ? "(" +
+                                  Object.values(checkedItems7).filter(
+                                    (item) => item === true
+                                  ).length +
+                                  ")"
+                                : ""}{" "}
+                            </Button>
+                            <Button
+                              onClick={lockedClaim}
+                              className={classes.nftStakeBtn}
+                            >
+                              CLAIM REWARDS{" "}
+                              {checkedItems7 &&
+                              Object.values(checkedItems7).filter(
+                                (item) => item === true
+                              ).length
+                                ? "(" +
+                                  Object.values(checkedItems7).filter(
+                                    (item) => item === true
+                                  ).length +
+                                  ")"
+                                : ""}{" "}
+                            </Button>
+                          </Box>
+                        </TabPanel>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid item md={4} xs={12}>
+                  <Box className={classes.rightRarityBlock}></Box>
                 </Grid>
               </Grid>
             </Box>
