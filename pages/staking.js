@@ -2015,20 +2015,22 @@ const Staking = () => {
     //Get Stake Data
     try {
       //ongoing data
-      const stakeIdLast = await lockedStakingContract?.userId(address);
-      const iter = ethers.utils.formatUnits(stakeIdLast, 0);
 
+      const stakedIds = (
+        await lockedStakingContract?.getStakedIds(address)
+      ).map((el) => ethers.utils.formatUnits(el, 0));
+      console.log(stakedIds);
       const stakeTokens = [];
 
-      for (let index = 1; index <= iter; index++) {
-        stakeTokens.push(multicallContract?.userStaked(address, index));
-      }
+      stakedIds.forEach((el) => {
+        stakeTokens.push(multicallContract?.userStaked(address, el));
+      });
 
       const _stakeData = await multicallProvider?.all(stakeTokens);
 
       const stakeData = _stakeData.map((el, index) => {
         return {
-          id: index + 1,
+          id: stakedIds[index],
           amount: ethers.utils.formatEther(el.amount),
           durationCode: ethers.utils.formatUnits(el.durationCode, 0),
           stakeTime: parseInt(ethers.utils.formatUnits(el.stakeTime, 0) * 1000),
@@ -2039,12 +2041,10 @@ const Staking = () => {
       const _ongoingItemsLocked = [];
 
       stakeData.forEach((el) => {
-        if (el.amount > 0) {
-          const months = decodeDuration(el.durationCode);
-          if (el.stakeTime + months * 30 * 24 * 60 * 60 * 1000 > Date.now())
-            _ongoingItemsLocked.push(el);
-          else _completedItemsLocked.push(el);
-        }
+        const months = decodeDuration(el.durationCode);
+        if (el.stakeTime + months * 30 * 24 * 60 * 60 * 1000 > Date.now())
+          _ongoingItemsLocked.push(el);
+        else _completedItemsLocked.push(el);
       });
 
       dispatch({
@@ -2061,9 +2061,9 @@ const Staking = () => {
 
       const rewardsTokens = [];
 
-      for (let index = 1; index <= iter; index++) {
-        rewardsTokens.push(multicallContract?.getReward(address, index));
-      }
+      stakedIds.forEach((el) => {
+        rewardsTokens.push(multicallContract?.getReward(address, el));
+      });
 
       const _rewardsData = (await multicallProvider?.all(rewardsTokens)).map(
         (el) => ethers.utils.formatEther(el)
@@ -2978,7 +2978,8 @@ const Staking = () => {
         [amount],
         [durationCode]
       );
-      const transaction = await result.wait();
+      await result.wait();
+      await getLockedStakingData();
       toast.success(`Successfully staked ${monthStakingInputAmount} GRAVs!`);
     } catch (e) {
       toast.error(e.message);
@@ -5101,7 +5102,7 @@ const Staking = () => {
                       6 MONTH
                     </Typography>
                     <Typography className={classes.topLabelInfo}>
-                      ~% APR
+                      30% APR
                     </Typography>
                   </Box>
                   <Box
@@ -5113,7 +5114,7 @@ const Staking = () => {
                       12 MONTH
                     </Typography>
                     <Typography className={classes.topLabelInfo}>
-                      ~% APR
+                      40% APR
                     </Typography>
                   </Box>
                 </Box>
@@ -5566,7 +5567,14 @@ const Staking = () => {
                                                   : classes.stakingName
                                               }
                                             >
-                                              {30} %
+                                              {item.durationCode === "0"
+                                                ? "20"
+                                                : item.durationCode === "1"
+                                                ? "30"
+                                                : item.durationCode === "2"
+                                                ? "40"
+                                                : "0"}
+                                              %
                                             </Typography>
                                           </Box>
                                         </Grid>

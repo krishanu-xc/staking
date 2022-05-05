@@ -485,7 +485,7 @@ export const singleAbi = [
   },
 ];
 
-export const lockContractAddress = "0x1cc984182FA5f36b42cf5e889307c06742Bc05b3";
+export const lockContractAddress = "0x7B2025cf80400987883277a2412Db40fC39A636c";
 
 export const lockAbi = [
   {
@@ -822,6 +822,27 @@ export const lockAbi = [
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_user",
+        type: "address",
+      },
+    ],
+    name: "getStakedIds",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+    constant: true,
+    signature: "0xd4ea2253",
   },
   {
     inputs: [
