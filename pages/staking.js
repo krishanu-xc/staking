@@ -5342,279 +5342,274 @@ const Staking = () => {
                           >
                             {ongoingItemsLocked &&
                               ongoingItemsLocked.map((item, index) => (
-                                <LazyLoad
-                                  height={90}
-                                  scrollContainer={"#locked-scroll-ongoing"}
-                                >
-                                  <Box key={index}>
+                                <Box key={index}>
+                                  <Grid
+                                    container
+                                    display="flex"
+                                    className={
+                                      checkedItems6 && checkedItems6[item.id]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <Grid
+                                      style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                      }}
+                                      xs={12}
+                                      md={2}
+                                    >
+                                      <Box
+                                        style={
+                                          checkedItems6 &&
+                                          checkedItems6[item.id]
+                                            ? {
+                                                fontSize: "32px",
+                                                fontWeight: "800",
+                                                color: "#121212",
+                                              }
+                                            : {
+                                                fontSize: "32px",
+                                                fontWeight: "800",
+                                                color: "#E9D758",
+                                              }
+                                        }
+                                      >
+                                        {decodeDuration(item.durationCode)}
+                                      </Box>
+                                      <Box
+                                        style={
+                                          checkedItems6 &&
+                                          checkedItems6[item.id]
+                                            ? {
+                                                fontWeight: "600",
+                                                color: "#121212",
+                                                marginTop: "-6px",
+                                              }
+                                            : {
+                                                fontWeight: "800",
+                                                color: "#E9D758",
+                                                marginTop: "-6px",
+                                              }
+                                        }
+                                      >
+                                        MONTHS
+                                      </Box>
+                                    </Grid>
+
                                     <Grid
                                       container
                                       display="flex"
-                                      className={
-                                        checkedItems6 && checkedItems6[item.id]
-                                          ? clsx(
-                                              classes.stakingNFTBlock,
-                                              classes.selectedNFT
-                                            )
-                                          : classes.stakingNFTBlock
-                                      }
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap2}
+                                      xs={12}
+                                      md={10}
                                     >
-                                      <Grid
-                                        style={{
-                                          display: "flex",
-                                          flexDirection: "column",
-                                          justifyContent: "center",
-                                          alignItems: "center",
-                                        }}
-                                        xs={12}
-                                        md={2}
-                                      >
+                                      <Grid xs={12} md={5}>
                                         <Box
-                                          style={
-                                            checkedItems6 &&
-                                            checkedItems6[item.id]
-                                              ? {
-                                                  fontSize: "32px",
-                                                  fontWeight: "800",
-                                                  color: "#121212",
-                                                }
-                                              : {
-                                                  fontSize: "32px",
-                                                  fontWeight: "800",
-                                                  color: "#E9D758",
-                                                }
-                                          }
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                          justifyContent="space-between"
                                         >
-                                          {decodeDuration(item.durationCode)}
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            AMOUNT
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.amount}
+                                          </Typography>
                                         </Box>
                                         <Box
-                                          style={
-                                            checkedItems6 &&
-                                            checkedItems6[item.id]
-                                              ? {
-                                                  fontWeight: "600",
-                                                  color: "#121212",
-                                                  marginTop: "-6px",
-                                                }
-                                              : {
-                                                  fontWeight: "800",
-                                                  color: "#E9D758",
-                                                  marginTop: "-6px",
-                                                }
-                                          }
+                                          display="flex"
+                                          alignItems="center"
+                                          justifyContent="space-between"
                                         >
-                                          MONTHS
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            TIME LEFT
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            <Countdown
+                                              date={
+                                                item.stakeTime +
+                                                decodeDuration(
+                                                  item.durationCode
+                                                ) *
+                                                  30 *
+                                                  24 *
+                                                  60 *
+                                                  60 *
+                                                  1000
+                                              }
+                                            />
+                                          </Typography>
                                         </Box>
                                       </Grid>
-
+                                      <Grid
+                                        xs={12}
+                                        md={5}
+                                        style={
+                                          matchesMd
+                                            ? { paddingLeft: "12px" }
+                                            : { paddingTop: "12px" }
+                                        }
+                                      >
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                          justifyContent="space-between"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            REWARDS
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {parseFloat(
+                                              lockStakedRewards[index]
+                                            ).toFixed(4)}
+                                          </Typography>
+                                        </Box>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          justifyContent="space-between"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            APR
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.position]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.durationCode === "0"
+                                              ? "20"
+                                              : item.durationCode === "1"
+                                              ? "30"
+                                              : item.durationCode === "2"
+                                              ? "40"
+                                              : "0"}
+                                            %
+                                          </Typography>
+                                        </Box>
+                                      </Grid>
                                       <Grid
                                         container
                                         display="flex"
-                                        justifyContent="space-between"
-                                        className={classes.stakingWrap2}
+                                        alignItems="center"
+                                        justifyContent="center"
                                         xs={12}
-                                        md={10}
+                                        md={2}
                                       >
-                                        <Grid xs={12} md={5}>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            mb="12px"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              AMOUNT
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.id]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              {item.amount}
-                                            </Typography>
-                                          </Box>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              TIME LEFT
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.id]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              <Countdown
-                                                date={
-                                                  item.stakeTime +
-                                                  decodeDuration(
-                                                    item.durationCode
-                                                  ) *
-                                                    30 *
-                                                    24 *
-                                                    60 *
-                                                    60 *
-                                                    1000
-                                                }
-                                              />
-                                            </Typography>
-                                          </Box>
-                                        </Grid>
-                                        <Grid
-                                          xs={12}
-                                          md={5}
-                                          style={
-                                            matchesMd
-                                              ? { paddingLeft: "12px" }
-                                              : { paddingTop: "12px" }
-                                          }
-                                        >
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            mb="12px"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              REWARDS
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.id]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              {parseFloat(
-                                                lockStakedRewards[index]
-                                              ).toFixed(4)}
-                                            </Typography>
-                                          </Box>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              APR
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems6 &&
-                                                checkedItems6[item.position]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              {item.durationCode === "0"
-                                                ? "20"
-                                                : item.durationCode === "1"
-                                                ? "30"
-                                                : item.durationCode === "2"
-                                                ? "40"
-                                                : "0"}
-                                              %
-                                            </Typography>
-                                          </Box>
-                                        </Grid>
-                                        <Grid
-                                          container
-                                          display="flex"
-                                          alignItems="center"
-                                          justifyContent="center"
-                                          xs={12}
-                                          md={2}
-                                        >
-                                          {checkedItems6 &&
-                                          checkedItems6[item.id] ? (
-                                            <CloseIcon
-                                              onClick={() =>
-                                                checkNFTHandle(
-                                                  item.id,
-                                                  false,
-                                                  "ongoing_locked"
-                                                )
-                                              }
-                                              className={classes.stakingCTA}
-                                            ></CloseIcon>
-                                          ) : (
-                                            <AddIcon
-                                              onClick={() =>
-                                                checkNFTHandle(
-                                                  item.id,
-                                                  true,
-                                                  "ongoing_locked"
-                                                )
-                                              }
-                                              className={classes.stakingCTA}
-                                            ></AddIcon>
-                                          )}
-                                        </Grid>
+                                        {checkedItems6 &&
+                                        checkedItems6[item.id] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.id,
+                                                false,
+                                                "ongoing_locked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.id,
+                                                true,
+                                                "ongoing_locked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
                                       </Grid>
                                     </Grid>
-                                  </Box>
-                                </LazyLoad>
+                                  </Grid>
+                                </Box>
                               ))}
                           </Box>
                           <Box display="flex" justifyContent="space-between">
@@ -5690,272 +5685,267 @@ const Staking = () => {
                           >
                             {completedItemsLocked &&
                               completedItemsLocked.map((item, index) => (
-                                <LazyLoad
-                                  height={90}
-                                  scrollContainer={"#locked-scroll-completed"}
-                                >
-                                  <Box key={index}>
+                                <Box key={index}>
+                                  <Grid
+                                    container
+                                    display="flex"
+                                    className={
+                                      checkedItems7 && checkedItems7[item.id]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <Grid
+                                      style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                      }}
+                                      xs={12}
+                                      md={2}
+                                    >
+                                      <Box
+                                        style={
+                                          checkedItems7 &&
+                                          checkedItems7[item.id]
+                                            ? {
+                                                fontSize: "32px",
+                                                fontWeight: "800",
+                                                color: "#121212",
+                                              }
+                                            : {
+                                                fontSize: "32px",
+                                                fontWeight: "800",
+                                                color: "#E9D758",
+                                              }
+                                        }
+                                      >
+                                        {decodeDuration(item.durationCode)}
+                                      </Box>
+                                      <Box
+                                        style={
+                                          checkedItems7 &&
+                                          checkedItems7[item.id]
+                                            ? {
+                                                fontWeight: "600",
+                                                color: "#121212",
+                                                marginTop: "-6px",
+                                              }
+                                            : {
+                                                fontWeight: "800",
+                                                color: "#E9D758",
+                                                marginTop: "-6px",
+                                              }
+                                        }
+                                      >
+                                        MONTHS
+                                      </Box>
+                                    </Grid>
+
                                     <Grid
                                       container
                                       display="flex"
-                                      className={
-                                        checkedItems7 && checkedItems7[item.id]
-                                          ? clsx(
-                                              classes.stakingNFTBlock,
-                                              classes.selectedNFT
-                                            )
-                                          : classes.stakingNFTBlock
-                                      }
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap2}
+                                      xs={12}
+                                      md={10}
                                     >
-                                      <Grid
-                                        style={{
-                                          display: "flex",
-                                          flexDirection: "column",
-                                          justifyContent: "center",
-                                          alignItems: "center",
-                                        }}
-                                        xs={12}
-                                        md={2}
-                                      >
+                                      <Grid xs={12} md={5}>
                                         <Box
-                                          style={
-                                            checkedItems7 &&
-                                            checkedItems7[item.id]
-                                              ? {
-                                                  fontSize: "32px",
-                                                  fontWeight: "800",
-                                                  color: "#121212",
-                                                }
-                                              : {
-                                                  fontSize: "32px",
-                                                  fontWeight: "800",
-                                                  color: "#E9D758",
-                                                }
-                                          }
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                          justifyContent="space-between"
                                         >
-                                          {decodeDuration(item.durationCode)}
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            AMOUNT
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.id]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.amount}
+                                          </Typography>
                                         </Box>
                                         <Box
-                                          style={
-                                            checkedItems7 &&
-                                            checkedItems7[item.id]
-                                              ? {
-                                                  fontWeight: "600",
-                                                  color: "#121212",
-                                                  marginTop: "-6px",
-                                                }
-                                              : {
-                                                  fontWeight: "800",
-                                                  color: "#E9D758",
-                                                  marginTop: "-6px",
-                                                }
-                                          }
+                                          display="flex"
+                                          alignItems="center"
+                                          justifyContent="space-between"
                                         >
-                                          MONTHS
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            TIME LEFT
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.id]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            <Countdown
+                                              date={
+                                                item.stakeTime +
+                                                decodeDuration(
+                                                  item.durationCode
+                                                ) *
+                                                  30 *
+                                                  24 *
+                                                  60 *
+                                                  60 *
+                                                  1000
+                                              }
+                                            />
+                                          </Typography>
                                         </Box>
                                       </Grid>
-
+                                      <Grid
+                                        xs={12}
+                                        md={5}
+                                        style={
+                                          matchesMd
+                                            ? { paddingLeft: "12px" }
+                                            : { paddingTop: "12px" }
+                                        }
+                                      >
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                          justifyContent="space-between"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            REWARDS
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.id]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {parseFloat(
+                                              lockStakedRewards[index]
+                                            ).toFixed(4)}
+                                          </Typography>
+                                        </Box>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          justifyContent="space-between"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            APR
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems7 &&
+                                              checkedItems7[item.position]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {30} %
+                                          </Typography>
+                                        </Box>
+                                      </Grid>
                                       <Grid
                                         container
                                         display="flex"
-                                        justifyContent="space-between"
-                                        className={classes.stakingWrap2}
+                                        alignItems="center"
+                                        justifyContent="center"
                                         xs={12}
-                                        md={10}
+                                        md={2}
                                       >
-                                        <Grid xs={12} md={5}>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            mb="12px"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              AMOUNT
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.id]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              {item.amount}
-                                            </Typography>
-                                          </Box>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              TIME LEFT
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.id]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              <Countdown
-                                                date={
-                                                  item.stakeTime +
-                                                  decodeDuration(
-                                                    item.durationCode
-                                                  ) *
-                                                    30 *
-                                                    24 *
-                                                    60 *
-                                                    60 *
-                                                    1000
-                                                }
-                                              />
-                                            </Typography>
-                                          </Box>
-                                        </Grid>
-                                        <Grid
-                                          xs={12}
-                                          md={5}
-                                          style={
-                                            matchesMd
-                                              ? { paddingLeft: "12px" }
-                                              : { paddingTop: "12px" }
-                                          }
-                                        >
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            mb="12px"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              REWARDS
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.id]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              {parseFloat(
-                                                lockStakedRewards[index]
-                                              ).toFixed(4)}
-                                            </Typography>
-                                          </Box>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="space-between"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.id]
-                                                  ? clsx(
-                                                      classes.stakingInfo2,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo2
-                                              }
-                                            >
-                                              APR
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems7 &&
-                                                checkedItems7[item.position]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              {30} %
-                                            </Typography>
-                                          </Box>
-                                        </Grid>
-                                        <Grid
-                                          container
-                                          display="flex"
-                                          alignItems="center"
-                                          justifyContent="center"
-                                          xs={12}
-                                          md={2}
-                                        >
-                                          {checkedItems7 &&
-                                          checkedItems7[item.id] ? (
-                                            <CloseIcon
-                                              onClick={() =>
-                                                checkNFTHandle(
-                                                  item.id,
-                                                  false,
-                                                  "completed_locked"
-                                                )
-                                              }
-                                              className={classes.stakingCTA}
-                                            ></CloseIcon>
-                                          ) : (
-                                            <AddIcon
-                                              onClick={() =>
-                                                checkNFTHandle(
-                                                  item.id,
-                                                  true,
-                                                  "completed_locked"
-                                                )
-                                              }
-                                              className={classes.stakingCTA}
-                                            ></AddIcon>
-                                          )}
-                                        </Grid>
+                                        {checkedItems7 &&
+                                        checkedItems7[item.id] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.id,
+                                                false,
+                                                "completed_locked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.id,
+                                                true,
+                                                "completed_locked"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
                                       </Grid>
                                     </Grid>
-                                  </Box>
-                                </LazyLoad>
+                                  </Grid>
+                                </Box>
                               ))}
                           </Box>
                           <Box display="flex" justifyContent="space-between">
