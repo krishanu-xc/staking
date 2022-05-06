@@ -2897,7 +2897,7 @@ const Staking = () => {
         );
         await setApproval.wait();
       }
-      const callLimit = 450;
+      const callLimit = 100;
       const numberOfCalls = Math.ceil(filtered.length / callLimit);
       console.log(numberOfCalls);
       for (let index = 0; index < numberOfCalls; index++) {
