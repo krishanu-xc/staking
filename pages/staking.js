@@ -1992,7 +1992,10 @@ const Staking = () => {
       });
 
       const infoTokens = await multicallProvider2.all(infoPromises);
+      console.log(infoTokens);
+
       const rewardsTokens = await multicallProvider2.all(rewardsPromises);
+      console.log(rewardsTokens);
 
       const rewardingResult = result.map((el, i) => {
         console.log(el);
@@ -2809,36 +2812,60 @@ const Staking = () => {
       _signer
     );
 
+    const setupMultiCallContract = async (nftAddress, nftABI) => {
+      const provider = new ethers.providers.Web3Provider(
+        web3.currentProvider,
+        "any"
+      );
+      const ethcallProvider = new MulticallProvider(provider);
+
+      await ethcallProvider.init();
+      ethcallProvider._multicallAddress =
+        "0x34b415f4d3b332515e66f70595ace1dcf36254c5";
+
+      const multicallContract = new MulticallContract(nftAddress, nftABI);
+      return [ethcallProvider, multicallContract];
+    };
+
+    const [multicallProvider, multicallContract] = await setupMultiCallContract(
+      rarityStakingContractAddress,
+      rarityStakingContractABI
+    );
+
     try {
       const baseURL =
         "https://oneverse-discord-bot.herokuapp.com/tokenSignature/";
-      const promises = filtered.map(async (id) => {
-        const isInitialised = await contract.tokenRarity(id);
-        const isNotInitialised =
-          ethers.utils.formatEther(isInitialised) === "0.0";
-        if (isNotInitialised) {
-          const res = await axios.get(baseURL + id);
-          const data = res.data;
-          const _id = id;
-          const _rarity = data.rarity;
-          const body = [_id, _rarity, data.signature];
-          return body;
-        }
-        return;
-      });
 
-      const toInitialise = await Promise.all(promises);
-      const toInitialiseFiltered = toInitialise.filter(
-        (el) => el !== undefined
+      const rarityPromises = filtered.map((id) =>
+        multicallContract.tokenRarity(id)
+      );
+      const rarityArray = (await multicallProvider.all(rarityPromises)).map(
+        (el) => ethers.utils.formatUnits(el, 0)
+      );
+      console.log(rarityArray);
+      const uninitialisedArray = [];
+      rarityArray.forEach(
+        (rarity, index) =>
+          rarity === "0.0" && uninitialisedArray.push(filtered[index])
       );
 
-      const setApproval = await nftContract.setApprovalForAll(
-        rarityStakingContractAddress,
-        true
-      );
-      await setApproval.wait();
+      if (uninitialisedArray.length) {
+        const dataPromises = [];
+        uninitialisedArray.forEach((id) =>
+          dataPromises.push(axios.get(baseURL + id))
+        );
 
-      if (toInitialiseFiltered.length) {
+        const dataArray = await Promise.all(dataPromises);
+        console.log(dataArray);
+
+        const toInitialise = uninitialisedArray.forEach((id, i) => {
+          return [id, dataArray[i].data.rarity, dataArray[i].data.signature];
+        });
+
+        const toInitialiseFiltered = toInitialise.filter(
+          (el) => el !== undefined
+        );
+
         toast.info(
           `Initializing Rarity for ${toInitialiseFiltered.length} NFTs`
         );
@@ -2848,10 +2875,34 @@ const Staking = () => {
         await initializeRarity.wait();
         toast.success(`Initialized ${toInitialiseFiltered.length} Nfts.`);
       }
-      toast.info(`Staking ${filtered.length} Nfts.`);
-      const stakeTokens = await contract?.stakeTokens(filtered);
-      await stakeTokens.wait();
-      toast.success(`${filtered.length} Nfts successfully staked.`);
+
+      const isApprovedForAll = await nftContract.isApprovedForAll(
+        address,
+        rarityStakingContractAddress
+      );
+      if (!isApprovedForAll) {
+        const setApproval = await nftContract.setApprovalForAll(
+          rarityStakingContractAddress,
+          true
+        );
+        await setApproval.wait();
+      }
+      const callLimit = 100;
+      const numberOfCalls = Math.ceil(filtered.length / callLimit);
+      console.log(numberOfCalls);
+      for (let index = 0; index < numberOfCalls; index++) {
+        const range = filtered.slice(
+          index * callLimit,
+          Math.min((index + 1) * callLimit, filtered.length)
+        );
+        toast.info(
+          `Staking ${range.length} NFTs (${index + 1}/${numberOfCalls})`
+        );
+        const stakeTokens = await contract?.stakeTokens(range);
+        await stakeTokens.wait();
+        toast.success(`${range.length} Nfts successfully staked.`);
+      }
+
       getHarmoleculesNFT();
       deselectAllNFT3();
     } catch (e) {
