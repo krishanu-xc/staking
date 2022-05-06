@@ -64,7 +64,7 @@ import {
   Contract as MulticallContract,
 } from "ethers-multicall";
 import axios from "axios";
-import Countdown from "react-countdown";
+import Countdown, { zeroPad } from "react-countdown";
 import LazyLoad from "react-lazyload";
 import Web3Context from "context/Web3Context";
 
@@ -1128,6 +1128,14 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: "55px",
     [theme.breakpoints.down("xs")]: {
       paddingRight: "10px",
+      marginBottom: "35px",
+    },
+  },
+  nftScroll2: {
+    height: "260px",
+    overflowY: "auto",
+    marginBottom: "55px",
+    [theme.breakpoints.down("xs")]: {
       marginBottom: "35px",
     },
   },
@@ -2846,8 +2854,10 @@ const Staking = () => {
       const uninitialisedArray = [];
       rarityArray.forEach(
         (rarity, index) =>
-          rarity === "0.0" && uninitialisedArray.push(filtered[index])
+          parseInt(rarity) === 0 && uninitialisedArray.push(filtered[index])
       );
+
+      console.log(uninitialisedArray);
 
       if (uninitialisedArray.length) {
         const dataPromises = [];
@@ -2858,7 +2868,7 @@ const Staking = () => {
         const dataArray = await Promise.all(dataPromises);
         console.log(dataArray);
 
-        const toInitialise = uninitialisedArray.forEach((id, i) => {
+        const toInitialise = uninitialisedArray.map((id, i) => {
           return [id, dataArray[i].data.rarity, dataArray[i].data.signature];
         });
 
@@ -2887,7 +2897,7 @@ const Staking = () => {
         );
         await setApproval.wait();
       }
-      const callLimit = 100;
+      const callLimit = 450;
       const numberOfCalls = Math.ceil(filtered.length / callLimit);
       console.log(numberOfCalls);
       for (let index = 0; index < numberOfCalls; index++) {
@@ -3172,6 +3182,12 @@ const Staking = () => {
       deselectAllNFT6();
     }
   };
+
+  const countDownRenderer = ({ days, hours, minutes }) => (
+    <span>
+      {zeroPad(days)} Days {zeroPad(hours)} Hours {zeroPad(minutes)} Mins
+    </span>
+  );
 
   const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -5487,7 +5503,7 @@ const Staking = () => {
                             )}
                           </Box>
                           <Box
-                            className={classes.nftScroll}
+                            className={classes.nftScroll2}
                             id="locked-scroll-ongoing"
                           >
                             {ongoingItemsLocked &&
@@ -5559,7 +5575,7 @@ const Staking = () => {
                                       justifyContent="space-between"
                                       className={classes.stakingWrap2}
                                       xs={12}
-                                      md={10}
+                                      md={8}
                                     >
                                       <Grid xs={12} md={5}>
                                         <Box
@@ -5595,6 +5611,53 @@ const Staking = () => {
                                             {item.amount}
                                           </Typography>
                                         </Box>
+                                      </Grid>
+                                      <Grid
+                                        xs={12}
+                                        md={5}
+                                        style={
+                                          matchesMd
+                                            ? { paddingLeft: "12px" }
+                                            : { paddingTop: "12px" }
+                                        }
+                                      >
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          mb="12px"
+                                          justifyContent="space-between"
+                                        >
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingInfo2,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo2
+                                            }
+                                          >
+                                            REWARDS{" "}
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems6 &&
+                                              checkedItems6[item.id]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {parseFloat(
+                                              lockStakedRewards[index]
+                                            ).toFixed(4)}
+                                          </Typography>
+                                        </Box>
+                                      </Grid>
+                                      <Grid xs={12} md={12}>
                                         <Box
                                           display="flex"
                                           alignItems="center"
@@ -5625,6 +5688,7 @@ const Staking = () => {
                                             }
                                           >
                                             <Countdown
+                                              renderer={countDownRenderer}
                                               date={
                                                 item.stakeTime +
                                                 decodeDuration(
@@ -5640,123 +5704,39 @@ const Staking = () => {
                                           </Typography>
                                         </Box>
                                       </Grid>
-                                      <Grid
-                                        xs={12}
-                                        md={5}
-                                        style={
-                                          matchesMd
-                                            ? { paddingLeft: "12px" }
-                                            : { paddingTop: "12px" }
-                                        }
-                                      >
-                                        <Box
-                                          display="flex"
-                                          alignItems="center"
-                                          mb="12px"
-                                          justifyContent="space-between"
-                                        >
-                                          <Typography
-                                            className={
-                                              checkedItems6 &&
-                                              checkedItems6[item.id]
-                                                ? clsx(
-                                                    classes.stakingInfo2,
-                                                    classes.stakingInfoSelected
-                                                  )
-                                                : classes.stakingInfo2
-                                            }
-                                          >
-                                            REWARDS
-                                          </Typography>
-                                          <Typography
-                                            className={
-                                              checkedItems6 &&
-                                              checkedItems6[item.id]
-                                                ? clsx(
-                                                    classes.stakingName,
-                                                    classes.stakingNameSelect
-                                                  )
-                                                : classes.stakingName
-                                            }
-                                          >
-                                            {parseFloat(
-                                              lockStakedRewards[index]
-                                            ).toFixed(4)}
-                                          </Typography>
-                                        </Box>
-                                        <Box
-                                          display="flex"
-                                          alignItems="center"
-                                          justifyContent="space-between"
-                                        >
-                                          <Typography
-                                            className={
-                                              checkedItems6 &&
-                                              checkedItems6[item.id]
-                                                ? clsx(
-                                                    classes.stakingInfo2,
-                                                    classes.stakingInfoSelected
-                                                  )
-                                                : classes.stakingInfo2
-                                            }
-                                          >
-                                            APR
-                                          </Typography>
-                                          <Typography
-                                            className={
-                                              checkedItems6 &&
-                                              checkedItems6[item.position]
-                                                ? clsx(
-                                                    classes.stakingName,
-                                                    classes.stakingNameSelect
-                                                  )
-                                                : classes.stakingName
-                                            }
-                                          >
-                                            {item.durationCode === "0"
-                                              ? "20"
-                                              : item.durationCode === "1"
-                                              ? "30"
-                                              : item.durationCode === "2"
-                                              ? "40"
-                                              : "0"}
-                                            %
-                                          </Typography>
-                                        </Box>
-                                      </Grid>
-                                      <Grid
-                                        container
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        xs={12}
-                                        md={2}
-                                      >
-                                        {checkedItems6 &&
-                                        checkedItems6[item.id] ? (
-                                          <CloseIcon
-                                            onClick={() =>
-                                              checkNFTHandle(
-                                                item.id,
-                                                false,
-                                                "ongoing_locked"
-                                              )
-                                            }
-                                            className={classes.stakingCTA}
-                                          ></CloseIcon>
-                                        ) : (
-                                          <AddIcon
-                                            onClick={() =>
-                                              checkNFTHandle(
-                                                item.id,
-                                                true,
-                                                "ongoing_locked"
-                                              )
-                                            }
-                                            className={classes.stakingCTA}
-                                          ></AddIcon>
-                                        )}
-                                      </Grid>
+                                    </Grid>
+                                    <Grid
+                                      container
+                                      display="flex"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      xs={12}
+                                      md={2}
+                                    >
+                                      {checkedItems6 &&
+                                      checkedItems6[item.id] ? (
+                                        <CloseIcon
+                                          onClick={() =>
+                                            checkNFTHandle(
+                                              item.id,
+                                              false,
+                                              "ongoing_locked"
+                                            )
+                                          }
+                                          className={classes.stakingCTA}
+                                        ></CloseIcon>
+                                      ) : (
+                                        <AddIcon
+                                          onClick={() =>
+                                            checkNFTHandle(
+                                              item.id,
+                                              true,
+                                              "ongoing_locked"
+                                            )
+                                          }
+                                          className={classes.stakingCTA}
+                                        ></AddIcon>
+                                      )}
                                     </Grid>
                                   </Grid>
                                 </Box>
@@ -5968,6 +5948,7 @@ const Staking = () => {
                                             }
                                           >
                                             <Countdown
+                                              renderer={countDownRenderer}
                                               date={
                                                 item.stakeTime +
                                                 decodeDuration(
@@ -6009,7 +5990,7 @@ const Staking = () => {
                                                 : classes.stakingInfo2
                                             }
                                           >
-                                            REWARDS
+                                            REWARDS{" "}
                                           </Typography>
                                           <Typography
                                             className={
@@ -6025,38 +6006,6 @@ const Staking = () => {
                                             {parseFloat(
                                               lockStakedRewards[index]
                                             ).toFixed(4)}
-                                          </Typography>
-                                        </Box>
-                                        <Box
-                                          display="flex"
-                                          alignItems="center"
-                                          justifyContent="space-between"
-                                        >
-                                          <Typography
-                                            className={
-                                              checkedItems7 &&
-                                              checkedItems7[item.id]
-                                                ? clsx(
-                                                    classes.stakingInfo2,
-                                                    classes.stakingInfoSelected
-                                                  )
-                                                : classes.stakingInfo2
-                                            }
-                                          >
-                                            APR
-                                          </Typography>
-                                          <Typography
-                                            className={
-                                              checkedItems7 &&
-                                              checkedItems7[item.position]
-                                                ? clsx(
-                                                    classes.stakingName,
-                                                    classes.stakingNameSelect
-                                                  )
-                                                : classes.stakingName
-                                            }
-                                          >
-                                            {30} %
                                           </Typography>
                                         </Box>
                                       </Grid>
