@@ -1089,6 +1089,17 @@ const useStyles = makeStyles((theme) => ({
       lineHeight: "15px",
     },
   },
+  stakingName2: {
+    fontStyle: "normal",
+    fontWeight: "normal",
+    fontSize: "13px",
+    lineHeight: "17px",
+    color: "#aaa",
+    [theme.breakpoints.down("xs")]: {
+      fontSize: "14px",
+      lineHeight: "15px",
+    },
+  },
   stakingNameSelect: {
     color: "#06070E",
   },
@@ -5602,10 +5613,10 @@ const Staking = () => {
                                               checkedItems6 &&
                                               checkedItems6[item.id]
                                                 ? clsx(
-                                                    classes.stakingName,
+                                                    classes.stakingName2,
                                                     classes.stakingNameSelect
                                                   )
-                                                : classes.stakingName
+                                                : classes.stakingName2
                                             }
                                           >
                                             {item.amount}
@@ -5645,10 +5656,10 @@ const Staking = () => {
                                               checkedItems6 &&
                                               checkedItems6[item.id]
                                                 ? clsx(
-                                                    classes.stakingName,
+                                                    classes.stakingName2,
                                                     classes.stakingNameSelect
                                                   )
-                                                : classes.stakingName
+                                                : classes.stakingName2
                                             }
                                           >
                                             {parseFloat(
@@ -5681,10 +5692,10 @@ const Staking = () => {
                                               checkedItems6 &&
                                               checkedItems6[item.id]
                                                 ? clsx(
-                                                    classes.stakingName,
+                                                    classes.stakingName2,
                                                     classes.stakingNameSelect
                                                   )
-                                                : classes.stakingName
+                                                : classes.stakingName2
                                             }
                                           >
                                             <Countdown
@@ -5909,10 +5920,10 @@ const Staking = () => {
                                               checkedItems7 &&
                                               checkedItems7[item.id]
                                                 ? clsx(
-                                                    classes.stakingName,
+                                                    classes.stakingName2,
                                                     classes.stakingNameSelect
                                                   )
-                                                : classes.stakingName
+                                                : classes.stakingName2
                                             }
                                           >
                                             {item.amount}
@@ -5941,26 +5952,13 @@ const Staking = () => {
                                               checkedItems7 &&
                                               checkedItems7[item.id]
                                                 ? clsx(
-                                                    classes.stakingName,
+                                                    classes.stakingName2,
                                                     classes.stakingNameSelect
                                                   )
-                                                : classes.stakingName
+                                                : classes.stakingName2
                                             }
                                           >
-                                            <Countdown
-                                              renderer={countDownRenderer}
-                                              date={
-                                                item.stakeTime +
-                                                decodeDuration(
-                                                  item.durationCode
-                                                ) *
-                                                  30 *
-                                                  24 *
-                                                  60 *
-                                                  60 *
-                                                  1000
-                                              }
-                                            />
+                                            COMPLETED
                                           </Typography>
                                         </Box>
                                       </Grid>
@@ -5997,10 +5995,10 @@ const Staking = () => {
                                               checkedItems7 &&
                                               checkedItems7[item.id]
                                                 ? clsx(
-                                                    classes.stakingName,
+                                                    classes.stakingName2,
                                                     classes.stakingNameSelect
                                                   )
-                                                : classes.stakingName
+                                                : classes.stakingName2
                                             }
                                           >
                                             {parseFloat(
