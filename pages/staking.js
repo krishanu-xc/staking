@@ -148,7 +148,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   lockStakingBlock: {
-    backgroundImage: "url('lock-staking-frame.png')",
+    backgroundImage: "url('nft-staking-frame.png')",
     backgroundRepeat: "no-repeat",
     backgroundSize: "100% 100%",
     backgroundPosition: "left",
@@ -683,7 +683,7 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "normal",
       fontSize: "14px",
       lineHeight: "17px",
-      color: "#333745",
+      color: "#aaa",
     },
     "& .MuiOutlinedInput-notchedOutline": {
       border: "0",
@@ -3280,7 +3280,7 @@ const Staking = () => {
       address={address}
     >
       <Container
-        disableGutters={matches}
+        // disableGutters={matches}
         style={{ overflowX: matches ? "hidden" : "unset" }}
       >
         <Grid container spacing={5}>
@@ -5236,9 +5236,25 @@ const Staking = () => {
                   style={{ right: "0px", top: "14px" }}
                 >
                   <Box
-                    width="217px"
+                    width="190px"
                     display="flex"
                     justifyContent="space-around"
+                    border="1px solid #E9D758"
+                    padding="11px"
+                  >
+                    <Typography className={classes.topLabel}>
+                      3 MONTH
+                    </Typography>
+                    <Typography className={classes.topLabelInfo}>
+                      40% APR
+                    </Typography>
+                  </Box>
+                  <Box
+                    width="190px"
+                    display="flex"
+                    justifyContent="space-around"
+                    border="1px solid #E9D758"
+                    padding="11px"
                   >
                     <Typography className={classes.topLabel}>
                       6 MONTH
@@ -5248,9 +5264,11 @@ const Staking = () => {
                     </Typography>
                   </Box>
                   <Box
-                    width="217px"
+                    width="200px"
                     display="flex"
                     justifyContent="space-around"
+                    border="1px solid #E9D758"
+                    padding="11px"
                   >
                     <Typography className={classes.topLabel}>
                       12 MONTH
@@ -5283,10 +5301,28 @@ const Staking = () => {
                     }}
                   >
                     <Typography className={classes.topLabel}>
+                      3 MONTH
+                    </Typography>
+                    <Typography className={classes.topLabelInfo}>
+                      40% APR
+                    </Typography>
+                  </Box>
+                  <Box
+                    width="217px"
+                    display="flex"
+                    flexDirection="column"
+                    style={{
+                      border: "1px solid #E9D758",
+                      padding: "20px",
+                      textAlign: "center",
+                      marginBottom: "15px",
+                    }}
+                  >
+                    <Typography className={classes.topLabel}>
                       6 MONTH
                     </Typography>
                     <Typography className={classes.topLabelInfo}>
-                      ~% APR
+                      50% APR
                     </Typography>
                   </Box>
                   <Box
@@ -5301,10 +5337,10 @@ const Staking = () => {
                     }}
                   >
                     <Typography className={classes.topLabel}>
-                      6 MONTH
+                      12 MONTH
                     </Typography>
                     <Typography className={classes.topLabelInfo}>
-                      ~% APR
+                      60% APR
                     </Typography>
                   </Box>
                 </Box>
@@ -5390,7 +5426,7 @@ const Staking = () => {
                     >
                       <Button
                         onClick={() => lockedStake(0)}
-                        className={clsx(classes.stake6btn, classes.mobileCTA)}
+                        className={clsx(classes.stake6btn)}
                       >
                         3 MONTHS
                       </Button>
