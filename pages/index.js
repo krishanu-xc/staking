@@ -281,7 +281,7 @@ const About = () => {
       onConnect={connectWallet}
       address={address}
     >
-      <Container disableGutters={matches}>
+      <Container disableGutters={matches} className="background-container">
         <Grid container spacing={5}>
           {!matches && (
             <Grid item md={2}>

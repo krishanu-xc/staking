@@ -3281,6 +3281,7 @@ const Staking = () => {
     >
       <Container
         // disableGutters={matches}
+        className="background-container"
         style={{ overflowX: matches ? "hidden" : "unset" }}
       >
         <Grid container spacing={5}>
