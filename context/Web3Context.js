@@ -131,7 +131,7 @@ export const Web3Provider = (props) => {
   useEffect(() => {
     if (address) {
       functionsToExport.fetchStuff();
-      functionsToExport.getHarmoleculesNFT();
+      // functionsToExport.getHarmoleculesNFT();
     }
   }, [address]);
 

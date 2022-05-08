@@ -1605,8 +1605,8 @@ const Staking = () => {
         package: WalletConnectProvider, // required
         options: {
           rpc: {
-            // 1666600000: "https://api.harmony.one",
-            1666700000: "https://api.s0.b.hmny.io",
+            1666600000: "https://api.harmony.one",
+            // 1666700000: "https://api.s0.b.hmny.io",
           },
           network: "harmony mainnet",
         },
@@ -1734,9 +1734,9 @@ const Staking = () => {
     nftContract && getNFTBalance();
   }, [nftContract]);
 
-  useEffect(() => {
-    rarityContract && getHarmoleculesNFT();
-  }, [rarityContract]);
+  // useEffect(() => {
+  //   rarityContract && getHarmoleculesNFT();
+  // }, [rarityContract]);
 
   useEffect(() => {
     lockedStakingContract && getLockedStakingData();
@@ -2011,13 +2011,10 @@ const Staking = () => {
       });
 
       const infoTokens = await multicallProvider2.all(infoPromises);
-      console.log(infoTokens);
 
       const rewardsTokens = await multicallProvider2.all(rewardsPromises);
-      console.log(rewardsTokens);
 
       const rewardingResult = result.map((el, i) => {
-        console.log(el);
         el.stakedInfo = infoTokens[i];
         el.rewards = rewardsTokens[i];
         return el;
@@ -2101,7 +2098,6 @@ const Staking = () => {
       const stakedIds = (
         await lockedStakingContract?.getStakedIds(address)
       ).map((el) => ethers.utils.formatUnits(el, 0));
-      console.log(stakedIds);
       const stakeTokens = [];
 
       stakedIds.forEach((el) => {
@@ -2113,7 +2109,6 @@ const Staking = () => {
 
       const stakeData = _stakeData.map((el, index) => {
         totalAmount += parseFloat(ethers.utils.formatEther(el.amount));
-        console.log(totalAmount);
         return {
           id: stakedIds[index],
           amount: ethers.utils.formatEther(el.amount),
@@ -2160,7 +2155,6 @@ const Staking = () => {
         (el) => ethers.utils.formatEther(el)
       );
 
-      console.log(_rewardsData);
       _rewardsData.forEach((el) => (totalRewards += parseFloat(el)));
 
       dispatch({
@@ -2209,7 +2203,6 @@ const Staking = () => {
   };
 
   const getBalance = async () => {
-    console.log(address);
     const stakedAmount = await singleContract.methods
       .balances(address)
       .call({ from: address });
@@ -2861,14 +2854,11 @@ const Staking = () => {
       const rarityArray = (await multicallProvider.all(rarityPromises)).map(
         (el) => ethers.utils.formatUnits(el, 0)
       );
-      console.log(rarityArray);
       const uninitialisedArray = [];
       rarityArray.forEach(
         (rarity, index) =>
           parseInt(rarity) === 0 && uninitialisedArray.push(filtered[index])
       );
-
-      console.log(uninitialisedArray);
 
       if (uninitialisedArray.length) {
         const dataPromises = [];
@@ -2877,7 +2867,6 @@ const Staking = () => {
         );
 
         const dataArray = await Promise.all(dataPromises);
-        console.log(dataArray);
 
         const toInitialise = uninitialisedArray.map((id, i) => {
           return [id, dataArray[i].data.rarity, dataArray[i].data.signature];
@@ -2910,7 +2899,6 @@ const Staking = () => {
       }
       const callLimit = 100;
       const numberOfCalls = Math.ceil(filtered.length / callLimit);
-      console.log(numberOfCalls);
       for (let index = 0; index < numberOfCalls; index++) {
         const range = filtered.slice(
           index * callLimit,
@@ -3032,8 +3020,6 @@ const Staking = () => {
       const transaction = await contract?.raffleRoll([id]);
       toast.info("Initializing Raffle Roll");
       const result = await transaction.wait();
-      console.log(result);
-      console.log(result.events);
       const _raffleResult = [];
       let _raffleWon = 0;
       result.events.forEach((event) => {
@@ -3045,7 +3031,6 @@ const Staking = () => {
           });
         }
       });
-      console.log(_raffleResult);
       setRaffleResult(_raffleResult);
       setRaffleWon(_raffleWon);
       setRaffleModalOpen(true);
@@ -3077,7 +3062,6 @@ const Staking = () => {
         const transaction = await contract?.raffleRoll(_id);
         toast.info("Initializing Raffle Roll");
         const result = await transaction.wait();
-        console.log(result.events);
         const _raffleResult = [];
         let _raffleWon = 0;
         result.events.forEach((event) => {
@@ -3089,7 +3073,7 @@ const Staking = () => {
             });
           }
         });
-        console.log(_raffleResult);
+
         setRaffleResult(_raffleResult);
         setRaffleWon(_raffleWon);
         setRaffleModalOpen(true);
@@ -3107,8 +3091,6 @@ const Staking = () => {
     }
 
     const amount = ethers.utils.parseEther(monthStakingInputAmount);
-
-    console.log(amount);
 
     const providerLocked = new ethers.providers.Web3Provider(
       web3.currentProvider
@@ -3149,12 +3131,9 @@ const Staking = () => {
     const keys = Object.keys(checkedItems6);
     const _id = keys.filter((el) => checkedItems6[el]);
 
-    console.log(_id);
-
     if (_id.length) {
       const transaction = await lockedStakingContract?.claimReward(_id);
       const result = await transaction.wait();
-      console.log(result);
       await getLockedStakingData();
       toast.success(`Claimed ${_id.length} Rewards!`);
       deselectAllNFT6();
@@ -3289,7 +3268,6 @@ const Staking = () => {
   };
 
   const formatAddress = (str) => {
-    console.log(str);
     return str ? str.slice(0, 5) + "..." + str.slice(str.length - 5) : "";
   };
 
@@ -3332,7 +3310,7 @@ const Staking = () => {
                   <Typography variant="h2">PUFF STAKING</Typography>
                 </Link>
 
-                <Link
+                {/* <Link
                   href="#"
                   smooth={true}
                   className={classes.leftMenu}
@@ -3342,7 +3320,7 @@ const Staking = () => {
                   spy={true}
                 >
                   <Typography variant="h2">RARITY STAKING</Typography>
-                </Link>
+                </Link> */}
                 <Link
                   href="#"
                   smooth={true}
@@ -4576,7 +4554,7 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            <Box id="rarity" className={classes.rarityStakingBlock}>
+            {/* <Box id="rarity" className={classes.rarityStakingBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
                 RARITY STAKING
               </Typography>
@@ -5242,7 +5220,7 @@ const Staking = () => {
                   <Box className={classes.rightRarityBlock}></Box>
                 </Grid>
               </Grid>
-            </Box>
+            </Box> */}
             <Box
               id="time"
               className={classes.lockStakingBlock}
@@ -5266,7 +5244,7 @@ const Staking = () => {
                       6 MONTH
                     </Typography>
                     <Typography className={classes.topLabelInfo}>
-                      30% APR
+                      50% APR
                     </Typography>
                   </Box>
                   <Box
@@ -5278,7 +5256,7 @@ const Staking = () => {
                       12 MONTH
                     </Typography>
                     <Typography className={classes.topLabelInfo}>
-                      40% APR
+                      60% APR
                     </Typography>
                   </Box>
                 </Box>

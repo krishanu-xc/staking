@@ -485,7 +485,7 @@ export const singleAbi = [
   },
 ];
 
-export const lockContractAddress = "0x7B2025cf80400987883277a2412Db40fC39A636c";
+export const lockContractAddress = "0xA7af9876711511600D44D45DDdF6035370EcC88b";
 
 export const lockAbi = [
   {
@@ -912,8 +912,8 @@ export const lockAbi = [
   },
 ];
 
-// export const tokenAddress = "0x5DCE7A3E8B53387A9Ee1cE0d855b7A8d948100A3";
-export const tokenAddress = "0x5200242744843aEd32cbc1F3c0565f2c5968B1F9";
+export const tokenAddress = "0x5DCE7A3E8B53387A9Ee1cE0d855b7A8d948100A3";
+// export const tokenAddress = "0x5200242744843aEd32cbc1F3c0565f2c5968B1F9";
 
 export const tokenAbi = [
   {
