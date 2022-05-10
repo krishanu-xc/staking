@@ -3122,7 +3122,7 @@ const Staking = () => {
       await getLockedStakingData();
       toast.success(`Successfully staked ${monthStakingInputAmount} GRAVs!`);
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.data.message);
       console.log(e);
     }
   };

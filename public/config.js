@@ -485,7 +485,7 @@ export const singleAbi = [
   },
 ];
 
-export const lockContractAddress = "0xA7af9876711511600D44D45DDdF6035370EcC88b";
+export const lockContractAddress = "0x5cd54783423B514564AD0B4865BB7E1117581803";
 
 export const lockAbi = [
   {
