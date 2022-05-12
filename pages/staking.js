@@ -1734,9 +1734,9 @@ const Staking = () => {
     nftContract && getNFTBalance();
   }, [nftContract]);
 
-  // useEffect(() => {
-  //   rarityContract && getHarmoleculesNFT();
-  // }, [rarityContract]);
+  useEffect(() => {
+    rarityContract && getHarmoleculesNFT();
+  }, [rarityContract]);
 
   useEffect(() => {
     lockedStakingContract && getLockedStakingData();
@@ -1897,6 +1897,7 @@ const Staking = () => {
   };
 
   const getHarmoleculesNFT = async () => {
+    console.log("H");
     const defaultUri =
       "https://harmolecules.mypinata.cloud/ipfs/QmTQfazmn4sXcte6TjVmY7NkxNqj8meqjpXxtC2xuzg6cA/1.json";
 
@@ -3311,7 +3312,7 @@ const Staking = () => {
                   <Typography variant="h2">PUFF STAKING</Typography>
                 </Link>
 
-                {/* <Link
+                <Link
                   href="#"
                   smooth={true}
                   className={classes.leftMenu}
@@ -3321,7 +3322,7 @@ const Staking = () => {
                   spy={true}
                 >
                   <Typography variant="h2">RARITY STAKING</Typography>
-                </Link> */}
+                </Link>
                 <Link
                   href="#"
                   smooth={true}
@@ -4555,7 +4556,7 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            {/* <Box id="rarity" className={classes.rarityStakingBlock}>
+            <Box id="rarity" className={classes.rarityStakingBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
                 RARITY STAKING
               </Typography>
@@ -5221,7 +5222,7 @@ const Staking = () => {
                   <Box className={classes.rightRarityBlock}></Box>
                 </Grid>
               </Grid>
-            </Box> */}
+            </Box>
             <Box
               id="time"
               className={classes.lockStakingBlock}
