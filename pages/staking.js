@@ -1734,9 +1734,9 @@ const Staking = () => {
     nftContract && getNFTBalance();
   }, [nftContract]);
 
-  // useEffect(() => {
-  //   rarityContract && getHarmoleculesNFT();
-  // }, [rarityContract]);
+  useEffect(() => {
+    rarityContract && getHarmoleculesNFT();
+  }, [rarityContract]);
 
   useEffect(() => {
     lockedStakingContract && getLockedStakingData();
@@ -4556,7 +4556,7 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            {/* <Box id="rarity" className={classes.rarityStakingBlock}>
+            <Box id="rarity" className={classes.rarityStakingBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
                 RARITY STAKING
               </Typography>
@@ -5222,7 +5222,7 @@ const Staking = () => {
                   <Box className={classes.rightRarityBlock}></Box>
                 </Grid>
               </Grid>
-            </Box> */}
+            </Box>
             <Box
               id="time"
               className={classes.lockStakingBlock}
