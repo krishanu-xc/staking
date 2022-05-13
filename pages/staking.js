@@ -4646,136 +4646,124 @@ const Staking = () => {
                           <Box className={classes.nftScroll} id="rarity-scroll">
                             {currentItemsRarity &&
                               currentItemsRarity.map((item, index) => (
-                                <LazyLoad
-                                  height={90}
-                                  scrollContainer={"#rarity-scroll"}
-                                >
-                                  <Box key={index}>
-                                    <Box
-                                      display="flex"
+                                <Box key={index}>
+                                  <Box
+                                    display="flex"
+                                    className={
+                                      checkedItems3 && checkedItems3[item.name]
+                                        ? clsx(
+                                            classes.stakingNFTBlock,
+                                            classes.selectedNFT
+                                          )
+                                        : classes.stakingNFTBlock
+                                    }
+                                  >
+                                    <img
                                       className={
                                         checkedItems3 &&
                                         checkedItems3[item.name]
                                           ? clsx(
-                                              classes.stakingNFTBlock,
+                                              classes.stakingImg,
                                               classes.selectedNFT
                                             )
-                                          : classes.stakingNFTBlock
+                                          : classes.stakingImg
                                       }
+                                      src={item.url}
+                                    ></img>
+                                    <Box
+                                      display="flex"
+                                      justifyContent="space-between"
+                                      className={classes.stakingWrap}
                                     >
-                                      <img
-                                        className={
-                                          checkedItems3 &&
-                                          checkedItems3[item.name]
-                                            ? clsx(
-                                                classes.stakingImg,
-                                                classes.selectedNFT
-                                              )
-                                            : classes.stakingImg
-                                        }
-                                        src={item.url}
-                                      ></img>
-                                      <Box
-                                        display="flex"
-                                        justifyContent="space-between"
-                                        className={classes.stakingWrap}
-                                      >
-                                        <Box>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            mb="12px"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems3 &&
-                                                checkedItems3[item.name]
-                                                  ? clsx(
-                                                      classes.stakingInfo,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo
-                                              }
-                                            >
-                                              NAME
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems3 &&
-                                                checkedItems3[item.name]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            >
-                                              {item.name}
-                                            </Typography>
-                                          </Box>
-                                          <Box
-                                            display="flex"
-                                            alignItems="center"
-                                          >
-                                            <Typography
-                                              className={
-                                                checkedItems3 &&
-                                                checkedItems3[item.name]
-                                                  ? clsx(
-                                                      classes.stakingInfo1,
-                                                      classes.stakingInfoSelected
-                                                    )
-                                                  : classes.stakingInfo1
-                                              }
-                                            >
-                                              RARITY RANK
-                                            </Typography>
-                                            <Typography
-                                              className={
-                                                checkedItems3 &&
-                                                checkedItems3[item.name]
-                                                  ? clsx(
-                                                      classes.stakingName,
-                                                      classes.stakingNameSelect
-                                                    )
-                                                  : classes.stakingName
-                                              }
-                                            ></Typography>
-                                          </Box>
-                                        </Box>
+                                      <Box>
                                         <Box
                                           display="flex"
-                                          justifyContent="end"
+                                          alignItems="center"
+                                          mb="12px"
                                         >
-                                          {checkedItems3 &&
-                                          checkedItems3[item.name] ? (
-                                            <CloseIcon
-                                              onClick={() =>
-                                                checkNFTHandle(
-                                                  item.name,
-                                                  false,
-                                                  "unstaked_rarity"
-                                                )
-                                              }
-                                              className={classes.stakingCTA}
-                                            ></CloseIcon>
-                                          ) : (
-                                            <AddIcon
-                                              onClick={() =>
-                                                checkNFTHandle(
-                                                  item.name,
-                                                  true,
-                                                  "unstaked_rarity"
-                                                )
-                                              }
-                                              className={classes.stakingCTA}
-                                            ></AddIcon>
-                                          )}
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo
+                                            }
+                                          >
+                                            NAME
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          >
+                                            {item.name}
+                                          </Typography>
                                         </Box>
+                                        <Box display="flex" alignItems="center">
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingInfo1,
+                                                    classes.stakingInfoSelected
+                                                  )
+                                                : classes.stakingInfo1
+                                            }
+                                          >
+                                            RARITY RANK
+                                          </Typography>
+                                          <Typography
+                                            className={
+                                              checkedItems3 &&
+                                              checkedItems3[item.name]
+                                                ? clsx(
+                                                    classes.stakingName,
+                                                    classes.stakingNameSelect
+                                                  )
+                                                : classes.stakingName
+                                            }
+                                          ></Typography>
+                                        </Box>
+                                      </Box>
+                                      <Box display="flex" justifyContent="end">
+                                        {checkedItems3 &&
+                                        checkedItems3[item.name] ? (
+                                          <CloseIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                false,
+                                                "unstaked_rarity"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></CloseIcon>
+                                        ) : (
+                                          <AddIcon
+                                            onClick={() =>
+                                              checkNFTHandle(
+                                                item.name,
+                                                true,
+                                                "unstaked_rarity"
+                                              )
+                                            }
+                                            className={classes.stakingCTA}
+                                          ></AddIcon>
+                                        )}
                                       </Box>
                                     </Box>
                                   </Box>
-                                </LazyLoad>
+                                </Box>
                               ))}
                           </Box>
                           <Box display="flex" justifyContent="end">
