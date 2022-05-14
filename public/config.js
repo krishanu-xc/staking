@@ -1989,7 +1989,7 @@ export const nftContractABI = [
 ];
 
 export const rarityStakingContractAddress =
-  "0xD00E0b348E09f3dBb8e6C895eA32041Da6d1602A";
+  "0xd52480d917B503a16ff4aC93E05BfE944Dd2E987";
 
 export const rarityStakingContractABI = [
   {
