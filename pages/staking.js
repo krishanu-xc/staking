@@ -4131,7 +4131,7 @@ const Staking = () => {
                               ))
                             )}
                           </Box>
-                          <Box display="flex" justifyContent="end">
+                          {/* <Box display="flex" justifyContent="end">
                             <Button
                               onClick={nftStake}
                               className={classes.nftStakeBtn}
@@ -4147,7 +4147,7 @@ const Staking = () => {
                                 : ""}{" "}
                               NFT
                             </Button>
-                          </Box>
+                          </Box>  */}
                         </TabPanel>
                         <TabPanel value={tabVal} index={1}>
                           <Box display="flex" justifyContent="end">
@@ -4556,7 +4556,7 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            <Box id="rarity" className={classes.rarityStakingBlock}>
+            {/* <Box id="rarity" className={classes.rarityStakingBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
                 RARITY STAKING
               </Typography>
@@ -5210,7 +5210,7 @@ const Staking = () => {
                   <Box className={classes.rightRarityBlock}></Box>
                 </Grid>
               </Grid>
-            </Box>
+            </Box> */}
             <Box
               id="time"
               className={classes.lockStakingBlock}
