@@ -2846,8 +2846,7 @@ const Staking = () => {
     );
 
     try {
-      const baseURL =
-        "https://oneverse-discord-bot.herokuapp.com/tokenSignature/";
+      const baseURL = "https://oneverse-backend.onrender.com/molecule/sign/";
 
       const rarityPromises = filtered.map((id) =>
         multicallContract.tokenRarity(id)
@@ -2856,9 +2855,9 @@ const Staking = () => {
         (el) => ethers.utils.formatUnits(el, 0)
       );
       const uninitialisedArray = [];
-      rarityArray.forEach(
-        (rarity, index) =>
-          parseInt(rarity) === 0 && uninitialisedArray.push(filtered[index])
+      rarityArray.forEach((rarity, index) =>
+        // parseInt(rarity) === 0 &&
+        uninitialisedArray.push(filtered[index])
       );
 
       if (uninitialisedArray.length) {
@@ -2870,6 +2869,7 @@ const Staking = () => {
         const dataArray = await Promise.all(dataPromises);
 
         const toInitialise = uninitialisedArray.map((id, i) => {
+          console.log(dataArray);
           return [id, dataArray[i].data.rarity, dataArray[i].data.signature];
         });
 
@@ -4556,7 +4556,7 @@ const Staking = () => {
                 </Grid>
               </Grid>
             </Box>
-            {/* <Box id="rarity" className={classes.rarityStakingBlock}>
+            <Box id="rarity" className={classes.rarityStakingBlock}>
               <Typography variant="h2" className={classes.blockTitle}>
                 RARITY STAKING
               </Typography>
@@ -5210,7 +5210,7 @@ const Staking = () => {
                   <Box className={classes.rightRarityBlock}></Box>
                 </Grid>
               </Grid>
-            </Box> */}
+            </Box>
             <Box
               id="time"
               className={classes.lockStakingBlock}
