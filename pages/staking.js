@@ -1749,7 +1749,8 @@ const Staking = () => {
     setLoading2(true);
 
     let provider = new ethers.providers.JsonRpcProvider(
-      "https://rpc.hermesdefi.io/"
+    //   "https://rpc.hermesdefi.io/"
+      "https://rpc.ankr.com/harmony"
     );
 
     //Contract
