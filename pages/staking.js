@@ -2725,9 +2725,8 @@ const Staking = () => {
         nftContractAddress
       );
       const transaction = await _nftContract.methods
-        ?.unstakeTokens(
-          filtered.map((e) => e.toString()),
-          [voucher.price, voucher.time, signature]
+        ?.emergencyUnstake(
+          filtered.map((e) => e.toString())
         )
         .send({ from: add, gas: 8000000 });
 
